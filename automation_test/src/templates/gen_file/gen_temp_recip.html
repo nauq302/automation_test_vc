@@ -1,0 +1,22 @@
+  <select  id="choose_recip_mess" data-placeholder="Chọn mẫu tin đến...." class="chosen-select"
+                                                multiple style="width:350px;" tabindex="4" >
+      <option value="">Select</option>
+  {% for item in list_mess_temp: %}
+      <option value="{{item['id_mess']}}">{{item['recip_mess']}}</option>
+  {% endfor %}
+
+  </select>
+
+<script>
+               var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"}
+                }
+            for (var selector in config) {
+                $(selector).chosen(config[selector]);
+            }
+
+</script>

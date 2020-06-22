@@ -1,0 +1,11 @@
+<tbody>
+     {% for group in list_group:%}
+           <tr>
+               <td><a data-toggle="tab" href="#contact-4" class="client-link">{{group['name']}}</a></td>
+               <td>{{group['id']}}</td>
+               <td class="contact-type"><i class="fa fa-envelope"> </i></td>
+               <td> {{group['id']}}@facebook.com</td>
+               <td class="client-status" ><button class="btn btn-primary" title="{{group['id']}}" onclick="get_detail_group(this);">Xem chi tiết</button></td>
+           </tr>
+     {%endfor%}
+</tbody>

@@ -1,0 +1,724 @@
+
+<script>
+$(document).ready(function() {
+
+
+
+       	// SEARCH AUTO COMPLETE
+$("#course_sales").autocomplete("/get_products_data",{
+width:260,
+matchContains : true,
+selectFirst : false,
+html:true
+			});
+
+
+      // Open close small chat
+    $('.open-small-chat').click(function () {
+        $(this).children().toggleClass('fa-comments').toggleClass('fa-remove');
+        $('.small-chat-box').toggleClass('active');
+    });
+
+
+
+    $('.small-chat-box .content').scrollTop(3000);
+    // Initialize slimscroll for small chat
+    $('.small-chat-box .content').slimScroll({
+        height: '200px',
+        start: 'bottom',
+        alwaysVisible: true
+    });
+
+
+
+    $('.small-chat-box .content').slimScroll().bind('slimscroll', function(e, pos){
+    console.log("Reached " + pos);
+     });
+});
+
+ var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"},
+                '.chosen-select'     : {search_contains: true}
+                }
+            for (var selector in config) {
+                $(selector).chosen(config[selector]);
+            }
+
+
+function gen_products(id_user, obj){
+
+var pro_id = $(obj).val();
+
+  $.ajax({
+		url:"/show_row_products",
+		type:"POST",
+		data: {"id": id_user, "pro_id": pro_id},
+		beforeSend:function(){},
+		success: function(response){
+               $("#body_order_"+id_user).append(response);
+               	update_cart(id_user);
+
+				}
+	  	})
+
+}
+
+
+function delete_pro_order(id_user, pro_id){
+console.log("userid"+ id_user);
+console.log("pro id"+ pro_id);
+ $.ajax({
+		url:"/delete_row_products",
+		type:"POST",
+		data: {"id": id_user, "pro_id": pro_id},
+		beforeSend:function(){},
+		success: function(response){
+              $("#tr_"+ pro_id).remove();
+                	update_cart(id_user);
+
+				}
+	  	})
+
+}
+
+
+
+
+
+
+
+function update_cart(id_user){
+
+var total = 0;
+var list_info_pro = [];
+				$("[name='info_pro_order']").each(function(){
+				   var pro_id = $(this).attr("title");
+                    var note = $("#area_note_"+pro_id).val();
+                    var num_pro = $("#txt_num_pro_"+pro_id).val();
+                    var img_link = $("#main_img_"+pro_id).attr("src");
+                    var name_pro = $("#name_pro_"+pro_id).html().trim();
+                    var price = remove_commans($("#price_"+ pro_id).html().trim());
+                    var thanhtien = eval(price) * eval(num_pro);
+                    $("#thanhtien_"+pro_id).html(numberWithCommas(thanhtien));
+
+                    total = eval(total)+eval(thanhtien);
+                     var info_pro = {"code_pro": pro_id, "note": note, "num_pro": num_pro, "img_link": img_link,
+                     "name": name_pro, "total": thanhtien };
+                          list_info_pro.push(info_pro);
+    					})
+
+ $("#total_order").html("");
+ console.log("total gan la:"+ numberWithCommas(total))
+ $("#total_order").html(numberWithCommas(total)+ " VND");
+ console.log(list_info_pro);
+
+var list_pro_order = JSON.stringify({"list_pro":list_info_pro});
+
+   $.ajax({
+		url:"/update_order",
+		type:"POST",
+		data: {"id": id_user, "list_pro_order": list_pro_order},
+		beforeSend:function(){},
+		success: function(response){
+
+
+				}
+	  	})
+
+   }
+
+
+</script>
+
+{% set item = info_user%}
+{% set item_detail = info_user_detail %}
+          <div class="small text-muted">
+                     <i class="fa fa-clock-o"></i>  Monday, 21 May 2014, 10:32 am
+                  </div>
+                  <div class="wrapper wrapper-content animated fadeInRight">
+                     <div class="row m-b-lg m-t-lg">
+                <div class="col-md-6">
+
+                    <div class="profile-image">
+                        <img alt="profile" class="img-circle circle-border m-b-md" src="https://graph.facebook.com/{{item['id']}}/picture?width=120&height=120">
+                    </div>
+                    <div class="profile-info">
+                        <div class="">
+                            <div>
+                                <h2 class="no-margins">
+                                    <strong id="panel_name_{{item['id']}}">{{item['name']}}</strong>
+                                </h2>
+                                 <code id="panel_email_{{item['id']}}">{{item['id']}}@facebook.com</code>
+                                <br>
+                                 <address class="m-t-md">
+
+                                    <h5 id="panel_address_{{item['id']}}"> <i class="fa fa-map-marker"></i>{% if item_detail['address']:%} {{item_detail['address']}}{%else%}No info{%endif%}</h5>
+
+
+
+                                    <h5 id="panel_phone_{{item['id']}}"> <abbr title="Phone">P:</abbr>{% if item_detail['phone_number']:%} {{item_detail['phone_number']}}{%else%}No Info{%endif%}</h5>
+                                 </address>
+                                <small>
+                                    {{item_detail['']}}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <table class="table small m-b-xs">
+                        <tbody>
+                        <tr>
+                            <td>
+                                <strong>142</strong> Order
+                            </td>
+                            <td>
+                                <strong>22</strong> Followers
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>61</strong> Comments
+                            </td>
+                            <td>
+                                <strong>54</strong> Articles
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>154</strong> Tags
+                            </td>
+                            <td>
+                                <strong>32</strong> Friends
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-3">
+                    <small>Modife in last 12/12/2016 22:22:11</small>
+                     <button type="button" class="btn btn-default btn-sm btn-block" href="#modal-change-profile_{{item['id']}}" data-toggle="modal" data-placement="left" title="Cập nhật thông tin "><i class="fa fa-coffee"></i> Cập nhật thông tin </button>
+
+                    <div id="sparkline1"><canvas style="display: inline-block; width: 248px; height: 50px; vertical-align: top;" width="248" height="50"></canvas></div>
+                </div>
+
+
+            </div>
+
+
+
+
+                      <div class="row">
+                        <!-- BEGIN: load chat -->
+
+                     {% if list_pro_order:%}
+
+
+                            <div class="col-md-8">
+                                 <div class="ibox">
+                                    <div class="ibox-title">
+                                       <span class="pull-right">(<strong>{{list_pro_order | length}}</strong>) items</span>
+                                       <h5></h5>
+
+                                        <div class="form-group">
+                <label class="font-noraml">Search Products </label>
+                <div class="input-group">
+                <select data-placeholder="Choose a Country..." class="chosen-select" id="choose_pro_{{item['id']}}" title="{{item['id']}}" onchange="gen_products({{item['id']}},this)"  name="choose_products"  style="width:450px;" tabindex="4">
+
+                {{gen_list_products()}}
+
+
+                </select>
+                    </div>
+                                            </div>
+
+
+                                    </div>
+                                    <div class="ibox-content">
+                                       <div class="table-responsive">
+                                          <table class="table shoping-cart-table">
+                                             <tbody id="body_order_{{item['id']}}">
+                                                {% set total = 0 %}
+
+                                                {% for info_pro in list_pro_order:%}
+                                                                <tr id="tr_{{info_pro['code_pro']}}" name="info_pro_order" title="{{info_pro['code_pro']}}">
+
+                                                   <td width="90">
+                                                      <div class="cart-product-imitation">
+
+
+                                                                    <a data-zoom-image="{{info_pro['img_link']}}" href="javascript:void(0)" data-image="{{info_pro['img_link']}}" data-update="" class="elevatezoom-gallery active">
+                                                                      <img id="main_img_{{info_pro['code_pro']}}" src="{{info_pro['img_link']}}" >
+                                                                    </a>
+
+                                                      </div>
+                                                   </td>
+
+                                                   <td class="desc">
+                                                      <h3>
+                                                         <a class="text-navy" href="#" id="name_pro_{{info_pro['code_pro']}}">
+                                                         {{info_pro['name']}}
+                                                         </a>
+                                                      </h3>
+
+                                                      <dl class="small m-b-none">
+                                                         <dt>Chú thích sản phẩm </dt>
+                                                          <dd>
+                                                              <textarea onblur="update_cart('{{id}}')" id="area_note_{{info_pro['code_pro']}}">{{info_pro['note']}}</textarea>
+                                                          </dd>
+                                                      </dl>
+
+                                                      <div class="m-t-sm">
+                                                         <a class="text-muted" href="#"><i class="fa fa-gift"></i> Add gift package</a>
+
+                                                         <a class="text-muted" href="#" onclick="delete_pro_order('{{id}}', '{{info_pro['code_pro']}}');"><i class="fa fa-trash"></i> Remove item</a>
+                                                      </div>
+                                                   </td>
+                                                   <td>
+
+
+                                                        <p class="price" id="price_{{info_pro['code_pro']}}">
+                                                             {{format_price(info_pro['total'] | int / info_pro['num_pro'] | int)}}
+                                                         </p>
+
+
+                                                   </td>
+                                                   <td width="65">
+                                                      <input type="text" placeholder="1" onkeyup="update_cart('{{id}}')" id="txt_num_pro_{{info_pro['code_pro']}}" value="{{info_pro['num_pro']}}"  class="form-control">
+                                                   </td>
+                                                   <td>
+                                                      <h5>
+                                                        <p class="price" id="thanhtien_{{info_pro['code_pro']}}">
+
+                                                               {{format_price(info_pro['total'] | int)}}
+                                                            {% set total = total + info_pro['total'] | int%}
+                                                         </p>
+                                                          VND
+
+                                                      </h5>
+                                                   </td>
+                                                </tr>
+
+
+
+                                                {%endfor %}
+
+
+
+
+                                             </tbody>
+                                          </table>
+                                       </div>
+                                    </div>
+                                    <div class="ibox-content">
+                                       <button class="btn btn-primary pull-right"><i class="fa fa fa-shopping-cart"></i> Checkout</button>
+                                       <button class="btn btn-white"><i class="fa fa-arrow-left"></i> Continue shopping</button>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="col-md-4">
+                                 <div class="ibox">
+                                    <div class="ibox-title">
+                                       <h5>Thông tin hóa đơn </h5>
+                                    </div>
+                                    <div class="ibox-content">
+                                       <span>
+                                        Tổng tiền hàng
+                                       </span>
+                                       <h2 class="font-bold" id="total_order">
+                                        {{format_price(total_order)}} VND
+                                       </h2>
+                                       <hr>
+                                       <span class="text-muted small">
+                                       *For United States, France and Germany applicable sales tax will be applied
+                                       </span>
+                                       <div class="m-t-sm">
+                                          <div class="btn-group">
+                                              <div class="input-group">
+                                                  <input type="text" class="form-control" placeholder="Mã giảm giá">
+                                                  <span class="input-group-btn">
+                                                      <button class="btn btn-warning" type="button"><i class="fa fa-shopping-cart"></i></button>
+                                                  </span>
+                                              </div>
+                                              <br>
+                                              <div class="input-group">
+                                                  <span class="input-group-addon"> <input type="radio" name="radio_off"> % </span>
+                                                  <input type="text" class="form-control" placeholder="Giảm">
+                                                  <span class="input-group-addon"> <input type="radio" name="radio_off"> VND</span>
+                                              </div>
+                                              <br>
+
+                                              <div class="input-group">
+
+                                                  <span class="input-group-btn">
+                                                      <button class="btn btn-warning" type="button" href="#modal-change-ship_{{item['id']}}" data-toggle="modal"><i class="fa fa fa-truck"></i>&nbsp;Phí Vận chuyển</button>
+                                                  </span>
+                                              </div>
+
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="ibox">
+                                    <div class="ibox-title">
+                                       <h5>Hỗ trợ</h5>
+                                    </div>
+                                    <div class="ibox-content text-center">
+                                       <h3><i class="fa fa-phone"></i> +84 123 477 1233</h3>
+                                       <span class="small">
+                                       Please contact with us if you have any questions. We are avalible 24h.
+                                       </span>
+                                    </div>
+                                 </div>
+
+                              </div>
+
+
+
+
+
+
+
+                     {% else %}
+
+                              <div class="col-md-8">
+                                 <div class="ibox">
+                                    <div class="ibox-title">
+                                       <span class="pull-right">(<strong>5</strong>) items</span>
+                                       <h5></h5>
+
+                                        <div class="form-group">
+                <label class="font-noraml">Search Products </label>
+                <div class="input-group">
+                <select data-placeholder="Choose a Country..." class="chosen-select" id="choose_pro_{{item['id']}}" title="{{item['id']}}" onchange="gen_products({{item['id']}},this)"  name="choose_products"  style="width:450px;" tabindex="4">
+
+                {{gen_list_products()}}
+
+
+                </select>
+                    </div>
+                                            </div>
+
+
+                                    </div>
+                                    <div class="ibox-content">
+                                       <div class="table-responsive">
+                                          <table class="table shoping-cart-table">
+                                             <tbody id="body_order_{{item['id']}}">
+
+
+
+
+                                             </tbody>
+                                          </table>
+                                       </div>
+                                    </div>
+                                    <div class="ibox-content">
+                                       <button class="btn btn-primary pull-right"><i class="fa fa fa-shopping-cart"></i> Checkout</button>
+                                       <button class="btn btn-white"><i class="fa fa-arrow-left"></i> Continue shopping</button>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="col-md-4">
+                                 <div class="ibox">
+                                    <div class="ibox-title">
+                                       <h5>Thông tin hóa đơn </h5>
+                                    </div>
+                                    <div class="ibox-content">
+                                       <span>
+                                        Tổng tiền hàng
+                                       </span>
+                                       <h2 class="font-bold" id="total_order">
+                                          000,000 VND
+                                       </h2>
+                                       <hr>
+                                       <span class="text-muted small">
+                                       *For United States, France and Germany applicable sales tax will be applied
+                                       </span>
+                                       <div class="m-t-sm">
+                                          <div class="btn-group">
+                                              <div class="input-group">
+                                                  <input type="text" class="form-control" placeholder="Mã giảm giá">
+                                                  <span class="input-group-btn">
+                                                      <button class="btn btn-warning" type="button"><i class="fa fa-shopping-cart"></i></button>
+                                                  </span>
+                                              </div>
+                                              <br>
+                                              <div class="input-group">
+                                                  <span class="input-group-addon"> <input type="radio" name="radio_off"> % </span>
+                                                  <input type="text" class="form-control" placeholder="Giảm">
+                                                  <span class="input-group-addon"> <input type="radio" name="radio_off"> VND</span>
+                                              </div>
+                                              <br>
+
+                                              <div class="input-group">
+
+                                                  <span class="input-group-btn">
+                                                      <button class="btn btn-warning" type="button" href="#modal-change-ship_{{item['id']}}" data-toggle="modal"><i class="fa fa fa-truck"></i>&nbsp;Phí Vận chuyển</button>
+                                                  </span>
+                                              </div>
+
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="ibox">
+                                    <div class="ibox-title">
+                                       <h5>Hỗ trợ</h5>
+                                    </div>
+                                    <div class="ibox-content text-center">
+                                       <h3><i class="fa fa-phone"></i> +84 123 477 1233</h3>
+                                       <span class="small">
+                                       Please contact with us if you have any questions. We are avalible 24h.
+                                       </span>
+                                    </div>
+                                 </div>
+
+                              </div>
+
+
+
+
+
+
+
+
+
+ {%endif%}
+                        <!-- END: Load chat -->
+
+                     </div>
+
+
+
+
+                  </div>
+
+
+          <div id="modal-change-ship_{{item['id']}}" class="modal fade" aria-hidden="true">
+                  <div class="modal-dialog">
+                     <div class="modal-content">
+                        <div class="modal-body">
+                           <div class="row">
+                              <div class="col-sm-6 b-r">
+                                 <h3 class="m-t-none m-b">Cập nhật thông tin Shipping</h3>
+                                 <p>Lựa chọn chi phí Ship bạn đã cấu hình trước đó .</p>
+                                 <form role="form">
+
+                                     {% for item in info_shipping:%}
+                                         <input type="radio" value="" name="ship_fee" checked="" value="{{item['fee_shipping']}}"> <i></i> {{item['kind_shipping']}} - {{item['fee_shipping']}}
+                                        <br>
+                                     {% endfor%}
+
+                                 </form>
+                              </div>
+                              <div class="col-sm-6 b-r">
+                                 <h3 class="m-t-none m-b">Nhập Phí Ship</h3>
+                                 <p>Bạn có thể nhập phí ship thủ công để cập nhật cho đơn hàng  </p>
+                                 <div>
+                                    <div class="form-group">
+                                       <div class="input-group m-b">
+
+                                          <input type="text" name="txt_label" title="{{item['id']}}" id="txt_label_{{item['id']}}" class="form-control">
+                                       </div>
+                                    </div>
+
+                                    <div class="form-group"><label>Ghi chú</label>
+                                       <textarea id="area_ghichu_{{item['id']}}"></textarea>
+                                    </div>
+                                    <div>
+                                       <button class="btn btn-sm btn-primary pull-right m-t-n-xs" id="btn_save_cus_{{item['id']}}" name="btn_save_customer" title="{{item['id']}}" type="button"><strong>Lưu dữ liệu</strong></button>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+
+
+               <div id="modal-change-profile_{{item['id']}}" class="modal fade" aria-hidden="true">
+                  <div class="modal-dialog">
+                     <div class="modal-content">
+                        <div class="modal-body">
+                           <div class="row">
+                              <div class="col-sm-6 b-r">
+                                 <h3 class="m-t-none m-b">Cập nhật thông tin</h3>
+                                 <p>Điền các thông tin của khách hàng để dễ dàng quản lí hơn.</p>
+                                 <form role="form">
+                                    <div class="form-group"><label>Khách hàng </label> <input type="text" placeholder="Khách hàng " id="txt_name_{{item['id']}}" class="form-control" value="{{item['name']}}"></div>
+                                    <div class="form-group"><label>Email</label> <input type="email" placeholder="Email" value="{{item['id']+'@facebook.com'}}" id="txt_email_{{item['id']}}" class="form-control"></div>
+                                    <div class="form-group"><label>Số điện thoại</label> <input type="text" placeholder="Số điện thoại" id="txt_phone_{{item['id']}}" value="{% if 'phone' in item:%}{{item['phone']}}{%endif%}" class="form-control"></div>
+                                    <div class="form-group"><label>Địa chỉ</label> <input type="text" placeholder="Địa chỉ" id="txt_address_{{item['id']}}" value="{% if 'address' in item:%}{{item['address']}}{%endif%}" class="form-control"></div>
+                                 </form>
+                              </div>
+                              <div class="col-sm-6 b-r">
+                                 <h3 class="m-t-none m-b">Nhãn và ghi chú</h3>
+                                 <p>Nhãn và ghi chú dùng để phân loại khách hàng </p>
+                                 <div>
+                                    <div class="form-group">
+                                       <div class="input-group m-b">
+                                          <div class="input-group-btn">
+                                             <button data-toggle="dropdown" class="btn btn-white dropdown-toggle" type="button">Chọn nhãn <span class="caret"></span></button>
+                                             <ul class="dropdown-menu">
+                                                {% for item in list_label:%}
+                                                <li><a href="#">{{item['name_label']}}</a></li>
+                                                {% endfor %}
+                                             </ul>
+                                          </div>
+                                          <input type="text" name="txt_label" title="{{item['id']}}" id="txt_label_{{item['id']}}" class="form-control">
+                                       </div>
+                                    </div>
+                                    <div class="form-group">
+                                       <div class="ibox-tools" id="list_label_{{item['id']}}">
+                                          <span class="label label-primary"  name="label_user" >Active</span><i class="fa fa-times" style="cursor:pointer"></i>
+                                       </div>
+                                    </div>
+                                    <div class="form-group"><label>Ghi chú</label>
+                                       <textarea id="area_ghichu_{{item['id']}}"></textarea>
+                                    </div>
+                                    <div>
+                                       <button class="btn btn-sm btn-primary pull-right m-t-n-xs" id="btn_save_cus_{{item['id']}}" name="btn_save_customer" title="{{item['id']}}" type="button"><strong>Lưu dữ liệu</strong></button>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+
+           <!--  <div>
+   <ul id="item-container">
+     <li>item 1</li>
+     <li>item 2</li>
+     <li>item 3</li>
+     <li>item 4</li>
+     <li>item 5</li>
+       <li>item 5</li>
+       <li>item 5</li>
+       <li>item 5</li>
+       <li>item 5</li>
+       <li>item 5</li>
+       <li>item 5</li>
+       <li>item 15</li>
+    </ul>
+</div>
+
+<input type="text" placeholder="add another item" id="add-input"/>
+    <button id="add-btn">Add</button>
+
+
+                                                    <script>
+                                                        $(document).ready(function() {
+    var itemContainer = $("#item-container");
+    itemContainer.slimScroll({
+        height: '100px',
+        start: 'bottom',
+        alwaysVisible: true
+    });
+    $("#add-btn").click(function() {
+        var newInput= $("#add-input");
+        if( newInput.val() !== "") {
+            itemContainer.append("<li>" + newInput.val() + "</li>");
+            newInput.val('');
+
+
+            var scrollTo_int = itemContainer.prop('scrollHeight') + 'px';
+            itemContainer.slimScroll({
+                scrollTo : scrollTo_int,
+                height: '200px',
+                start: 'bottom',
+                alwaysVisible: true
+            });
+        }
+    });
+});
+                                                    </script>
+                                                    -->
+
+<div class="small-chat-box fadeInRight animated">
+        <div class="heading" draggable="true">
+            <small class="chat-date pull-right">
+                02.19.2015
+            </small>
+            Small chat
+        </div>
+        <div class="content" id="chat_{{item['id']}}">
+           {{gen_chat_small(item['id'])}}
+        </div>
+        <div class="form-chat">
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control" onkeyup="push_message(this, event);" id="{{info_page['page_id']}}" alt="{{info_user['id']}}" title="{{info_page['page_avata']}}" name="txt_msg">
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" >
+                        <i class="fa fa-send"></i> &nbspSend
+                    </button>
+                </span>
+            </div>
+            <br>
+            <div class="input-group input-group-sm">
+            <span class="input-group-btn">
+                    <button class="btn btn-warning" type="button">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        Tìm sản phẩm
+                    </button>
+                    <button class="btn btn-warning" type="button">
+                        <i class="fa fa-file-image-o"></i>
+                        Thư viện ảnh
+                    </button>
+                    <button class="btn btn-warning" type="button">
+                        <i class="fa fa-envelope-square"></i>
+                        Tin mẫu
+                    </button>
+            </span>
+            </div>
+        </div>
+    </div>
+
+   <div id="small-chat">
+        <span class="badge badge-warning pull-right">0</span>
+        <a class="open-small-chat">
+            <i class="fa fa-comments"></i>
+        </a>
+    </div>
+
+
+  <script>
+  $("[name='btn_save_customer']").click(function(){
+  var id_cus = $(this).attr("title");
+  var name_cus = $("#txt_name_"+id_cus).val();
+  var email_cus = $("#txt_email_"+id_cus).val();
+  var phone_cus = $("#txt_phone_"+id_cus).val();
+  var address_cus = $("#txt_address_"+ id_cus).val();
+  var note_cus = $("#area_ghichu_"+id_cus).val();
+  $.ajax({
+				url :'/save_info_customer',
+				type : 'POST',
+				data :{"id_cus": id_cus, "name_cus": name_cus, "email_cus": email_cus,
+				"phone_cus": phone_cus, "address_cus": address_cus, "note_cus": note_cus},
+				beforeSend:function(){
+
+				},
+				success : function(html){
+				if (html == "True")
+				{
+				  alert("Cập nhật thông tin thành công ");
+                  location.reload();
+				}
+
+				}
+				});
+
+
+  });
+
+  </script>

@@ -1,0 +1,127 @@
+   <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>Chỉnh sửa bài đăng  </h5>
+                        </div>
+                        <div>
+
+                            <div class="ibox-content profile-content">
+
+
+                                <p>Bạn điền đầy đủ các thông tin cho bài đăng mới : </p>
+                                <div class="form-group">
+
+                                    <input placeholder="Tiêu đề " class="form-control" type="text" value="{{info_blog['title']}}" id="txt_title"  >
+
+                                </div>
+                                <div class="form-group">
+                                    <textarea style="width:100%" rows="10" class="form-control"   id="area_post_face" placeholder="Template nội dung POST lên Facebook">{{info_blog['content'] | trim}}</textarea>
+                                </div>
+
+
+                               <div class="form-group">
+
+                                    <label class="font-noraml"><strong>Chọn danh mục tin đăng </strong> </label>
+                                    <div class="input-group">
+                                        <select data-placeholder="Choose a Country..." class="chosen-select"
+                                                style="width:350px;" tabindex="4" id="select_cat_param">
+                                            <option value="">Lựa chọn</option>
+
+                                            {% for item in list_cat_post:%}
+
+                                              <option   {% if item['id_cat']|trim == info_blog['id_cat_blog']|trim%} selected = "selected" {%endif%} value="{{item['id_cat']}}">{{item['name_cat']}} </option>
+                                            {%endfor%}
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                               <hr>
+
+                                <div class="form-group" id="data_1">
+                                    <label class="font-noraml">Đặt thời gian đăng bài lên Fanpage</label>
+                                    <div class="col-lg-7">
+                                        <div class="input-group date">
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            <input type="text" class="form-control" value="{{info_blog['date_post']}}" id="txt_date_post">
+                                        </div>
+                                     </div>
+                                    <div class="col-lg-5">
+                                        <div class="input-group clockpicker" data-autoclose="true">
+                                            <input type="text" class="form-control" value="{{info_blog['time_post']}}" id="txt_time_post">
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                     </div>
+                                </div>
+                                <hr>
+
+
+                                     <div class="form-group">
+                                     <label class="font-noraml">Thêm Link ảnh đính kèm &nbsp
+                                         <button type="button" class="btn btn-primary" onclick="add_row_images();">
+                                             <i class="fa fa-file-image-o"></i>&nbspThêm Link
+                                         </button>
+                                     </label>
+
+                                    <div id="id_images_link">
+
+                                        {% for item in info_blog['list_img_attach']:%}
+                                        {% if item:%}
+                                        {%set index = 23%}
+                                    <div class="input-group" id="link_img_{{index}}">
+
+                                        <input class="form-control" placeholder="Link Images" value="{{item}}" type="text" name="txt_link_img" >
+                                        <span class="input-group-btn"> <button type="button" class="btn btn-danger" title="1" onclick="remove_link_images({{index}});">
+                                            <i class="fa fa-trash"></i> </button>
+                                        </span>
+                                    </div>
+                                        {%set index = index+1%}
+                                        {%endif%}
+                                        {%endfor%}
+
+                                    </div>
+
+
+                                    </div>
+
+
+
+
+
+
+
+                                <div class="user-button">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-primary btn-sm btn-block" title="{{info_blog['code_blog']}}" onclick="update_info_post(this, 'update');"><i class="fa fa-envelope"></i> Cập nhật bài viết </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+
+
+                            </div>
+                    </div>
+                </div>
+
+           <script>
+
+ $('.clockpicker').clockpicker();
+
+ $('#data_1 .input-group.date').datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true
+            });
+           </script>

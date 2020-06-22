@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from webapplayers.com/inspinia_admin-v2.5/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 12 May 2016 10:43:17 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>INSPINIA | Login</title>
+
+   {% include 'common/css.html'%}
+
+ <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+ <script>
+     function onSubmit = function(token) {
+       document.getElementById("demo-form").submit();
+     }
+     </script>
+
+
+</head>
+
+<body class="gray-bg">
+
+    <div class="middle-box text-center loginscreen animated fadeInDown">
+        <div>
+            <div>
+
+                <h1 class="logo-name">K+</h1>
+
+            </div>
+            <h3>Welcome to Kiot page</h3>
+            <p>Giải pháp bán hàng cực kỳ hiệu quả trên Facebook .
+                <!--Continually expanded and constantly improved Inspinia Admin Them (IN+)-->
+            </p>
+            {% if alert_message:%}<p style="color:red">{{alert_message}}</p>{% endif%}
+            <p>Đăng nhập</p>
+            <form class="m-t" role="form" method="post" action="/login">
+                <div class="form-group">
+                    <input type="text" class="form-control" value="{% if username:%}{{username}}{%endif%}" name="username" placeholder="Username" required="">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" name="password" placeholder="Password" required="">
+                </div>
+<div class="g-recaptcha" data-sitekey="6LdbywgTAAAAAN_FQ-Pc2J3D_skigEvENb9JP_sw"></div>
+                 <button class="g-recaptcha" data-sitekey="6LdbywgTAAAAAN_FQ-Pc2J3D_skigEvENb9JP_sw" data-callback='onSubmit'>Submit</button>
+
+                <!--<button type="submit" class="btn btn-primary block full-width m-b">Đăng nhập</button> -->
+
+                <a href="#"><small>Forgot password?</small></a>
+                <p class="text-muted text-center"><small>Do not have an account?</small></p>
+                <a class="btn btn-sm btn-white btn-block" href="kiotso1.com/dangki">Create an account</a>
+            </form>
+            <p class="m-t"> <small>COMIT 2015</small> </p>
+        </div>
+    </div>
+
+
+    {% include 'common/script.html'%}
+
+    </script>
+
+</body>
+
+
+<!-- Mirrored from webapplayers.com/inspinia_admin-v2.5/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 12 May 2016 10:43:17 GMT -->
+</html>

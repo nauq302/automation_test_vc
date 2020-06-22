@@ -1,0 +1,161 @@
+        <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-sm-12 b-r"><h3 class="m-t-none m-b">Chọn nhân viên / Cộng tác viên</h3>
+
+
+                                                        <div class="ibox-content">
+
+                     <div class="form-group">
+
+                                   <small>Tìm thông tin nhân viên / Cộng tác viên theo mã số hoặc tên để cập nhật thông tin </small>
+
+                                    <div class="input-group">
+                                    <select data-placeholder="Choose a NV..." class="chosen-select" name="form_post_duty" title="info_ctv" multiple style="width:350px;" tabindex="4" id="choose_ctv" alt="*">
+                                                    {% set info_ctv = info_duty['info_ctv'] %}
+                                                    {% for item in list_ctv:%}
+                                                    <option value="{{item['code_ctv']}}"  {% if item['code_ctv'] in info_ctv:%} selected{%endif%} >{{item['code_ctv']}} - {{item['phone_ctv']}} - {{item['name_ctv']}}</option>
+                                                    {% endfor %}
+                    </select>
+                    </div>
+                                                             </div>
+                         <div class="form-group">
+                                            <label class="font-noraml">Trạng thái </label>
+                                            <div class="input-group">
+                                            <select data-placeholder="Chọn trạng thái" style="width:250px" name="form_post_duty" class="chosen-select" title="status_duty" tabindex="2">
+
+                                            <option value="Chưa thanh toán" {%if info_duty and info_duty['status_duty'] == "Chưa thanh toán"%}selected{%endif%}>Chưa thanh toán </option>
+                                             <option value="Đã thanh toán"  {%if info_duty and info_duty['status_duty'] != "Chưa thanh toán"%}selected{%endif%}>Đã thanh toán </option>
+                                            </select>
+                                            </div>
+                                              </div>
+                          <div class="form-group">
+                                            <label class="font-noraml">Hình thức thanh toán</label>
+                                            <div class="input-group">
+                                            <select data-placeholder="Chọn tài khoản thu " style="width:250px" class="chosen-select"  tabindex="2" name="form_post_duty" title="info_payment" alt="*" type="text" class="form-control required">
+                                              <option>Lựa chọn hình thức thanh toán</option>
+                                                {% set tk = info_duty['info_payment']%}
+                                                {% for item in list_acc:%}
+                                                <option value="{{item['num_acc']}}" {%if info_duty and tk==item['num_acc']%}selected{%endif%}>CK-{{item['num_acc']}}_{{item['bank_acc']}}</option>
+                                               {%endfor%}
+                                            </select>
+                                            </div>
+                                                </div>
+
+
+
+
+
+                                                <input type="hidden" readonly name="form_post_duty" title="code_order"  type="text" value="{%if code_order:%}{{code_order}}{%endif%}"  >
+
+
+                                            <div class="form-group">
+                                                <label>Đơn giá </label>
+                                                <input  name="form_post_duty" onblur="caculator_ctv(this,'{{id_duty}}');" id="prices_ctv{{id_duty}}" title="prices_ctv" value="{%if info_duty %}{{info_duty['prices_ctv']}}{%else%}0{%endif%}" type="text" class="form-control required" alt="requied_number">
+                                            </div>
+
+
+                                             <div class="form-group">
+                                                <label>Số lượng</label>
+                                                <input  name="form_post_duty" onblur="caculator_ctv(this,'{{id_duty}}');" id="num_ctv{{id_duty}}" title="num_ctv" value="{%if info_duty %}{{info_duty['num_ctv']}}{%else%}1{%endif%}" type="text" class="form-control required" alt="*">
+                                            </div>
+                                              <div class="form-group">
+                                                <label>Thành tiền :<b id="label_thanhtien_ctv{{id_duty}}">{%if info_duty %}{{format_price(info_duty['prices_ctv']|replace(",","")|int * info_duty['num_ctv']|int)}}{%else%}0{%endif%}</b>&nbspVND</label>
+                                               </div>
+
+
+                                             <input type="hidden" name="form_post_duty" title="code_duty" value="{{id_duty}}">
+
+
+
+
+                                             </div>
+                                                    {% if info_duty["status_duty"] == "Đã thanh toán":%}
+                                                    <label class="lb lb-warning" style="color:red">Đã thanh toán , không thể sửa đổi </label>
+                                                    {%else%}
+
+                                                    <button class="btn btn-primary" id="tbl_duty"  name="btn_post_data_duty" title="/update_duty_info">Lưu giao việc </button>
+                                                      {%endif%}
+
+                                                </div>
+
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+
+                <script>
+
+  var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"}
+                }
+            for (var selector in config) {
+                $(selector).chosen(config[selector]);
+            }
+   $(".select2_demo_1").select2();
+   $(".select_form").select2();
+   $(".chosen-container").css("width","300px");
+
+$("[alt='requied_number']").keyup(function(){
+var number = remove_commans($(this).val());
+$(this).val(numberWithCommas(number));
+});
+
+/* POST DATA CHUNG*/
+
+function post_data_common( name_button_post, name_item_post){
+  var list_post = {};
+  var url_request = $("[name='"+name_button_post+"']").attr("title");
+  var table_save = $("[name='"+name_button_post+"']").attr("id");
+	$( "[name='"+name_item_post+"']" ).each(function(){
+		       var values = $(this).val();
+				var name_field = $(this).attr("title");
+                 var require = $(this).attr("alt");
+
+                  $(this).css("border-color","gray");
+				if (require == "*" && values == ""){
+                 $(this).css("border-color","red");
+                 $(this).attr("placeholder", "Not Empty");
+                 list_post= [];
+                return false;
+					}
+				else{
+				list_post[name_field] = values.toString();
+				}
+		});
+
+       $.ajax({
+		url:url_request,
+		type:"POST",
+		data:{"table": table_save, 'info_data': JSON.stringify(list_post)},
+		beforeSend:function(){},
+		success: function(html){
+                if (html == "True"){
+                  alert("Add Success");
+                  $("[name='"+name_item_post+"']").val("");
+                  location.reload();
+                }
+                else if (html=="add_duty"){
+                   alert("Them Cong viec thanh cong");
+                }
+                else{
+                  alert(html);
+                }
+                }
+                });
+
+
+}
+
+
+/* QUAN LI DUTY*/
+$("[name='btn_post_data_duty']").click(function(){
+post_data_common( "btn_post_data_duty", "form_post_duty");
+})
+
+                </script>

@@ -1,0 +1,68 @@
+  {% if list_page["page_id"] :%}
+                                     <tr>
+                                        <td class="project-people">
+                                            <a href="#"><img alt="image" class="img-circle" src="{{list_page['page_avata']}}"></a>
+
+                                        </td>
+                                        <td class="project-status">
+                                              {% if flag == "1":%}
+                                                  <span class="label label-primary">Active</span>
+                                              {%else%}
+                                                  <span class="label label-danger">Exits other Account</span>
+                                              {% endif %}
+                                        </td>
+                                        <td class="project-title">
+                                            <a href="project_detail.html"> {{list_page['page_name']}}</a>
+
+                                        </td>
+
+
+                                        <td class="project-actions">
+                                            <a href="https://www.facebook.com/{{list_page['page_id']}}" target="_blank" class="btn btn-white btn-sm"><i class="fa fa-desktop"></i> Xem  </a>
+                                           {% if flag == "1":%}
+                                            <a class="btn btn-white btn-sm" alt="{{token_key}}" name="btn_choose_page" title="{{list_page['page_id']}}" id="btn_choose_{{list_page['page_id']}}"><i class="fa fa-check"></i> Chọn </a>
+                                           {%endif%}
+                                        </td>
+                                    </tr>
+
+
+ {%endif%}
+
+<script>
+
+
+$("[name='btn_choose_page']").click(function(){
+var token_key = $(this).attr("alt");
+var page_id = $(this).attr("title");
+		     /* handle the result */
+
+      $.ajax({
+				url :'/direct_chat',
+				type : 'POST',
+				data :{"token_key": token_key, "page_id": page_id},
+				beforeSend:function(){
+                    $("#div_info_page").html("<h3>Bạn chờ trong giây lát để khởi tạo Messager Trang ban đầu !</h3>");
+				},
+				success : function(html){
+
+				    if (html == "True"){
+				      location.reload();
+				    }
+
+				    else{
+				       alert("Het Session");
+				    }
+
+
+				}
+				}); /*End AJAX*/
+
+});
+
+
+          </script>
+
+
+
+
+

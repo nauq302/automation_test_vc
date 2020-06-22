@@ -1,0 +1,61 @@
+                <tr id="tr_{{info_pro['code_pro']}}" name="info_pro_order" title="{{info_pro['code_pro']}}">
+
+                                                   <td width="90">
+                                                      <div class="cart-product-imitation">
+
+                                                          {% for item in info_pro['img_pro']:%}
+                                                                   {% if item['status'] == "True": %}
+                                                                    <a data-zoom-image="{{url_img}}/{{domain}}/{{get_album(domain,item['id_album'])}}/{{item['name_img']}}" href="javascript:void(0)" data-image="{{url_img}}/{{domain}}/{{get_album(domain,item['id_album'])}}/{{item['name_img']}}" data-update="" class="elevatezoom-gallery active">
+                                                                      <img id="main_img_{{info_pro['code_pro']}}" alt="{{item['name_img']}}" title="{{get_album(domain,item['id_album'])}}" src="{{url_img}}/zoom/50_50/{{domain}}/{{get_album(domain,item['id_album'])}}/{{item['name_img']}}" >
+                                                                    </a>
+                                                                   {%endif%}
+                                                           {% endfor %}
+
+                                                      </div>
+                                                   </td>
+
+                                                   <td class="desc">
+                                                      <h3>
+                                                         <a class="text-navy" href="#" id="name_pro_{{info_pro['code_pro']}}">
+                                                         {{info_pro['name_pro']}}
+                                                         </a>
+                                                      </h3>
+
+                                                      <dl class="small m-b-none">
+                                                         <dt>Chú thích sản phẩm </dt>
+                                                          <dd>
+                                                              <textarea onblur="update_cart('{{id}}')" id="area_note_{{info_pro['code_pro']}}"></textarea>
+                                                          </dd>
+                                                      </dl>
+
+                                                      <div class="m-t-sm">
+                                                         <a class="text-muted" href="#"><i class="fa fa-gift"></i> Add gift package</a>
+                                                         |
+                                                         <a class="text-muted" href="#" onclick="delete_pro_order('{{id_user}}', '{{info_pro['code_pro']}}');"><i class="fa fa-trash"></i> Remove item</a>
+                                                      </div>
+                                                   </td>
+                                                   <td>
+                                                        <p class="price" id="price_{{info_pro['code_pro']}}">
+                                                          {% if info_pro["info_promo"] and info_pro['info_promo']['allow'] == "1" and info_pro['info_promo']['enddate'] | int -get_current_date() | int >=0 :%}
+                                                          <del>{{info_pro['sales_price']}}</del> {{format_price(info_pro['info_promo']['prices_saleoff'])}} VND
+                                                          {% set price_sales_pro = info_pro['info_promo']['prices_saleoff'] %}
+                                                          {%else:%}
+                                                          {{format_price(info_pro['sales_price'])}}
+                                                          {% set price_sales_pro = info_pro['sales_price']%}
+                                                          {%endif%}
+                                                         </p>
+                                                   </td>
+                                                   <td width="65">
+                                                      <input type="text" placeholder="1" onkeyup="update_cart('{{id}}')" id="txt_num_pro_{{info_pro['code_pro']}}" value="1"  class="form-control">
+                                                   </td>
+                                                   <td>
+                                                      <h5>
+                                                        <p class="price" id="thanhtien_{{info_pro['code_pro']}}">
+                                                              {{format_price(info_pro['sales_price'])}}
+
+                                                         </p>
+                                                          VND
+
+                                                      </h5>
+                                                   </td>
+                                                </tr>

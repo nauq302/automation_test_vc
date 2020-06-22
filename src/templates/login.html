@@ -1,0 +1,123 @@
+<!DOCTYPE >
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="http://qatickets.vccorp.vn/img/faviconT.jpg">
+    <link rel="icon" href="http://qatickets.vccorp.vn/img/faviconT.jpg">
+    <script src="http://qatickets.vccorp.vn/inspinia/js/jquery-2.1.1.js"></script>
+    <script src="http://qatickets.vccorp.vn/js/codeLogin.js"></script>
+
+    <link href="http://qatickets.vccorp.vn/css/bootstrap.min.css" rel="stylesheet">
+    <title>Login</title>
+    <link href="http://qatickets.vccorp.vn/css/animate.css" rel="stylesheet">
+    <link href="http://qatickets.vccorp.vn/css/styleT.css" rel="stylesheet">
+    
+	<style>
+        .login{
+            background: url("assets/img/agent-login.png") no-repeat fixed;
+            background-size: cover;
+            width: 100%;
+            height: 100%;
+        }
+        .canvas {
+            position: absolute;
+            z-index:-1;
+            margin-top: -130px;
+        }
+    </style>
+</head>
+
+<body class="gray-bg login">
+<canvas id="spiders" class="hidden-xs canvas" width="1600" height="755"></canvas>
+
+<div class="loginColumns animated fadeInDown">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="image" style="width:50%;">
+                <img alt="image" class="img-responsive" src="assets/img/logo.png">
+            </div>
+            <!-- <h2 class="font-bold">QA Ticket</h2> -->
+
+        </div>
+        <div class="col-md-6">
+            <div style="background-color: initial ">
+                {% if alert_message:%}<p style="color:red">{{alert_message}}</p>{% endif%}
+
+            <form class="m-t" role="form" method="post" action="/login">
+                <div class="form-group">
+                    <input type="text" class="form-control" value="{% if username:%}{{username}}{%endif%}" name="username" placeholder="Username" required="">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" name="password" placeholder="Password" required="">
+                </div>
+              <button type="submit" class="btn btn-primary block full-width m-b">Đăng nhập</button>
+
+                <a href="#"><small>Forgot password?</small></a>
+                <p class="text-muted text-center"><small>Do not have an account?</small></p>
+                <a class="btn btn-sm btn-white btn-block" href="kiotso1.com/dangki">Create an account</a>
+            </form>
+                <p class="m-t">
+                    <small></small>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+    <!-- Mainly scripts -->
+    <script src="http://qatickets.vccorp.vn/inspinia/js/jquery-2.1.1.js"></script>
+    <script src="http://qatickets.vccorp.vn/inspinia/js/bootstrap.min.js"></script>
+    <script src="http://qatickets.vccorp.vn/inspinia/js/plugins/validate/jquery.validate.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#email').focus();
+            $('#form_1 input').click(function(){
+                $('.text-danger').remove();
+            });
+            $("#form_1").validate({
+                rules: {
+                    email: {
+                        required: true,
+                        email: false
+                    },
+                    password: {
+                        required: true
+                    }
+                },
+                messages: {
+                    email: {
+                        required: "Bạn không được bỏ trống trường này.",
+                        email
+                    },
+                    password: {
+                        required: "Bạn không được bỏ trống trường này."
+                    },
+                },
+                errorPlacement:function(error, element) {
+                    $('.text-danger').remove();
+                    error.appendTo( element.parent());
+                }
+            });
+            var message_email = "";
+            var message_password = "";
+            if(message_email) {
+                $('#email').focus();
+            } else if(message_password) {
+                $('#password').focus();
+            } else {
+
+            }
+
+
+            
+        });
+
+    </script>
+	
+	
+</body>
+</html>

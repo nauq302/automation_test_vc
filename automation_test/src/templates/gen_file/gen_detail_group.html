@@ -1,0 +1,103 @@
+          <div id="contact-1" class="tab-pane active">
+                                    <div class="row m-b-lg">
+                                        <div class="col-lg-4 text-center">
+
+
+                                            <div class="m-b-sm">
+                                                <img alt="image" class="img-circle" src="{% if 'source' in info_group['cover']:%}{{info_group['cover']['source']}}{%endif%}"
+                                                     style="width: 100px; height: 100px">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <strong>
+                                               {{info_group['name']}}
+                                            </strong>
+
+                                            <p>
+                                              Description
+                                            </p>
+                                            {% if flag == "1":%}
+                                            <button type="button" class="btn btn-primary btn-sm btn-block"  onclick="update_groupface(this,'add');"  title="{{info_group['id']}}"><i
+                                                    class="fa fa-multiuser"></i> Thêm Group/ nhóm
+                                            </button>
+                                            {% else:%}
+
+                                            <hr>
+                                             <button type="button" class="btn btn-danger btn-sm btn-block" onclick="update_groupface(this, 'delete');" title="{{info_group['id']}}"><i
+                                                    class="fa fa-trash"></i> Xóa nhóm này
+                                            </button>
+                                            {%endif%}
+                                            <hr>
+                                            <a target="_blank" href="https://www.facebook.com/{{info_group['id']}}"><button type="button" class="btn btn-warning btn-sm btn-block"><i
+                                                    class="fa fa-user"></i> Gia lập Group/ nhóm
+                                            </button></a>
+                                        </div>
+                                    </div>
+                                    <div class="client-detail">
+                                    <div class="full-height-scroll">
+
+                                        <strong>Một số thành viên trong nhóm</strong>
+
+                                        <ul class="list-group clear-list">
+                                            {% for item in info_group['members']['data'][0:5]:%}
+                                            <li class="list-group-item fist-item">
+                                                <img alt="image" class="img-circle" src="https://graph.facebook.com/{{item['id']}}/picture?width=120&height=120"
+                                                     style="width: 60px; height: 60px">
+
+                                                <span class="pull-right">  {{item['name']}} </span>
+
+                                            </li>
+                                            {%endfor%}
+
+
+
+
+                                        </ul>
+                                        <strong>Noi quy</strong>
+                                        <p>
+                                            {{info_group['description']}}
+                                        </p>
+                                        <hr/>
+
+
+                                    </div>
+                                    </div>
+                                </div>
+
+
+ <script>
+     function update_groupface(obj, option){
+
+  var id_group = $(obj).attr("title");
+  var msg_confirm = "Bạn xác nhận đã gia lập nhóm và thêm nhóm này vào danh sách POST tự động của bạn ? ";
+  if (option == "delete"){
+    msg_confirm = "Bạn xác nhận xoá nhóm này ? ";
+  }
+
+
+  if(confirm(msg_confirm))
+    {
+   	$.ajax({
+				url :'/update_groupface',
+				type : 'POST',
+				data :{"id_group": id_group, "option": option},
+				beforeSend:function(){
+				   $("#div_group").html("Loading.....");
+				},
+				success : function(html)
+				{
+				  if (html == "False"){
+				    alert("Error!!");
+				  }else{
+				     alert("Thành công");
+					$("#div_group").html(html);
+					}
+				}
+				});
+}
+
+
+}
+
+
+ </script>

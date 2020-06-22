@@ -1,0 +1,16 @@
+Flask
+requests
+qrcode
+pymongo
+bson
+redis
+validate_email
+pyotp
+facebook
+unirest
+blinker
+raven
+flask_socketio
+eventlet
+hotqueue
+

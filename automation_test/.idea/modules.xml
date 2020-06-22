@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/apec.iml" filepath="$PROJECT_DIR$/.idea/apec.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/api_proxy_dashboard/.idea/api_proxy_dashboard.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/api_proxy_dashboard/.idea/api_proxy_dashboard.iml" />
+      <module fileurl="file://$USER_HOME$/PycharmProjects/auto_report/.idea/auto_report.iml" filepath="$USER_HOME$/PycharmProjects/auto_report/.idea/auto_report.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../biigate/.idea/biigate.iml" filepath="$PROJECT_DIR$/../biigate/.idea/biigate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/billing-callcenter/.idea/billing-callcenter.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/billing-callcenter/.idea/billing-callcenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/bip_bip_manage/.idea/bip_bip_manage.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/bip_bip_manage/.idea/bip_bip_manage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/bipbip_admin/.idea/bipbip_admin.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/bipbip_admin/.idea/bipbip_admin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../booking_tour/.idea/booking_tour.iml" filepath="$PROJECT_DIR$/../booking_tour/.idea/booking_tour.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/c2c/.idea/c2c.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/c2c/.idea/c2c.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../chucanhhung/.idea/chucanhhung.iml" filepath="$PROJECT_DIR$/../chucanhhung/.idea/chucanhhung.iml" />
+      <module fileurl="file://$USER_HOME$/PycharmProjects/dashboard_proxy/.idea/dashboard_proxy.iml" filepath="$USER_HOME$/PycharmProjects/dashboard_proxy/.idea/dashboard_proxy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/infoBIP/.idea/infoBIP.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/infoBIP/.idea/infoBIP.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/introduction-cc/.idea/introduction-cc.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/introduction-cc/.idea/introduction-cc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/manage-vccloud-vn/.idea/manage-vccloud-vn.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/manage-vccloud-vn/.idea/manage-vccloud-vn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/proxy-filter-html/.idea/proxy-filter-html.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/proxy-filter-html/.idea/proxy-filter-html.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../pycloudinary/.idea/pycloudinary.iml" filepath="$PROJECT_DIR$/../pycloudinary/.idea/pycloudinary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/repo_voice_be1/.idea/repo_voice_be1.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/repo_voice_be1/.idea/repo_voice_be1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/script-check/.idea/script-check.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/script-check/.idea/script-check.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/splunk_agent/.idea/splunk_agent.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/splunk_agent/.idea/splunk_agent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/sys_brandname/.idea/sys_brandname.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/sys_brandname/.idea/sys_brandname.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../VCCORP_PROJECT/upload_file/.idea/upload_file.iml" filepath="$PROJECT_DIR$/../../VCCORP_PROJECT/upload_file/.idea/upload_file.iml" />
+    </modules>
+  </component>
+</project>

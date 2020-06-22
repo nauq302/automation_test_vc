@@ -1,0 +1,402 @@
+#!/usr/bin/env python
+#coding: utf8
+import facebook
+import json
+import requests
+import urllib2
+import unirest
+import db
+import datetime
+import time
+from json import loads as load_jsons
+from json import  dumps as dump_jsons
+from bson.objectid import ObjectId
+import setting
+import redis
+#access_token = "EAAXzexOhIHsBANhsdi4mReB1W1KFLPsoZA3TOZCzcJMrQBr9Wvnu59Oxn3G5WO1QahPZAlbZAkdbOuxTzAHvfJaZBaXbXtHXrZAO3GwwRkNuOzWGVHpOMzN50VJqNyhrZAZABZAidODZBSNJFStJUHtnBgU7XJSCFlK2M2LrfYSHPcCgZDZD"
+
+
+red = redis.Redis(setting.DB_REDIS, 6379, db=12)
+
+def gen_graph(access_token):
+    graph = facebook.GraphAPI(access_token)
+    return graph
+
+
+
+def get_info_client(graph):
+    profile = graph.get_object("me/groups")
+    return profile
+
+
+
+def get_info_page(graph, id_page):
+    args = {}
+    res = graph.get_object(id_page, **args)
+    return res
+
+
+#print get_info_client()
+def get_info_album(graph):
+    user = graph.get_object("me")
+    friends = graph.get_connections(user["id"], "friends")
+    album = graph.get_connections(user["id"], "albums")
+    permit = graph.get_connections(user["id"], "permissions")
+    info_album = album["data"]
+    return album
+
+
+
+
+def revoke_permission(graph,name_permit):
+    user = graph.get_object("me")
+    url = "https://graph.facebook.com/%s/permissions/%s" % (user["id"], name_permit)
+    print url
+    #req  = unirest.delete(url)
+    req = requests.delete(url)
+    return req
+
+
+#print revoke_permission("user_friends")
+
+
+
+
+
+
+def get_img_info(graph,id_album):
+    args = {"fields": "images"}
+    photos = graph.get_object('%s/photos'%(id_album),**args)
+    list_images = []
+    if photos :
+
+        data = photos['data']
+        for item in data:
+
+            if 'images' in item :
+                list_img = item["images"]
+                id = item["id"]
+                url = list_img[0]['source']
+                temp = {"id": id, "link_img": url}
+                list_images.append(temp)
+
+        if list_images and len(list_images) >0 :
+            return list_images
+        else:
+            return []
+    else:
+        return False
+
+# #
+# graph = gen_graph("EAAXzexOhIHsBAHny7CmZCC4VBArZC8aiAIZAHJSs5KKlk1Vw6DQWVj6ujqnckYiuD2iR560ipfZBlCziUrX2r3R3J7fsZAWf8ZBjw4rgtRZCSZAqzaTbJSbe93xkASeGRbWn1riTFoSQvQLxO5dZBxmbGI2QsoFgG3EdeLfpb00OqxQZDZD")
+#
+# res=  get_img_info(graph, "247629498728368")
+# for item in  res:
+#     print item
+#
+
+
+def upload_feed(graph, msg):
+    graph.put_object("me", "feed", message= msg)
+    return True
+
+def delet_permit(id, graph, permit):
+    res= graph.delete_object(id, {"permissions": permit,"method": "delete"})
+    print res
+    return True
+
+def upload_feed_page(id_page, graph, Link_img,  msg):
+    #graph.put_wall_post(msg, Link_img, id_page)
+    #args = {"message": msg, "link": "http://tino.kiotso1.com/web/products/1473642930" , "name": "Campaign1", "description": "Unique travel exper",
+     #       "caption": "Alaska 300$", "picture": Link_img}
+    #graph.put_wall_post(msg, args, id_page)
+    args = {"message": msg, "attached_media[0]":{"media_fbid": "1783646228514802"},
+            "attached_media[1]":{"media_fbid": "1783646241848134"}}
+    graph.put_object(id_page, "feed", **args)
+    return True
+
+
+# post 1 link images len Facebook
+def upload_sigle_photos_page(graph, page_id, link_picture, caption):
+    args_feed = {}
+    args = {"url": link_picture,  "caption":  caption, "published": "false"}
+    res  = graph.put_object(page_id,"photos", **args)
+    print res
+    id_photo = res['id']
+    if id_photo:
+        return id_photo
+    return False
+
+# Upload tin feed voi list images
+def post_link_photos_page(graph, page_id, list_id_images, message):
+    args_feed = {}
+    index = 0
+    for id_photo in list_id_images:
+        args_feed["attached_media[%s]"%(index)] = {"media_fbid": "%s" % (id_photo)}
+        index += 1
+    args_feed["message"]= message
+    # Post len Feed
+    print str(args_feed)
+    res = graph.put_object(page_id, "feed", **args_feed)
+    print res
+    return True
+
+# Upload anhd + tin feed
+def upload_photos_page(graph, page_id, list_picture, message):
+    # Dang anh voi publiched = False
+    args_feed = {}
+    index = 0
+    for photo in list_picture:
+        args = {"url": photo,  "caption": message, "published": "false"}
+        res  = graph.put_object(page_id,"photos", **args)
+        print res
+        id_photo = res['id']
+        if id_photo:
+            args_feed["attached_media[%s]"%(index)] = {"media_fbid": "%s" % (id_photo)}
+        index += 1
+
+    args_feed["message"]= message
+    # Post len Feed
+    res = graph.put_object(page_id, "feed", **args_feed)
+    print res
+    return True
+
+
+def get_page_access_token(graph, id_page):
+    args = {"fields": "access_token"}
+    res = graph.get_object(id_page, **args)
+    return res['access_token']
+#delet_permit("me", graph, "business_management")
+
+def create_new_album(graph,name_album , desc):
+    resp = graph.put_object("me", "albums", name=name_album,message=desc)
+    return resp["id"]
+
+
+def upload_img(graph,path_img , desc,id_album=None):
+    res = graph.put_photo(path_img, desc ,id_album, tags=None)
+    return res
+
+
+
+
+
+def get_info_senderid(graph_page, sender_id):
+    args = {"fields":"first_name,last_name,profile_pic,locale,timezone,gender"}
+    res = graph_page.get_object(sender_id, **args)
+    return res
+
+
+
+def get_info_message(graph_page, mes_id):
+    args = {"fields": "from,to,message,id,created_time,subject,attachments,shares,tags"}
+    res = graph_page.get_object(mes_id, **args)
+    return res
+
+
+token_page = "EAAXzexOhIHsBALcdAW5kkZAeMSCvGhqWASCvUk4t8lZBCpAy3p5ZAziUcqcEsZCCrdhnPZBxsxkZBwBBHYd2WFFCY0Mtiub9GSN51ZAhjyOTIfzZBLcKM1a3slEIBkixo2EbMFFB7tZAEKiEDthxvkQ26zdaCunZCtsOgZD"
+gr_page = gen_graph(token_page)
+
+print get_info_message(gr_page, "m_mid.1480481195834:ad68f05153")
+
+#
+# token = "EAAXzexOhIHsBANN0tmBrJEboh55Szqz0eiUOjL2E2GTccSyauPrZBZCnk4ztTn1e66vd6zUKMnmO6S10PD1YHCDza6MIq3eKlBtt0tGES79FZCRnNdwZADNU7oGkfgV7Bq1Rq3Gh8JlbWsRjSUvwTXwDf94SOZA5t98Ds8M4UmQZDZD"
+# graph = gen_graph(token)
+# # print upload_img(graph, "http://test_image.vcmedia.vn/laydygaga/Sanpham/vest3.jpg", "Tham số chèn", None)
+# #
+# args = {"fields": "likes, name, album"}
+# page = graph.get_object('247385845419400', **args)
+# print page
+
+#print '{} has {} likes.'.format(page['name'], page['likes'])
+
+## put image to page face
+# import requests
+#token = "EAACEdEose0cBAKVydSytS2gTl8763ksGijGlf4oogsttI3qKD08O0eLY1EdTJew7XnTjuv59LbVzkYxTHTx4TH2puOSAqJtUaplN4q5qP0wb73IokFx4P1ZB0iZCGy9tuvAZBCs5vfrPBSV1OcjuwolRHD8tersrRgU3ZBwZCXwZDZD"
+# token = "EAAXzexOhIHsBAMPovCcaJXgZBzbVJGbqZCy6wocsGE9ja0hizn00lQL1gnIkcsdbzNoM3kwlEjzEiXjUj1LNVERgZChcx9c4LswFb7eEF2LQvgsz6wvCYpAgptRV7QpM9TkQYkHER8Rnz1xtUCivVGmdiDNZCTRSVKQ8bTvHaLEgl6jUdYxdQqbFjpBMupMtdJPdbCZBJ0gZDZD"
+# graph = gen_graph(token)
+# page_id = "247385845419400"
+# album_id = "247630422061609"
+# # url = "http://test_image.vcmedia.vn/laydygaga/Sanpham/vest3.jpg"
+# # url = "http://laydygaga.kiotso1.com/storage_images/laydygaga/Sanpham/vest3.jpg"
+# url = "http://kiotso1.com/storage_images//laydygaga/Sanpham/1414298176_product4500x717.jpg"
+# caption = "��� Sản phẩm mới cực hot trong hè này , không thể bỏ qua , siêu phẩm ao jaket � Với giá cực ưu đãi : 3450000 bạn đã sở hữu sản phẩm ngay lập tức !"
+#
+# res  = upload_photos_page(graph, page_id, url, caption)
+# print res
+
+# upload_img(graph,url , "test upload", page_id)
+def send_message(token, recipient, text):
+  """Send the message text to recipient with id recipient.
+  """
+
+  r = requests.post("https://graph.facebook.com/v2.6/me/messages",
+    params={"access_token": token},
+    data=json.dumps({
+      "recipient": {"id": recipient},
+      "message": {"text": text.decode('unicode_escape')}
+    }),
+    headers={'Content-type': 'application/json'})
+  print r.text
+  if r.status_code != requests.codes.ok:
+    print r.text
+
+
+# #
+# token_key = "EAAXzexOhIHsBAJWsUmO0v6II4ZCZAaurNBqm7UBsXeX47fGOltVY9dGM6UD5B482gB3eYaGoHRyxExYC4x97ZAnWIaa4ZA66TZAst1IZBZCkMvuxx6N4Y1weotyZC3Aq0GAzw8WKZBHLksekw63lzr5OW722QhMpA1Xu6ujBZBzLDpoQZDZD"
+# graph = gen_graph(token_key)
+# page_id = "1627678080778285"
+# args_page = {"fields": "access_token"}
+# res = graph.get_object(page_id, **args_page)
+# print res
+# token_page = res['access_token']
+# print token_page
+# graph_page = gen_graph(token_page)
+#
+#
+# #send_message(token_page, "1223809897691259", "hello baby id")
+#
+# #
+# args = {}
+# conversition = graph_page.get_object('%s/conversations'%(page_id),**args)
+# print conversition
+# data_con = conversition['data']
+# for item in data_con:
+#     print item
+#     id_con = item['id']
+#     args = {}
+#     message = graph_page.get_object('%s/messages'%(id_con), **args)
+#     print message
+#     list_message = message['data']
+#     for msg in list_message:
+#
+#         msg_id = msg['id']
+#         args = {"fields":"id,message,created_time,subject,attachments,from,to,tags"}
+#         info_message = graph_page.get_object('%s'%(msg_id), **args)
+#         print info_message
+
+import uuid
+def get_all_conversition(domain, graph_page, page_id):
+    args = {}
+    try:
+        conversition = graph_page.get_object('%s/conversations'%(page_id),**args)
+    except:
+        return "expire" , False
+
+    data_con = conversition['data']
+    for item in data_con:
+        # Lay conversition
+        id_con = item['id']
+        args = {}
+        message = graph_page.get_object('%s/messages'%(id_con), **args)
+        # Lay 20 session / 1 conversition
+        list_message = message['data']
+        index = 0
+        id_new_user = 0
+        if list_message:
+            for msg in list_message:
+
+                if index <=20:
+                    msg_id = msg['id']
+                    args = {"fields":"id,message,created_time,subject,attachments,from,to,tags"}
+                    info_message = graph_page.get_object('%s'%(msg_id), **args)
+                    # Lay Thong tin User
+
+                    fr = info_message["from"]
+                    to = info_message["to"]["data"][0]
+                    email_new_user = fr["email"]
+
+
+                    id_new_user = fr["id"]
+                    # Check khong phai la page
+                    res = db.get_table_admin("tbl_pageface", {"page_id": str(id_new_user)})
+
+                    # neu fr la la page
+                    if res:
+                        id_new_user = to["id"]
+                        email_new_user = to["email"]
+
+                    args = {"fields": "id,name,picture"}
+                    try:
+                        info_new_user  = graph_page.get_object("/%s"%(id_new_user), **args)
+                        info_new_user["email"] = email_new_user
+                    except:
+                        pass
+                    # Them User Chat moi
+                    res = db.get_one_table(domain, "tbl_user_inbox", {"id": str(id_new_user)})
+                    print info_new_user
+                    print res
+
+                    if not res:
+                        print info_new_user
+                        if '_id' not in info_new_user:
+                            if not db.get_one_table(domain, "tbl_user_inbox", {"email": "%s@facebook.com" % (str(id_new_user))}):
+                                info_new_user["page_id"] = page_id
+                                db.save_table(domain, "tbl_user_inbox", info_new_user)
+
+
+                    list_user = db.get_all_table(domain, "tbl_user_inbox", {})
+                    list_id = []
+                    for user in list_user:
+                        id = user["id"]
+                        if id in list_id:
+                            # Xoa duplicate
+                            objid = str(user["_id"])
+                            db.delete_table(domain, "tbl_user_inbox", {"_id": ObjectId(objid)})
+                        else:
+                            list_id.append(id)
+                    # Them list id_user vao trong page
+                    db.update_pageinfo_by_pageid(page_id,{"list_user": list_id})
+                    info_message["id_con"] = id_con
+                    info_message["time_save"] = int(time.time())
+                    db.save_table(domain, "tbl_inbox", info_message)
+                    index +=1
+                else:
+                    break
+    return "ok", True
+
+
+import urllib2
+from uuid import uuid4
+
+def post_message(page_access_token, message,  delived):
+    url = 'https://graph.facebook.com/v2.6/me/messages?access_token=%s'%(page_access_token)
+    message_id = str(uuid4())
+    postdata = {
+          "recipient":{
+            "id": delived
+          },
+          "message":{
+            "text": message
+          }
+        }
+    print postdata
+    req = urllib2.Request(url)
+    req.add_header('Content-Type','application/json')
+    data = json.dumps(postdata)
+    response = urllib2.urlopen(req, data)
+    return str(response.read())
+
+#
+# id_page = "1627678080778285"
+#
+# token_page = "EAAXzexOhIHsBAGbRVdFOpTNpgtQ7KZAIfIWddnlIov929RcouOmaj15v9bT1bpPizBd7LzN1oeiZAht2zA9Lcmbk8HyiXDamvlmx1WOajeF3KC1ZBQL8gptToIHdLbcAqcIdW4Q5eB2ZBgyi8FeiiY3iNwRGi8DbH72t1KIWvAZDZD"
+# graph_page = gen_graph(token_page)
+#
+#
+# get_all_conversition("laydygaga", graph_page, id_page)
+#
+
+def get_token_key_page_pageid(page_id):
+    key = "*_%s" %(page_id)
+    l_key = red.keys(key)[0]
+    if l_key:
+        token_key = red.get(l_key)
+        key_page = "*_%s" % (token_key)
+        l_key_page = red.keys(key_page)[0]
+        info_page = red.get(l_key_page)
+        token_page = load_jsons(info_page)
+        token_page = token_page["access_token"]
+        return token_key
+    return False
+

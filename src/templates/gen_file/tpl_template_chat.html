@@ -1,0 +1,116 @@
+    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5> Update mẫu tin</h5>
+                        </div>
+                        <div>
+
+                            <div class="ibox-content profile-content">
+
+                                <p><i class="fa fa-map-marker"></i> Thêm mẫu tin nhắn đến và mẫu trả lời khi có message trên messenger Facebook </p>
+
+                                  <div class="form-group">
+                                     <label class="font-noraml"><strong>Thêm mẫu tin đến</strong> </label>
+
+                                <div class="input-group"><input type="text" class="form-control" id="txt_recip_mess" >
+                                    <span class="input-group-btn"> <button class="btn btn-primary" onclick="save_recip_mess('save');" type="button">Thêm
+                                        </button> </span></div>
+                                  </div>
+
+
+                                 <div class="form-group">
+                                    <label class="font-noraml"><strong>Chọn mẫu tin đến</strong> </label>
+                                    <div class="input-group" id="div_recip_mess">
+                                         <select id="choose_recip_mess" data-placeholder="Chọn mẫu tin đến...." class="chosen-select"
+                                                multiple style="width:350px;" tabindex="4" >
+                                              <option value="">Select</option>
+
+                                          {% for item in list_mess_temp: %}
+
+                                              <option {% if item['id_mess'] in info_message['list_mess_temp_id']%} selected {%endif%} value="{{item['id_mess']}}">{{item['recip_mess']}}</option>
+                                          {% endfor %}
+
+                                        </select>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <textarea style="width:100%" class="form-control"  rows="10" id="area_response_mess"
+                                              placeholder="Nội dung tin trả lời lại ">{{info_message['mess_resonse']}}</textarea>
+                                </div>
+
+
+                                 <div class="form-group">
+                                    <label class="font-noraml"><strong>Chọn Thông tin tham số chèn vào mẫu tin </strong> </label>
+                                    <div class="input-group">
+                                        <select data-placeholder="Choose a Country..." class="chosen-select"
+                                                style="width:350px;" tabindex="4" onchange="gen_label_param(this);" id="select_label_param ">
+                                            <option value="">Lựa chọn</option>
+                                            <option value="0">Thông tin sản phẩm </option>
+                                            <option value="1">Thông tin Đơn hàng </option>
+                                            <option value="2">Thông tin khách hàng </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                  <ul style="padding: 0" class="tag-list" id="label_param">
+
+
+                                  </ul>
+                                </div>
+                                <hr>
+
+
+                                <div class="user-button">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <button class="btn btn-primary btn-sm btn-block" title="{{info_message['id_temp_chat']}}" type="button" onclick="save_template_message(this);">
+                                                <i class="fa fa-envelope"></i> Update mẫu tin </button>
+                                        </div>
+                                       <!-- <div class="col-md-6">
+                                            <button class="btn btn-default btn-sm btn-block" type="button"><i class="fa fa-coffee"></i> Buy a coffee</button>
+                                        </div>-->
+                                    </div>
+                                </div>
+
+                            </div>
+
+                    </div>
+                </div>
+
+
+            <script>
+      var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"}
+                }
+            for (var selector in config) {
+                $(selector).chosen(config[selector]);
+            }
+
+
+
+
+function dragStart(event) {
+    event.dataTransfer.setData("Text", event.target.id);
+
+}
+
+function allowDrop(event) {
+    event.preventDefault();
+}
+
+function drop(event) {
+    event.preventDefault();
+    var data = event.dataTransfer.getData("Text");
+    event.target.appendChild(document.getElementById(data));
+
+}
+
+
+
+            </script>

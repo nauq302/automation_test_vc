@@ -1,0 +1,232 @@
+     <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-sm-12 b-r">
+                                                    <!--<h3 class="m-t-none m-b">Thêm khách hàng mới  </h3> -->
+
+
+                                                    <div class="tabs-container">
+                                                        <ul class="nav nav-tabs">
+                                                            <li class="active"><a data-toggle="tab" href="#tab-1"> Thông tin nhân viên</a></li>
+                                                            <li class=""><a data-toggle="tab" href="#tab-2">Phân Quyền truy cập</a></li>
+                                                        </ul>
+                                                        <div class="tab-content">
+                                                            <div id="tab-1" class="tab-pane active">
+
+
+                                                    <div class="ibox-content">
+                                            <div class="form-group">
+                                                <label>Mã nhân viên(*)</label>
+                                                <small>Mã nhân viên dùng để định danh cho mỗi nhân viên trong công ty </small>
+                                                <input name="form_post" title="code_emp" type="text" class="form-control required"  alt="*" {% if info_emp:%}readonly{%endif%} value="{% if info_emp:%}{{info_emp['code_emp']}}{%else:%}{{code_nv}}{%endif%}">
+                                            </div>
+
+                                              <div class="form-group">
+                                                <label> Username(*)</label>
+                                                <input name="form_post" title="username"  value="{% if info_emp:%}{{info_emp['username']}}{%endif%}" type="text" class="form-control required" alt="*">
+                                            </div>
+
+                                             <div class="form-group">
+                                                <label> Mật khẩu (*)</label>
+                                                <input name="form_post" title="password" type="password" value="{% if info_emp:%}{{info_emp['password']}}{%endif%}" class="form-control required" alt="*">
+                                            </div>
+
+
+
+                                            <div class="form-group">
+                                                <label>Tên nhân viên (*)</label>
+                                                <input name="form_post" title="fullname" type="text" value="{% if info_emp:%}{{info_emp['fullname']}}{%endif%}" class="form-control required" alt="*">
+                                            </div>
+
+                                           <div class="form-group">
+                                                <label>Chức vụ (*)</label>
+                                                <input name="form_post" title="permit_name" type="text" value="{% if info_emp:%}{{info_emp['permit_name']}}{%endif%}" class="form-control required" alt="*">
+                                            </div>
+
+
+                                               <div class="form-group">
+                                                <label>SDT </label>
+                                                <input id="userName" name="form_post" title="phone_number" value="{% if info_emp:%}{{info_emp['phone_number']}}{%endif%}" type="text" class="form-control required" alt="phone">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Email </label>
+                                                <input id="userName" name="form_post" title="email" type="text" value="{% if info_emp:%}{{info_emp['email']}}{%endif%}" class="form-control required" alt="email">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Địa chỉ</label>
+                                                <input id="userName" name="form_post" title="address" type="text" value="{% if info_emp:%}{{info_emp['address']}}{%endif%}" class="form-control required">
+                                            </div>
+                                              {% if info_emp:%}
+                                              <input type="hidden" name="form_post" title="action" value="update">
+                                              {%endif%}
+
+
+
+                                             </div>
+                                                                </div>
+                                                            <div id="tab-2" class="tab-pane">
+                                <div class="panel-body">
+
+
+
+                                <div class="table-responsive" id="form_post_check">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Tính năng</th>
+                                        <th>Xem</th>
+                                        <th>
+                                            Thêm
+
+                                        </th>
+                                        <th>
+                                            Sửa
+
+                                        </th>
+                                        <th>
+                                            Xoá
+
+                                        </th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <th>Quản lí Dự án/ đơn hàng </th>
+                                         <td><input type="checkbox" name="form_post_check" title="order_view" {% if info_emp and 'order_view' in info_emp['list_permit']:%}checked{%endif%} ></td>
+                                        <td><input type="checkbox" name="form_post_check" title="order_add"  {% if info_emp and 'order_add' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="order_edit" {% if info_emp and 'order_edit' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                         <td><input type="checkbox" name="form_post_check" title="order_delete" {% if info_emp and 'order_delete' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Quản lí Khách hàng  </th>
+                                        <td><input type="checkbox" name="form_post_check" title="cus_view" {% if info_emp and 'cus_view' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="cus_add" {% if info_emp and 'cus_add' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="cus_edit" {% if info_emp and 'cus_edit' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                         <td><input type="checkbox" name="form_post_check" title="cus_delete" {% if info_emp and 'cus_delete' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                    </tr>
+                                    <tr>
+
+                                        <th>Quản lí thu/chi </th>
+                                         <td><input type="checkbox" name="form_post_check" title="paper_view" {% if info_emp and 'paper_view' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="paper_add" {% if info_emp and 'paper_add' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="paper_edit" {% if info_emp and 'paper_edit' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                         <td><input type="checkbox" name="form_post_check" title="paper_delete" {% if info_emp and 'paper_delete' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                    </tr>
+                                    <tr>
+
+                                        <th>Quản lí Tài khoản thanh toán  </th>
+                                        <td><input type="checkbox" name="form_post_check" title="payment_view" {% if info_emp and 'payment_view' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="payment_add" {% if info_emp and 'payment_add' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="payment_edit" {% if info_emp and 'payment_edit' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                         <td><input type="checkbox" name="form_post_check" title="payment_delete" {% if info_emp and 'payment_delete' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                    </tr>
+                                     <tr>
+                                        <th>Quản lí phân công / giao việc  </th>
+                                         <td><input type="checkbox" name="form_post_check" title="duty_view" {% if info_emp and 'duty_view' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="duty_add" {% if info_emp and 'duty_add' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="duty_edit" {% if info_emp and 'duty_edit' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                         <td><input type="checkbox" name="form_post_check" title="duty_delete" {% if info_emp and 'duty_delete' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                    </tr>
+                                     <tr>
+
+                                         <th>Quản lí Account </th>
+                                         <td><input type="checkbox" name="form_post_check" title="account_view" {% if info_emp and 'account_view' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="account_add" {% if info_emp and 'account_add' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                        <td><input type="checkbox" name="form_post_check" title="account_edit" {% if info_emp and 'account_edit' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                         <td><input type="checkbox" name="form_post_check" title="account_delete" {% if info_emp and 'account_delete' in info_emp['list_permit']:%}checked{%endif%}></td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                                </div>
+                            </div>
+                                                            </div>
+                                                        </div>
+
+
+
+                                                         {% if info_emp:%}
+                                                      <button class="btn btn-warning" id="tbl_account" name="btn_post_data" title="/update_account_info">Update nhân viên</button>
+
+                                                    {%else:%}
+                                                    <button class="btn btn-primary" id="tbl_account" name="btn_post_data" title="/update_account_info">Thêm nhân viên</button>
+                                                    {%endif%}
+
+                                                </div>
+
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+
+
+             <script>
+
+$("[name='btn_post_data']").click(function(){
+  var list_post = {};
+  var url_request = $(this).attr("title");
+  var table_save = $(this).attr("id");
+  var option = $(this).attr("alt");
+
+
+	$( "[name='form_post']" ).each(function(){
+		       var values = $(this).val();
+				var name_field = $(this).attr("title");
+                 var require = $(this).attr("alt");
+
+                  $(this).css("border-color","gray");
+				if (require == "*" && values == ""){
+                 $(this).css("border-color","red");
+                 $(this).attr("placeholder", "Not Empty");
+                 list_post= [];
+                return false;
+					}
+				else{
+				list_post[name_field] = values;
+				}
+		});
+
+
+
+var list_permit = "";
+$("#form_post_check input:checked").each(function() {
+    var pm = $(this).attr('title');
+    list_permit += pm + ",";
+});
+
+
+
+       $.ajax({
+		url:url_request,
+		type:"POST",
+		data:{'option': option, "table": table_save, 'info_data': JSON.stringify(list_post),
+		'list_permit': list_permit},
+		beforeSend:function(){},
+		success: function(html){
+                if (html == "True"){
+                  alert("Add Success");
+                  $("[name='form_post']").val("");
+                  location.reload();
+                }
+                else if (html == "Update"){
+                   alert("Cap Nhat Thanh Cong !");
+
+                  location.reload();
+                }
+                else{
+                  alert(html);
+                }
+
+				}
+	  	})
+
+
+})
+
+
+             </script>

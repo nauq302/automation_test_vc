@@ -1,0 +1,66 @@
+
+
+
+           {% for mes in list_convertion:%}
+                 {% if mes['from']['id'] == id_face:%}
+           <div class="left">
+                <div class="author-name">
+                    <img alt="image" class="img-circle" src="https://graph.facebook.com/{{mes['from']['id']}}/picture?width=20&height=20">
+
+                    {{mes['from']['name']}} <small class="chat-date">
+                    10:02 am
+                </small>
+                </div>
+                <div class="chat-message active">
+                                  {% if mes['message']:%}
+                                       {{mes['message']}}
+                                {%else:%}
+                                    {% set attact = mes['attachments']%}
+                                    {% if 'data' in attact and attact['data']:%}
+                                          {% for data in attact['data']:%}
+
+                                            <img src="{{data['image_data']['preview_url']}}">
+                                          {%endfor%}
+                                      {% endif %}
+
+                                {% endif %}
+                </div>
+
+            </div>
+                   {%else : %}
+
+
+
+
+            <div class="right">
+                <div class="author-name">
+
+                   {{info_page['page_name']}}
+                     <img alt="image" class="img-circle" src="https://graph.facebook.com/{{info_page['page_id']}}/picture?width=20&height=20">
+
+                    <small class="chat-date">
+                        11:24 am
+                    </small>
+
+                </div>
+                <div class="chat-message">
+                    {% if mes['message']:%}
+                                       {{mes['message']}}
+                                {%else:%}
+                                    {% set attact = mes['attachments']%}
+                                    {% if 'data' in attact and attact['data']:%}
+                                          {% for data in attact['data']:%}
+
+                                            <img src="{{data['image_data']['preview_url']}}">
+                                          {%endfor%}
+                                      {% endif %}
+
+                                {% endif %}
+                </div>
+            </div>
+          {%endif %}
+
+
+          {%endfor %}
+
+

@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+  <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>
+                      </h2>
+
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="index-2.html">Home</a>
+                        </li>
+
+                        <li class="active">
+                            <strong>Tạo dự án mới</strong>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-lg-2">
+
+                </div>
+            </div>
+
+  <div class="wrapper wrapper-content  animated fadeInRight">
+
+      <div class="row">
+      </div>
+     
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- Steps -->
+    <script src="assets/js/plugins/staps/jquery.steps.min.js"></script>
+
+    <!-- Jquery Validate -->
+    <script src="assets/js/plugins/validate/jquery.validate.min.js" ></script>
+ <script src="assets/js/plugins/jeditable/jquery.jeditable.js"></script>
+            <script src="assets/js/plugins/dataTables/datatables.min.js"></script>
+
+    <script>
+
+
+
+ function fnClickAddRow() {
+             var d = new Date();
+            var id_second_block = d.getTime();
+            var rowid = $('#editable').dataTable().fnAddData( [
+                 "<button class='btn btn-danger' title='"+id_second_block+"' onclick='fnClickRemoveRow(this);'><i class='fa fa-remove'></i></button>",
+                "<textarea name='content_order' cols='20' rows='5'></textarea>",
+                " <input name='unit_order' type='text' style='max-width:100px'>",
+                "<input name='prices_order' type='text' onkeyup='onchange_thanhtien("+id_second_block+");' value='0' id='prices_"+id_second_block+"' style='max-width:100px'>",
+                "<input name='qty_order' type='text' onkeyup='onchange_thanhtien("+id_second_block+");' value='1' id='qty_"+id_second_block+"' style='max-width:100px'>",
+                 "<label name='thanhtien_order' id='thanhtien_"+id_second_block+"' >0</label>VND",
+                "<button class='btn btn-warning' onclick='show_data_duty(this);' name='duty-ctv' id='"+id_second_block+"' data-toggle='modal'  href='#modal-form-duty'>NV xử lí </button>",
+                  ] );
+
+       var theNode = $('#editable').dataTable().fnSettings().aoData[rowid[0]].nTr;
+        theNode.setAttribute('id', id_second_block);
+        theNode.setAttribute('name', "row_order");
+
+        }
+
+
+function onchange_thanhtien(id_handel){
+
+var dongia = remove_commans($("#prices_"+id_handel).val());
+var soluong = $("#qty_"+id_handel).val();
+
+var thanhtien = eval(dongia*soluong);
+$("#thanhtien_"+id_handel).html(numberWithCommas(thanhtien));
+$("#prices_"+id_handel).val(numberWithCommas(dongia));
+tinhhoadon();
+}
+
+
+function tinhhoadon(){
+   var tonghoadon = 0;
+     	$( "[name='thanhtien_order']" ).each(function(){
+				var thanhtien_row = eval(remove_commans($(this).html()));
+				tonghoadon = eval(tonghoadon+thanhtien_row);
+		});
+   var fee = eval(remove_commans($("[title='value_fee_order']").val()));
+   var giam_gia = $("#sales_off_order").val();
+   var giagiam = 0 ;
+   if (giam_gia != "0"){
+       giagiam = eval(giam_gia*tonghoadon)/100;
+   }
+   var vat = $("[title='vat_order']").val();
+   if (eval(vat)>0){
+      vat = eval(vat*tonghoadon)/100;
+   }
+
+   console.log(tonghoadon);
+   console.log(fee);
+   console.log(giagiam);
+   console.log(vat);
+   var khachphaitra = eval(tonghoadon)+eval(fee)-eval(giagiam)+eval(vat);
+
+   $("#tonghoadon").html(numberWithCommas(tonghoadon));
+   console.log(khachphaitra);
+   $("#kh_thanhtoan").html(numberWithCommas(khachphaitra));
+
+   // Cap nhat tong so luong
+   var total_qty = 0;
+   $( "[name='qty_order']" ).each(function(){
+				total_qty = eval(total_qty) + eval($(this).val());
+		});
+   $("[title='num_ctv']").val(total_qty);
+
+}
+
+
+function fnClickRemoveRow(obj){
+
+         var row = $(obj).closest('tr')[0];
+         $('#editable').dataTable().fnDeleteRow(row );
+         tinhhoadon();
+  }
+
+  var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"}
+                }
+            for (var selector in config) {
+                $(selector).chosen(config[selector]);
+            }
+   $(".select2_demo_1").select2();
+   $(".select_form").select2();
+
+   $('.select2_demo_1').on("select2:select", function(e) {
+    var code_cus = $(this).val();
+    if (code_cus){
+                       $.ajax({
+							url:"/manage_info_custom",
+							type:"POST",
+							data:{'code_cus': code_cus},
+							beforeSend: function(){
+							},
+							success: function(html){
+								$("[name='form_post_cus']").val("");
+                                html = JSON.parse(html);
+                                $("[title='code_cus']").val(html.code_cus);
+                                $("[title='name_cus']").val(html.name_cus);
+                                $("[title='group_cus']").val(html.group_cus);
+                                $("[title='phone_cus']").val(html.phone_cus);
+                                $("[title='email_cus']").val(html.email_cus);
+                                $("[title='address_cus']").val(html.address_cus);
+                                $("[title='phone_cus']").val(html.phone_cus);
+                                $("[title='birthday_cus']").val(html.birthday_cus);
+							}
+							});
+    }
+    else{
+    $("[name='form_post_cus']").val("");
+    }
+
+   });
+
+
+
+  $('.input-group.date').datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true,
+                format: 'dd/mm/yyyy'
+            });
+
+
+  $('.select_form').on("select2:select", function(e) {
+     var label = $(this).attr("name");
+     var valu = $(this).val();
+     $("[title='"+label+"']").val(valu);
+  });
+
+$(".chosen-container").css("width","300px");
+
+
+
+   $("#choose_ctv").chosen().change(function() {
+    var code_ctv = $(this).val();
+    if (code_ctv){
+           $("[name='duty-ctv']").hide();
+    }
+    else{
+           $("[name='duty-ctv']").show();
+    }
+
+   });
+
+
+function caculator_ctv(obj, id_duty){
+
+if (id_duty){
+var prices_ctv = remove_commans($("#prices_ctv"+id_duty+"").val());
+var num_ctv = $("#num_ctv"+id_duty+"").val();
+
+var thanhtien_ctv = eval(prices_ctv) * eval(num_ctv);
+$("#label_thanhtien_ctv"+id_duty).html(numberWithCommas(thanhtien_ctv));
+}else{
+var prices_ctv = remove_commans($("[title='prices_ctv']").val());
+var num_ctv = $("[title='num_ctv']").val();
+
+var thanhtien_ctv = eval(prices_ctv) * eval(num_ctv);
+$("#label_thanhtien_ctv").html(numberWithCommas(thanhtien_ctv));
+}
+
+}
+
+
+
+
+function show_data_duty(obj)
+{
+var id_duty = $(obj).attr("id");
+var code_order = $("[title='code_order']").val();
+
+if(id_duty){
+
+     $.ajax({
+							url:"/show_dialog_duty",
+							type:"POST",
+							data:{'id_duty': id_duty, 'code_order': code_order},
+							beforeSend: function(){
+							},
+							success: function(html){
+							  $("#modal-form-duty").html(html);
+							}
+							});
+
+}
+}
+
+
+
+
+    </script>
+
+{% endblock %}

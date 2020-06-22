@@ -1,0 +1,97 @@
+ <div class="col-lg-8">
+
+                <div class="ibox float-e-margins">
+
+                    <div class="ibox-content">
+
+                        <div>
+                <div class="chat-activity-list" id="chat1_{{info_user['id']}}" title="{{domain}}">
+
+                    {% for mes in list_convertion:%}
+
+
+                      {% if mes['from']['id'] == id_face:%}
+                      <div class="chat-element">
+                        <a href="#" class="pull-left">
+                            <img alt="image" class="img-circle" src=" {{info_user['picture']['data']['url']}}">
+                        </a>
+                        <div class="media-body ">
+                           <!-- <small class="pull-right text-navy">1m ago</small>-->
+                            <strong>{{mes['from']['name']}}</strong>
+                            <p class="m-b-xs">
+                                {% if mes['message']:%}
+                                       {{mes['message']}}
+                                {%else:%}
+                                    {% set attact = mes['attachments']%}
+                                    {% if 'data' in attact and attact['data']:%}
+                                          {% for data in attact['data']:%}
+
+                                            <img src="{{data['image_data']['preview_url']}}">
+                                          {%endfor%}
+                                      {% endif %}
+
+                                {% endif %}
+                            </p>
+                            <small class="text-muted">{{mes['created_time']}}</small>
+                        </div>
+                    </div>
+                    {% else:%}
+
+                       <div class="chat-element right">
+                        <a href="#" class="pull-right">
+                            <img alt="image" class="img-circle" src="{{info_page['page_avata']}}">
+                        </a>
+                        <div class="media-body text-right ">
+                            <!--<small class="pull-left">5m ago</small>-->
+                            <strong>{{info_page['page_name']}}</strong>
+                            <p class="m-b-xs">
+                                  {% if mes['message']:%}
+                                       {{mes['message']}}
+                                {%else:%}
+                                    {% set attact = mes['attachments']%}
+                                    {% if 'data' in attact and attact['data']:%}
+                                          {% for data in attact['data']:%}
+                                            <img src="{{data['image_data']['preview_url']}}">
+                                          {%endfor%}
+                                      {% endif %}
+                                {% endif %}
+                            </p>
+                            <small class="text-muted">{{mes['created_time']}}</small>
+                        </div>
+                    </div>
+                    {% endif%}
+
+
+                    {%endfor %}
+
+
+
+                </div>
+                </div>
+                        <div class="chat-form">
+                            <form role="form">
+
+
+
+
+
+                                <div class="form-group">
+                                    <textarea class="form-control"  placeholder="Message"></textarea>
+                                </div>
+                                <div class="text-right">
+                                     <button type="submit" class="btn btn-sm btn-primary m-t-n-xs"><strong><i aria-hidden="true" class="fa fa-search"></i>&nbspTìm sản phẩm</strong></button>
+                                    <button type="submit" class="btn btn-sm btn-primary m-t-n-xs"><strong><i aria-hidden="true" class="fa fa-picture-o"></i>&nbspKho hình ảnh</strong></button>
+                                    <button type="submit" class="btn btn-sm btn-primary m-t-n-xs"><strong><i aria-hidden="true" class="fa fa-upload"></i>&nbspTải hình mới </strong></button>
+                                    <button type="submit" class="btn btn-sm btn-primary m-t-n-xs"><strong><i aria-hidden="true" class="fa fa-pencil-square-o"></i>&nbspTin nhắn mẫu</strong></button>
+                                </div>
+                            </form>
+                        </div>
+                </div>
+                </div>
+
+
+
+
+
+                </div>
+
