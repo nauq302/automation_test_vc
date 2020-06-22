@@ -11,6 +11,7 @@ from bson import ObjectId
 client = pymongo.MongoClient(config.DB_MONGO)
 db = client.voice_db
 
+
 def convert_time_to_int(time_convert):
     time_format = "%d/%m/%Y %H:%M"
     current_result = int(time.mktime(datetime.datetime.strptime(time_convert, time_format).timetuple()))
@@ -65,7 +66,6 @@ def login(username, password):
                                                           [ {"username": username},
                                                            {"email": username},
                                                            {"phone_number": username} ]})
-
 
     if user_info and password == user_info['password']:
         session_id = str(uuid.uuid4())

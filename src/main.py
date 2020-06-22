@@ -66,9 +66,9 @@ def _decode_dict(data):
     rv = {}
     for key, value in data.iteritems():
         if isinstance(key, unicode):
-            key = key.encode('utf-8')
+            key = key.encode("utf-8")
         if isinstance(value, unicode):
-            value = value.encode('utf-8')
+            value = value.encode("utf-8")
         elif isinstance(value, list):
             value = _decode_list(value)
         elif isinstance(value, dict):
@@ -102,8 +102,8 @@ def utility_processor():
 # convert to conrency
 @app.context_processor
 def utility_processor():
-    def format_price(amount, currency=u'€'):
-        return '{:20,.0f}'.format(amount, currency)
+    def format_price(amount, currency=u"€"):
+        return "{:20,.0f}".format(amount, currency)
     return dict(format_price=format_price)
 
 
@@ -126,7 +126,7 @@ class ItsdangerousSessionInterface(SessionInterface):
         if not app.secret_key:
             return None
         return URLSafeTimedSerializer(app.secret_key,
-                                      signer_kwargs={'key_derivation': 'hmac'})
+                                      signer_kwargs={"key_derivation": "hmac"})
 
     def open_session(self, app, request):
         s = self.get_serializer(app)
@@ -162,8 +162,8 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         is_ok = False
-        if 'session_id' in session:
-            session_id = session.get('session_id')
+        if "session_id" in session:
+            session_id = session.get("session_id")
             user_id = db.get_user_id(session_id)
             user = None
             if user_id:
@@ -175,11 +175,11 @@ def login_required(f):
                 user =  g.user
         if not is_ok:
             session.clear()
-            scheme = request.headers.get('X-Forwarded-Proto', 'http')
-            url = scheme + '://' + request.host
-            if request.path == '/sign_out':
-                url += '/'
-            return redirect('/login')
+            scheme = request.headers.get("X-Forwarded-Proto", "http")
+            url = scheme + "://" + request.host
+            if request.path == "/sign_out":
+                url += "/"
+            return redirect("/login")
 
         return f(*args, **kwargs)
     return decorated_function
@@ -192,17 +192,17 @@ def login_required(f):
 @app.route("/assets/<path:filename>")
 def public_files(filename):
     src = os.path.dirname(__file__)
-    return send_from_directory(os.path.join(src, 'assets'), filename)
+    return send_from_directory(os.path.join(src, "assets"), filename)
 
 
-@app.route('/login', methods=["POST", "GET"])
+@app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "GET":
-        alert_message = session.pop('alert_message') \
-                if 'alert_message' in session else None
+        alert_message = session.pop("alert_message") \
+                if "alert_message" in session else None
         username  = session.pop('username') \
-                if 'username' in session else None
-        res = render_template('login.html', alert_message=alert_message, username=username)
+                if "username" in session else None
+        res = render_template("login.html", alert_message=alert_message, username=username)
         response = make_response(res)
         return response
 
@@ -217,28 +217,28 @@ def login():
             user_id = db.get_user_id(session_id)
             user = db.get_user_info(user_id)
             print user
-            session['user_id'] = str(user['_id'])
+            session["user_id"] = str(user["_id"])
             # set session info page Active
             if True:
-                session['session_id'] = session_id
-                session['timestamp'] = time.time()
-                session['user_id'] = str(user['_id'])
-                return redirect('/')
+                session["session_id"] = session_id
+                session["timestamp"] = time.time()
+                session["user_id"] = str(user["_id"])
+                return redirect("/")
         else:
-            session['alert_message'] = message
-            session['alert_type'] = 'danger'
-            session['username'] = username
-            session['password'] = ""
-            return redirect('/login')
+            session["alert_message"] = message
+            session["alert_type"] = "danger"
+            session["username"] = username
+            session["password"] = ""
+            return redirect("/login")
 
 
 
-@app.route('/sign_out')
+@app.route("/sign_out")
 @login_required
 def sign_out():
     if g.user_id:
          db.sign_out(g.user_id)
-    return redirect('/login')
+    return redirect("/login")
 
 
 
@@ -247,17 +247,22 @@ def sign_out():
 @login_required
 def index():
    info_user = g.user
-   res = render_template('index.html', info_user=info_user)
+   res = render_template("index.html", info_user=info_user)
    response = make_response(res)
    return response
 
+@app.route("/test_script")
+@login_required
+def test_script():
+    info_user = g.user
+    return render_template("test_script.html", info_user=info_user)
 
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   try:
     port = int(sys.argv[1])
   except (TypeError, IndexError):
     port = 8089
-  app.run(debug=True, host='0.0.0.0', port=port)
+  app.run(debug=True, host="0.0.0.0", port=port)
 
