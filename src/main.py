@@ -33,18 +33,20 @@ from simplejson import dumps as dump_json
 from raven.contrib.flask import Sentry
 from json import loads as load_jsons
 reload(sys)
-sys.setdefaultencoding('utf-8')
+sys.setdefaultencoding("utf-8")
 from cPickle import loads, dumps
 async_mode = None
 #Define App
 app = Flask(__name__)
 app.jinja_env.autoescape = False
 
+#fake data for test
+import fake_data
 
-app.config['SECRET_KEY'] = config.SECRET_KEY
-app.config['SESSION_COOKIE_DOMAIN'] = config.SESSION_COOKIE_DOMAIN
+app.config["SECRET_KEY"] = config.SECRET_KEY
+app.config["SESSION_COOKIE_DOMAIN"] = config.SESSION_COOKIE_DOMAIN
 sentry = Sentry(app)
-app.jinja_env.add_extension('jinja2.ext.do')
+app.jinja_env.add_extension("jinja2.ext.do")
 
 red = redis.Redis(config.DB_REDIS, 6379, db=14)
 
@@ -53,7 +55,7 @@ def _decode_list(data):
     rv = []
     for item in data:
         if isinstance(item, unicode):
-            item = item.encode('utf-8')
+            item = item.encode("utf-8")
         elif isinstance(item, list):
             item = _decode_list(item)
         elif isinstance(item, dict):
@@ -126,7 +128,7 @@ class ItsdangerousSessionInterface(SessionInterface):
         if not app.secret_key:
             return None
         return URLSafeTimedSerializer(app.secret_key,
-                                      signer_kwargs={"key_derivation": "hmac"})
+                                      signer_kwargs = { "key_derivation": "hmac" })
 
     def open_session(self, app, request):
         s = self.get_serializer(app)
@@ -200,7 +202,7 @@ def login():
     if request.method == "GET":
         alert_message = session.pop("alert_message") \
                 if "alert_message" in session else None
-        username  = session.pop('username') \
+        username  = session.pop("username") \
                 if "username" in session else None
         res = render_template("login.html", alert_message=alert_message, username=username)
         response = make_response(res)
@@ -237,32 +239,91 @@ def login():
 @login_required
 def sign_out():
     if g.user_id:
-         db.sign_out(g.user_id)
+        db.sign_out(g.user_id)
     return redirect("/login")
 
 
 
 
-@app.route('/', methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-   info_user = g.user
-   res = render_template("index.html", info_user=info_user)
-   response = make_response(res)
-   return response
+    info_user = g.user
+    res = render_template("index.html", info_user=info_user)
+    response = make_response(res)
+    return response
 
-@app.route("/test_script")
+@app.route("/test_script", methods=["GET", "POST"])
 @login_required
 def test_script():
+    page = request.args.get("page")
+    try:
+        page = int(page)
+    except:
+        page = 1
+
+    ts_from = (page - 1) * test_script.page_size
+    ts_to = page * test_script.page_size
+
+    page_count = int(ceil(fake_data.test_script_list.__len__() / float(test_script.page_size)))
+
     info_user = g.user
-    return render_template("test_script.html", info_user=info_user)
+    test_script_list = fake_data.test_script_list[ts_from : ts_to]
 
+    return render_template(
+        "test_script.html", 
+        info_user = info_user, 
+        test_script_list = test_script_list, 
+        page = page, 
+        page_count = page_count
+    )
 
+test_script.page_size = 10
+
+@app.route("/test_case", methods=["GET", "POST"])
+@login_required
+def test_case():
+    info_user = g.user
+    
+    test_case_list = fake_data.test_case_list
+    test_script_list = fake_data.test_script_list
+
+    test_script_id = request.args.get("test_script_id")
+    
+    try:
+        test_script_id = int(test_script_id)
+    except:
+        test_script_id = test_script_list[0]['_id']
+
+    return render_template(
+        "test_case.html",
+        info_user = info_user,
+        test_case_list = test_case_list,
+        test_script_list = test_script_list,
+        test_script_id = test_script_id
+    )
+
+@app.route("/create_test_case", methods=["GET", "POST"])
+@login_required
+def create_test_case():
+    info_user = g.user
+    listen_phone_list = fake_data.listen_phone_list
+
+    call_script_list = fake_data.call_script_list
+    listen_script_list = fake_data.listen_script_list
+
+    return render_template(
+        "create_test_case.html",
+        info_user = info_user,
+        listen_phone_list = listen_phone_list,
+        call_script_list = call_script_list,
+        listen_script_list = listen_script_list
+    )
 
 if __name__ == "__main__":
-  try:
-    port = int(sys.argv[1])
-  except (TypeError, IndexError):
-    port = 8089
-  app.run(debug=True, host="0.0.0.0", port=port)
+    try:
+        port = int(sys.argv[1])
+    except (TypeError, IndexError):
+        port = 8089
+    app.run(debug=True, host="0.0.0.0", port=port)
 

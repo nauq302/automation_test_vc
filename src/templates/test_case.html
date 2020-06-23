@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <style>
+            .red {
+                color: red;
+            }
+            .green {
+                color: green;
+            }
+            .right {
+                float: right;
+            }
+        </style>
+    
+        <script>
+            function redirect(url) {
+                location.href = url;
+            }
+
+            function toggle(source) {
+                let checkboxes = document.getElementsByName('selected_test_cases');
+                for (let cb of checkboxes) {
+                    cb.checked = source.checked;
+                }
+            }
+        </script>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h2>Quản lý Test Case</h2>
+                    </div>
+
+                    <div class="ibox-content">
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label">Chọn Kịch bản Test</label>
+
+                            <form action="test_case" class="col-sm-5">
+                                <select name="test_script_id" onchange="this.form.submit()" class="form-control">
+                                    {% for ts in test_script_list %}
+                                        <option value="{{ts['_id']}}" {{'selected' if (ts['_id'] == test_script_id)}}>{{ts['name']}}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-1">
+                                <button class="btn btn-primary"><i class="fa fa-plus"></i> Thêm Test Case</button>
+                                <button class="btn btn-primary"><i class="fa fa-play"></i> Run Test Case</button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover" >
+
+                                    <thead class="form-group">
+                                        <tr>
+                                            <th>Tên Test Case</th>
+                                            <th>
+                                                <input type="checkbox" id="select-all" onclick="toggle(this)">
+                                                <label for="select-all">Select All</label>
+                                            </th>
+                                            <th>Ngày tạo</th>
+                                            <th>Trạng thái</th>
+                                            <th>Chỉnh sửa</th>
+                                            <th>Note</th>
+                                            <th>Xóa</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {% for tc in test_case_list %}
+                                            <tr class="gradeX">
+                                                {% set id = tc['_id'] %}
+                                                <td>{{tc['name']}}</td>
+
+                                                <td>
+                                                    <input type="checkbox" id="select-one-{{id}}" name="selected_test_cases">
+                                                    <label for="select-one-{{id}}">Select</label>
+                                                </td>
+
+                                                <td>{{tc['create_date']}}</td>
+
+                                                {% if tc['status'] %}
+                                                    <td class="green">Passed</td>
+                                                {% else %}
+                                                    <td class="red">Failed</td>
+                                                {% endif %}
+
+                                                <td><a href="#">Edit</a></td>
+
+                                                <td>{{tc['note']}}</td>
+
+                                               
+                                                <td><button onclick="redirect('delete_test_case?id={{id}}')"><i class="fa fa-minus"></i></button></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+{% endblock %}

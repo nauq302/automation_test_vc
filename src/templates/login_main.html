@@ -10,15 +10,15 @@
 
     <title>INSPINIA | Login</title>
 
-   {% include 'common/css.html'%}
+    {% include 'common/css.html'%}
 
- <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
- <script>
-     function onSubmit = function(token) {
-       document.getElementById("demo-form").submit();
-     }
-     </script>
+    <script>
+        let onSubmit = function(token) {
+            document.getElementById("demo-form").submit();
+        }
+    </script>
 
 
 </head>
@@ -60,8 +60,6 @@
 
 
     {% include 'common/script.html'%}
-
-    </script>
 
 </body>
 
