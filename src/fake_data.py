@@ -13,7 +13,8 @@ for i in range(1, 30):
         "passed_test_cases": {
             "pass": i,
             "total": i if (i % 3 == 0) else (i + 1)
-        }
+        },
+        "hotline_number": "%010d" % i
     })
 
 test_case_list = []

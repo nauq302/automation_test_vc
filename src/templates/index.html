@@ -57,6 +57,7 @@
                                             <th>Ngày Test</th>
                                             <th>Account Test</th>
                                             <th>Test Case Pass</th>
+                                            <th>Hotline Number</th>
                                             <th>Chi tiết</th>
                                             <th>Xóa</th>
                                         </tr>
@@ -76,6 +77,8 @@
                                                 <td class="{{'green' if tc['pass'] == tc['total'] else 'red'}}">
                                                     {{tc['pass']}}/{{tc['total']}}
                                                 </td>
+
+                                                <td>{{ts['hotline_number']}}</td>
 
                                                 <td><a href="/test_case">Xem chi tiết</a></td>
 
