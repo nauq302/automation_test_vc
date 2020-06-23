@@ -218,7 +218,7 @@ def login():
             session_id = resp
             user_id = db.get_user_id(session_id)
             user = db.get_user_info(user_id)
-            print user
+
             session["user_id"] = str(user["_id"])
             # set session info page Active
             if True:
@@ -249,36 +249,34 @@ def sign_out():
 @login_required
 def index():
     info_user = g.user
-    res = render_template("index.html", info_user=info_user)
-    response = make_response(res)
-    return response
-
-@app.route("/test_script", methods=["GET", "POST"])
-@login_required
-def test_script():
+     
     page = request.args.get("page")
     try:
         page = int(page)
     except:
         page = 1
 
-    ts_from = (page - 1) * test_script.page_size
-    ts_to = page * test_script.page_size
+    ts_from = (page - 1) * index.page_size
+    ts_to = page * index.page_size
 
-    page_count = int(ceil(fake_data.test_script_list.__len__() / float(test_script.page_size)))
+    page_count = int(ceil(fake_data.test_script_list.__len__() / float(index.page_size)))
 
-    info_user = g.user
     test_script_list = fake_data.test_script_list[ts_from : ts_to]
 
-    return render_template(
-        "test_script.html", 
+    res = render_template(
+        "index.html", 
         info_user = info_user, 
         test_script_list = test_script_list, 
         page = page, 
         page_count = page_count
     )
 
-test_script.page_size = 10
+    response = make_response(res)
+
+    return response
+
+index.page_size = 10
+
 
 @app.route("/test_case", methods=["GET", "POST"])
 @login_required
