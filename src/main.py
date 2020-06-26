@@ -305,17 +305,10 @@ def test_case():
 @login_required
 def create_test_case():
     info_user = g.user
-    listen_phone_list = fake_data.listen_phone_list
-
-    call_script_list = fake_data.call_script_list
-    listen_script_list = fake_data.listen_script_list
 
     return render_template(
         "create_test_case.html",
         info_user = info_user,
-        listen_phone_list = listen_phone_list,
-        call_script_list = call_script_list,
-        listen_script_list = listen_script_list
     )
 
 if __name__ == "__main__":
