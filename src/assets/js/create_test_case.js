@@ -25,32 +25,22 @@ class Action {
     changeActionType(type) {
         switch (type) {
             case 'press':
-                this.value.type = 'text';
-                this.value.classList.add('form-control');
-                this.value.value = '';
-                break;
             case 'wait':
+            case 'delay':
                 this.value.type = 'text';
-                this.value.classList.add('form-control');
                 this.value.value = '';
                 break;
             case 'play':
-                this.value.type = 'button';
-                this.value.classList.remove('form-control');
+                this.value.type = 'file';
                 this.value.value = '';
-                break;
-            case 'delay':
-                this.value.type = 'text';
-                this.value.classList.add('form-control');
-                this.value.value = '';
-                break;
+            break;
         }
     }
 
 
     setHTML() {
         this.row.innerHTML = /*html*/`
-            <td>
+            <td class="col-sm-2">
                 <select class="action form-control">
                     <option value="press" selected>Press (Phím bấm sẽ thực hiện)</option>
                     <option value="wait">Wait (Thời gian chờ đợi)</option>
@@ -58,10 +48,10 @@ class Action {
                     <option value="delay">Delay (Thời gian chờ trước khi thực hiện cuộc gọi)</option>
                 </select>
             </td>
-            <td><input type="text" class="value form-control"/></td>
-            <td><input type="text" class="result form-control"/></td>
-            <td><textarea class="note form-control"></textarea></td>
-            <td>
+            <td class="col-sm-2"><input type="text" class="value form-control"/></td>
+            <td class="col-sm-2"><input type="text" class="result form-control"/></td>
+            <td class="col-sm-3"><textarea class="note form-control"></textarea></td>
+            <td class="col-sm-1">
                 <button type="button" class="delete form-control" >
                     <i class="fa fa-minus"></i>
                 </button>
