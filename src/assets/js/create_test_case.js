@@ -5,12 +5,14 @@ class Action {
     get action() { return this.row.getElementsByClassName('action')[0]; }
     get value() { return this.row.getElementsByClassName('value')[0]; }
     get result() { return this.row.getElementsByClassName('result')[0]; }
+    get note() { return this.row.getElementsByClassName('note')[0]; }
     get delete() { return this.row.getElementsByClassName('delete')[0]; }
 
     constructor(parent) {
         this.row = document.createElement('tr');
         this.setHTML();
 
+        
         this.action.onclick = function() { 
             let opt = this.action.options[this.action.selectedIndex];
             this.changeActionType(opt.value); 
@@ -57,6 +59,13 @@ class Action {
                 </button>
             </td>
         `;
+    }
+
+    setDataName(widgetCount, actionCount) {
+        this.action.name = 'action_' + widgetCount + '_' + actionCount;
+        this.value.name = 'value_' + widgetCount + '_' + actionCount;
+        this.result.name = 'result_' + widgetCount + '_' + actionCount;
+        this.note.name = 'note_' + widgetCount + '_' + actionCount;
     }
 }
 
@@ -110,12 +119,12 @@ class Widget {
                     <label class="col-sm-3 control-label">Chọn loại Kịch bản</label>
 
                     <label class="col-sm-3 control-label">
-                        <input type="radio" name="script_type" checked/>
+                        <input type="radio" value="call" class="script-type" checked/>
                         Kịch bản Gọi
                     </label>
 
                     <label class="col-sm-3 control-label">
-                        <input type="radio" name="script_type"/>
+                        <input type="radio" value="listen" class="script-type"/>
                         Kịch bản Nghe
                     </label>
                 </div>
@@ -123,7 +132,7 @@ class Widget {
 
                 <div class="row">
                     <label class="col-sm-2 control-label">Chọn máy</label>
-                    <div class="col-sm-5"><input type="text" class="form-control"></div>
+                    <div class="col-sm-5"><input type="text" class="phone form-control"></div>
                 </div>
                 <div class="hr-line-dashed"></div>
 
@@ -152,6 +161,20 @@ class Widget {
             <div class="hr-line-dashed"></div>
         `;
     }
+
+    setDataName(count) {
+        let scriptTypes = this.div.getElementsByClassName('script-type');
+        for (let i = 0; i < scriptTypes.lenth; ++i) {
+            console.log(scriptTypes[i]);
+            scriptTypes[i].name = 'scriptType_' + count;
+        }
+
+        this.div.getElementsByClassName('phone').name = 'phone_' + count;
+
+        for (let i in this.actionList) {
+            this.actionList[i].setDataName(count, i);
+        }
+    }
 }
 
 
@@ -165,7 +188,6 @@ class WidgetList {
         this.widgets[0].addAction();
     }
 
-
     addWidget() {
         let widget = new Widget(this);
         this.widgets.push(widget);
@@ -176,4 +198,12 @@ class WidgetList {
         this.widgets.splice(this.widgets.indexOf(widget), 1);
         this.div.removeChild(widget.div);
     }
+
+    setDataName() {
+        for (let i in this.widgets) {
+            this.widgets[i].setDataName(i);
+        }
+    }
 }
+
+

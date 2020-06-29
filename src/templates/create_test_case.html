@@ -23,22 +23,22 @@
                     </div>
 
                     <div class="ibox-content">
-                        <form action="#" method="POST">
+                        <form action="create_test_case" id="form" method="GET">
                             <div class="row">
                                 <label class="col-sm-2 control-label">Tên Kịch bản Test</label>
-                                <div class="col-sm-5"><input type="text" class="form-control"></div>
+                                <div class="col-sm-5"><input type="text" name="script-name" class="form-control"></div>
                             </div>
                             <div class="hr-line-dashed"></div>
 
                             <div class="row">
                                 <label class="col-sm-2 control-label">Tên Test Case</label>
-                                <div class="col-sm-5"><input type="text" class="form-control"></div>
+                                <div class="col-sm-5"><input type="text" name="name" class="form-control"></div>
                             </div>
                             <div class="hr-line-dashed"></div>
 
                             <div class="row">
                                 <label class="col-lg-2 control-label">Mô tả</label>
-                                <div class="col-lg-4"><textarea class="form-control"></textarea></div>
+                                <div class="col-lg-4"><textarea name="description" class="form-control"></textarea></div>
                             </div>
                             <div class="hr-line-dashed"></div>
 
@@ -55,7 +55,7 @@
 
                             <div class="row">
                                 <div class="col-lg-3 col-lg-offset-3">
-                                    <button type="submit" class="btn btn-primary">
+                                    <button type="button" onclick="sm()" class="btn btn-primary">
                                         <i class="fa fa-save"></i> Lưu và tiếp tục
                                     </button>
                                 </div>
@@ -72,6 +72,11 @@
 
         <script>
             var widgetList = new WidgetList(document.getElementById('widget-list'));
+
+            function sm() {
+                widgetList.setDataName();
+                document.getElementById('form').submit();
+            }
         </script>
 
     </div>
