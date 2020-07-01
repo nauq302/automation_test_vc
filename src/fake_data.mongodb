@@ -1,0 +1,59 @@
+use voice_db;
+db.createCollection("tbl_account_automation");
+db.createCollection("tbl_test_dialplan");
+db.createCollection("tbl_test_case");
+db.createCollection("tbl_call_listen_dialplan");
+db.createCollection("tbl_action_dialplan");
+
+
+db.tbl_account_automation.insert({ 
+    id: UUID(), 
+    username: "username", 
+    password: hex_md5("password"), 
+    email: "liame@gmail.com" 
+}) 
+
+for (let i = 0; i < 28; ++i) {
+    db.tbl_test_dialplan.insert({
+        id: "tdid" + i,
+        name: "name " + i,
+        create_date: new Date("2020-06-" + i),
+        test_account: "Account " + i,
+        hotline_number: "0123456789"
+    })
+}
+
+
+for (let i = 0; i < 100; ++i) {
+    db.tbl_test_case.insert({
+        id: "tcid" + i,
+        id_dialplan: "tdid" + Math.floor(Math.random() * 28),
+        create_date: new Date("2020-06-" + i),
+        name: "name " + i,
+        desc: "Nothing",
+        status: Boolean(i % 2)
+    })
+}
+
+
+
+for (let i = 0; i < 10; ++i) {
+    db.tbl_call_listen_dialplan.insert({
+        id: UUID(),
+        type: i % 2 ? "Call" : "Listen",
+        machine: "name " + i,
+    })
+}
+
+
+for (let i = 0; i < 10; ++i) {
+    db.tbl_action_dialplan.insert({
+        id: UUID(),
+        id_call_listen: UUID(),
+        name: "name " + i,
+        value: "value " + i,
+        result: "result " + i,
+        note: "Nothing"
+    })
+}
+

@@ -41,9 +41,9 @@
                             <label class="col-sm-2 control-label">Chọn Kịch bản Test</label>
 
                             <form action="test_case" class="col-sm-5">
-                                <select name="test_script_id" onchange="this.form.submit()" class="form-control">
-                                    {% for ts in test_script_list %}
-                                        <option value="{{ts['_id']}}" {{'selected' if (ts['_id'] == test_script_id)}}>{{ts['name']}}</option>
+                                <select name="test_dialplan_id" onchange="this.form.submit()" class="form-control">
+                                    {% for ts in test_dialplan_list %}
+                                        <option value="{{ts['id']}}" {{'selected' if (ts['id'] == test_dialplan_id)}}>{{ts['name']}}</option>
                                     {% endfor %}
                                 </select>
                             </form>
@@ -87,7 +87,7 @@
                                                     <label for="select-one-{{id}}">Select</label>
                                                 </td>
 
-                                                <td>{{tc['create_date']}}</td>
+                                                <td>{{tc['create_date'].date()}}</td>
 
                                                 {% if tc['status'] %}
                                                     <td class="green">Passed</td>
@@ -97,7 +97,7 @@
 
                                                 <td><a href="#">Edit</a></td>
 
-                                                <td>{{tc['note']}}</td>
+                                                <td>{{tc['desc']}}</td>
 
                                                
                                                 <td><button onclick="redirect('delete_test_case?id={{id}}')"><i class="fa fa-minus"></i></button></td>

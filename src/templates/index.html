@@ -64,25 +64,24 @@
                                     </thead>
 
                                     <tbody>
-                                        {% for ts in test_script_list %}
+                                        {% for p in test_dialplans %}
                                             <tr class="gradeX">
+                                                {% set td = p[0] %}
+                                                <td>{{td['name']}}</td>
 
-                                                <td>{{ts['name']}}</td>
+                                                <td>{{td['create_date'].date()}}</td>
 
-                                                <td>{{ts['test_date']}}</td>
+                                                <td>{{td['test_account']}}</td>
 
-                                                <td>{{ts['test_account']['username']}}</td>
-
-                                                {% set tc = ts['passed_test_cases'] %}
-                                                <td class="{{'green' if tc['pass'] == tc['total'] else 'red'}}">
-                                                    {{tc['pass']}}/{{tc['total']}}
+                                                <td class="{{'green' if p[1] == p[2] else 'red'}}">
+                                                    {{p[1]}}/{{p[2]}}
                                                 </td>
 
-                                                <td>{{ts['hotline_number']}}</td>
+                                                <td>{{td['hotline_number']}}</td>
 
-                                                <td><a href="/test_case">Xem chi tiết</a></td>
-
-                                                {% set id = ts['_id'] %}
+                                                {% set id = td['id'] %}
+                                                <td><a href="/test_case?test_dialplan_id={{id}}">Xem chi tiết</a></td>
+                
                                                 <td>
                                                     <button onclick="redirect('delete_test_script?id={{id}}')">
                                                         <i class="fa fa-minus"></i>
