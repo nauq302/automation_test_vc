@@ -62,10 +62,8 @@ def login(username, password):
         return False, 'Vui lòng nhập Username & password.'
     username = username.lower().strip()
 
-    user_info = db.tbl_account_automation.find_one({"$or":
-                                                          [ {"username": username},
-                                                           {"email": username},
-                                                           {"phone_number": username} ]})
+    user_info = db.tbl_account_automation.find_one({"$or":[ {"username": username},
+                                                           {"email": username} ]})
 
     if user_info and password == user_info['password']:
         session_id = str(uuid.uuid4())
@@ -78,6 +76,47 @@ def login(username, password):
 
 
 
+def getTestDialplans(page_index, page_size):
+    search_from = (page_index - 1) * page_size
+    test_dialplans = db.tbl_test_dialplan.find() \
+        .skip(search_from)  \
+        .limit(page_size)
+    return test_dialplans
+
+def getTestDialplansIdAndName():
+    test_dialplans = db.tbl_test_dialplan.find({}, { "id": 1, "name": 1 }) 
+    return test_dialplans
+
+def getTestDialplanIdAndName(id):
+    test_dialplans = db.tbl_test_dialplan.find({ "id": id }, { "id": 1, "name": 1 }) 
+    
+    try:
+        return test_dialplans[0]
+    except:
+        return None
+
+def getTestDialplanCount():
+    return db.tbl_test_dialplan.count({})
+
+
+def getTestCase(test_dialplan_id):
+    return db.tbl_test_case.find({ "id_dialplan": test_dialplan_id })
+
+def getTestCasePassedCount(test_dialplan_id):
+    tc_pass = db.tbl_test_case.find({
+        "id_dialplan": test_dialplan_id,
+        "status": True
+    }).count()
+    return tc_pass
+
+def addTestCase(testCase):
+    db.tbl_test_case.insert(testCase)
+
+def addCallListenDialplan(call_listen_dialplan):
+    db.tbl_call_listen_dialplan.insert(call_listen_dialplan)
+
+def addActionDialplan(action_dialplan):
+    db.tbl_action_dialplan.insert(action_dialplan)
 
 # find all documents
 

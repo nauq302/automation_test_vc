@@ -54,7 +54,7 @@ class Action {
             <td class="col-sm-2"><input type="text" class="result form-control"/></td>
             <td class="col-sm-3"><textarea class="note form-control"></textarea></td>
             <td class="col-sm-1">
-                <button type="button" class="delete form-control" >
+                <button type="button" class="delete form-control">
                     <i class="fa fa-minus"></i>
                 </button>
             </td>
@@ -69,15 +69,19 @@ class Action {
     }
 }
 
-
+/**
+ * Widget
+ */
 class Widget {
     actionList = [];
     div;
 
+    // Getter
     get tBody() { return this.div.getElementsByTagName('tbody')[0]; }
     get addButton() { return this.div.getElementsByClassName('add-button')[0]; }
     get deleteWidgetButton() { return this.div.getElementsByClassName('delete-widget')[0]; }
 
+    // Constructor
     constructor(parent) {
         this.div = document.createElement('div');
         this.div.classList.add('row');
@@ -92,12 +96,14 @@ class Widget {
         }.bind(this);
     }
 
+    // Add action into action list
     addAction() {
         let action = new Action(this.tBody);
         this.actionList.push(action);
         this.tBody.appendChild(action.row);
     }
 
+    // Remove a action from action list
     removeAction(action) {
         this.actionList.remove(action);
         this.tBody.removeChild(action.row);
@@ -164,16 +170,25 @@ class Widget {
 
     setDataName(count) {
         let scriptTypes = this.div.getElementsByClassName('script-type');
-        for (let i = 0; i < scriptTypes.lenth; ++i) {
-            console.log(scriptTypes[i]);
+        for (let i = 0; i < scriptTypes.length; ++i) {
             scriptTypes[i].name = 'scriptType_' + count;
         }
 
-        this.div.getElementsByClassName('phone').name = 'phone_' + count;
+        this.div.getElementsByClassName('phone')[0].name = 'phone_' + count;
 
         for (let i in this.actionList) {
             this.actionList[i].setDataName(count, i);
         }
+
+        this.addSize(count);
+    }
+
+    addSize(count) {
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'size_' + count;
+        input.value = this.actionList.length;
+        this.div.appendChild(input);
     }
 }
 
@@ -203,6 +218,16 @@ class WidgetList {
         for (let i in this.widgets) {
             this.widgets[i].setDataName(i);
         }
+
+        this.addSize();
+    }
+
+    addSize() {
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'size';
+        input.value = this.widgets.length;
+        this.div.appendChild(input);
     }
 }
 

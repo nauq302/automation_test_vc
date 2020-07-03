@@ -33,6 +33,7 @@ from simplejson import dumps as dump_json
 from raven.contrib.flask import Sentry
 from json import loads as load_jsons
 reload(sys)
+
 sys.setdefaultencoding("utf-8")
 from cPickle import loads, dumps
 async_mode = None
@@ -40,13 +41,11 @@ async_mode = None
 app = Flask(__name__)
 app.jinja_env.autoescape = False
 
-#fake data for test
-import fake_data
 
 app.config["SECRET_KEY"] = config.SECRET_KEY
 app.config["SESSION_COOKIE_DOMAIN"] = config.SESSION_COOKIE_DOMAIN
 sentry = Sentry(app)
-app.jinja_env.add_extension("jinja2.ext.do")
+#app.jinja_env.add_extension("jinja2.ext.do")
 
 red = redis.Redis(config.DB_REDIS, 6379, db=14)
 
@@ -79,37 +78,37 @@ def _decode_dict(data):
     return rv
 
 
-@app.context_processor
-def utility_processor():
-    def get_current_date():
-        return db.get_current_datetime("time")
-    return dict(get_current_date=get_current_date)
+# @app.context_processor
+# def utility_processor():
+#     def get_current_date():
+#         return db.get_current_datetime("time")
+#     return dict(get_current_date=get_current_date)
 
 
 
-@app.context_processor
-def utility_processor():
-    def format_date(datetime):
-        return db.convert_int_to_time(datetime)
-    return dict(format_date=format_date)
+# @app.context_processor
+# def utility_processor():
+#     def format_date(datetime):
+#         return db.convert_int_to_time(datetime)
+#     return dict(format_date=format_date)
 
 
-@app.context_processor
-def utility_processor():
-    def format_date_main(datetime):
-        return db.convert_int_to_date(datetime)
-    return dict(format_date_main=format_date_main)
+# @app.context_processor
+# def utility_processor():
+#     def format_date_main(datetime):
+#         return db.convert_int_to_date(datetime)
+#     return dict(format_date_main=format_date_main)
 
 
-# convert to conrency
-@app.context_processor
-def utility_processor():
-    def format_price(amount, currency=u"€"):
-        return "{:20,.0f}".format(amount, currency)
-    return dict(format_price=format_price)
+# # convert to conrency
+# @app.context_processor
+# def utility_processor():
+#     def format_price(amount, currency=u"€"):
+#         return "{:20,.0f}".format(amount, currency)
+#     return dict(format_price=format_price)
 
 
-
+#################################################################
 
 
 class ItsdangerousSession(CallbackDict, SessionMixin):
@@ -119,7 +118,7 @@ class ItsdangerousSession(CallbackDict, SessionMixin):
         CallbackDict.__init__(self, initial, on_update)
         self.modified = False
 
-
+#################################################################
 
 class ItsdangerousSessionInterface(SessionInterface):
     session_class = ItsdangerousSession
@@ -159,22 +158,23 @@ class ItsdangerousSessionInterface(SessionInterface):
 
 app.session_interface = ItsdangerousSessionInterface()
 
+#################################################################
 
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         is_ok = False
+
         if "session_id" in session:
             session_id = session.get("session_id")
             user_id = db.get_user_id(session_id)
-            user = None
             if user_id:
                 g.user_id = user_id
                 g.session_id = session_id
                 g.user = db.get_user_info(user_id)
                 if session:
                     is_ok = True
-                user =  g.user
+
         if not is_ok:
             session.clear()
             scheme = request.headers.get("X-Forwarded-Proto", "http")
@@ -189,24 +189,22 @@ def login_required(f):
 
 
 
-
+#################################################################
 
 @app.route("/assets/<path:filename>")
 def public_files(filename):
     src = os.path.dirname(__file__)
     return send_from_directory(os.path.join(src, "assets"), filename)
 
+#################################################################
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "GET":
-        alert_message = session.pop("alert_message") \
-                if "alert_message" in session else None
-        username  = session.pop("username") \
-                if "username" in session else None
+        alert_message = session.pop("alert_message") if ("alert_message" in session) else None
+        username  = session.pop("username") if ("username" in session) else None
         res = render_template("login.html", alert_message=alert_message, username=username)
-        response = make_response(res)
-        return response
+        return make_response(res)
 
     else:
         username = request.form.get("username")
@@ -233,7 +231,7 @@ def login():
             session["password"] = ""
             return redirect("/login")
 
-
+#################################################################
 
 @app.route("/sign_out")
 @login_required
@@ -243,78 +241,174 @@ def sign_out():
     return redirect("/login")
 
 
-
-
-@app.route("/", methods=["GET", "POST"])
+#################################################################
+#
+#           Index Page:
+# Show all Test Dialplan and their passed test cases.
+#  
+@app.route("/", methods = ["GET"])
 @login_required
+
 def index():
-    info_user = g.user
-     
-    page = request.args.get("page")
+    # Get page index, if not 
     try:
-        page = int(page)
+        page = int(request.args.get("page"))
     except:
         page = 1
 
-    ts_from = (page - 1) * index.page_size
-    ts_to = page * index.page_size
+    # Calculate page count
+    pageCount = db.getTestDialplanCount() / index.pageSize + 1 
 
-    page_count = int(ceil(fake_data.test_script_list.__len__() / float(index.page_size)))
+    # Get dialplans
+    testDialplanList = db.getTestDialplans(page, index.pageSize)
 
-    test_script_list = fake_data.test_script_list[ts_from : ts_to]
+    # Count passed and total test cases
+    # And then push all data into a list
+    testDialplans = []
+    for i in range(testDialplanList.count(True)):
+        id = testDialplanList[i]["id"]
 
+        # Get passed and totoal test cases
+        passed = db.getTestCasePassedCount(id)
+        total = db.getTestCase(id).count()
+
+        # Push data to list
+        testDialplans.append((testDialplanList[i], passed, total))
+
+    # Create response
     res = render_template(
         "index.html", 
-        info_user = info_user, 
-        test_script_list = test_script_list, 
+        info_user = g.user, 
+        test_dialplans = testDialplans, 
         page = page, 
-        page_count = page_count
+        page_count = pageCount
     )
 
-    response = make_response(res)
+    return make_response(res)
 
-    return response
+# Default page size for index page is 10 row
+index.pageSize = 10
 
-index.page_size = 10
-
-
-@app.route("/test_case", methods=["GET", "POST"])
+#################################################################
+#
+#           Test Case page:
+# Show test cases of specific Test dialplan
+#
+@app.route("/test_case", methods=["GET"])
 @login_required
+
 def test_case():
-    info_user = g.user
+    # Get Test dialplan ID from request
+    testDialplanID = request.args.get("test_dialplan_id")
     
-    test_case_list = fake_data.test_case_list
-    test_script_list = fake_data.test_script_list
+    # Get list of ID and Name of Test dialplan
+    testDialplanList = db.getTestDialplansIdAndName()
 
-    test_script_id = request.args.get("test_script_id")
+    # If not found Test dialplan ID from request then set it as the first of list
+    if testDialplanID == None:
+        testDialplanID = testDialplanList[0]["id"]
+
+    # Get all Test case of specific Test dialplan
+    testCaseList = db.getTestCase(testDialplanID)
     
-    try:
-        test_script_id = int(test_script_id)
-    except:
-        test_script_id = test_script_list[0]['_id']
-
-    return render_template(
+    # Create response
+    res = render_template(
         "test_case.html",
-        info_user = info_user,
-        test_case_list = test_case_list,
-        test_script_list = test_script_list,
-        test_script_id = test_script_id
+        info_user = g.user,
+        test_case_list = testCaseList,
+        test_dialplan_list = testDialplanList,
+        test_dialplan_id = testDialplanID
     )
 
-@app.route("/create_test_case", methods=["GET", "POST"])
+    return make_response(res)
+
+
+
+#################################################################
+#           Create Test Case page:
+#   Show the Create Test Case form
+#
+@app.route("/create_test_case", methods=["GET"])
 @login_required
-def create_test_case():
-    info_user = g.user
 
-    return render_template(
-        "create_test_case.html",
-        info_user = info_user,
-    )
+def create_test_case_get():
+    testDialplanID = request.args.get("test_dialplan_id")
+
+    testDialplan = db.getTestDialplanIdAndName(testDialplanID)
+
+    if testDialplan != None:
+        res = render_template(
+            "create_test_case.html",
+            info_user = g.user,
+            test_dialplan = testDialplan
+        )
+
+        return make_response(res)
+
+    else:
+        return redirect("/")
+
+#################################################################
+#
+#           Create Test Case page
+#   Process post method to adding data to database
+@app.route("/create_test_case", methods=["POST"])
+@login_required
+
+def create_test_case_post():
+
+    try:
+        id_dialplan = request.form["test_dialplan_id"]
+
+        test_case = {
+            "id": uuid4(),
+            "id_dialplan": id_dialplan,
+            "name": request.form["name"],
+            "desc": request.form["description"],
+            "create_date": datetime.datetime.today(),
+            "status": False
+        }
+
+        db.addTestCase(test_case)
+        
+        size = int(request.form["size"])
+
+        for i in range(size):
+            call_listen_dialplan = {
+                "id": uuid4(),
+                "id_test_case": test_case["id"],
+                "type": request.form["scriptType_%d" % i],
+                "machine": request.form["phone_%d" % i]
+            }
+
+            db.addCallListenDialplan(call_listen_dialplan)
+
+            size_ = int(request.form["size_%d" % i])
+
+            for j in range(size_):
+                db.addActionDialplan({
+                    "id": uuid4(),
+                    "id_call_listen": call_listen_dialplan["id"],
+                    "name": request.form["action_%d_%d" % (i,j)],
+                    "value": request.form["value_%d_%d" % (i,j)],
+                    "result": request.form["result_%d_%d" % (i,j)],
+                    "note": request.form["note_%d_%d"% (i,j)],
+                })
+
+
+
+    except Exception as e:
+        print(e)
+
+
+    return redirect("/test_case")
+
+#################################################################
 
 if __name__ == "__main__":
     try:
         port = int(sys.argv[1])
     except (TypeError, IndexError):
         port = 8089
-    app.run(debug=True, host="0.0.0.0", port=port)
+    app.run(debug = True, host = "0.0.0.0", port = port)
 
