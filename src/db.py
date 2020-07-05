@@ -75,48 +75,60 @@ def login(username, password):
         return False, 'Username  hoặc mật khẩu của bạn không đúng.'
 
 
-
-def getTestDialplans(page_index, page_size):
-    search_from = (page_index - 1) * page_size
-    test_dialplans = db.tbl_test_dialplan.find() \
+def getTestDialplans(searchString, pageIndex, pageSize):
+    search_from = (pageIndex - 1) * pageSize
+    test_dialplans = db.tbl_test_dialplan.find({ "name": { "$regex": ".*" + searchString + ".*" }}) \
         .skip(search_from)  \
-        .limit(page_size)
+        .limit(pageSize)
     return test_dialplans
 
 def getTestDialplansIdAndName():
-    test_dialplans = db.tbl_test_dialplan.find({}, { "id": 1, "name": 1 }) 
-    return test_dialplans
+    return db.tbl_test_dialplan.find({}, { "id": 1, "name": 1 }) 
 
 def getTestDialplanIdAndName(id):
-    test_dialplans = db.tbl_test_dialplan.find({ "id": id }, { "id": 1, "name": 1 }) 
-    
-    try:
-        return test_dialplans[0]
-    except:
-        return None
+    return db.tbl_test_dialplan.find_one({ "id": id }, { "id": 1, "name": 1 }) 
+
 
 def getTestDialplanCount():
     return db.tbl_test_dialplan.count({})
 
+def getTestCase(id):
+    return db.tbl_test_case.find_one({ "id": id })
 
-def getTestCase(test_dialplan_id):
+def getTestCaseOfDialplan(test_dialplan_id):
     return db.tbl_test_case.find({ "id_dialplan": test_dialplan_id })
 
 def getTestCasePassedCount(test_dialplan_id):
-    tc_pass = db.tbl_test_case.find({
-        "id_dialplan": test_dialplan_id,
-        "status": True
-    }).count()
-    return tc_pass
+    return db.tbl_test_case.find({ "id_dialplan": test_dialplan_id, "status": True }).count()
 
 def addTestCase(testCase):
     db.tbl_test_case.insert(testCase)
 
+def getCallListenDialplan(id):
+    return db.tbl_call_listen_dialplan.find({ "id": id })
+
+def getCallListenDialplansOfTestCase(test_case_id):
+    return db.tbl_call_listen_dialplan.find({ "id_test_case": test_case_id })
+
 def addCallListenDialplan(call_listen_dialplan):
     db.tbl_call_listen_dialplan.insert(call_listen_dialplan)
 
+def getActionsOfCallListenDialplan(call_listen_dialplan_id):
+    return db.tbl_action_dialplan.find({ "id_call_listen": call_listen_dialplan_id })
+
 def addActionDialplan(action_dialplan):
     db.tbl_action_dialplan.insert(action_dialplan)
+
+def deleteTestCase(id):
+    call_listen_dialplan_id_list = db.tbl_call_listen_dialplan.find({ "id_test_case": id }, { "id": 1 })
+    for cldi in call_listen_dialplan_id_list:
+        db.tbl_action_dialplan.delete_many({ "id_call_listen": cldi["id"] })
+
+    db.tbl_call_listen_dialplan.delete_many({ "id_test_case": id })
+
+    db.tbl_test_case.delete_one({ "id": id })
+
+
 
 # find all documents
 

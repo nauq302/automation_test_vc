@@ -6,7 +6,7 @@ import time
 import ast
 import json
 import math
-from uuid import uuid4
+from uuid import uuid4, UUID
 import random
 from flask import (Flask, request, send_from_directory, Response,
                    render_template, redirect, session, g, make_response)
@@ -256,11 +256,16 @@ def index():
     except:
         page = 1
 
-    # Calculate page count
-    pageCount = db.getTestDialplanCount() / index.pageSize + 1 
+    try:
+        searchString = request.args["search"]
+    except:
+        searchString = ""
 
     # Get dialplans
-    testDialplanList = db.getTestDialplans(page, index.pageSize)
+    testDialplanList = db.getTestDialplans(searchString, page, index.pageSize)
+
+    # Calculate page count
+    pageCount = testDialplanList.count(True) / index.pageSize + 1
 
     # Count passed and total test cases
     # And then push all data into a list
@@ -270,7 +275,7 @@ def index():
 
         # Get passed and totoal test cases
         passed = db.getTestCasePassedCount(id)
-        total = db.getTestCase(id).count()
+        total = db.getTestCaseOfDialplan(id).count()
 
         # Push data to list
         testDialplans.append((testDialplanList[i], passed, total))
@@ -309,7 +314,7 @@ def test_case():
         testDialplanID = testDialplanList[0]["id"]
 
     # Get all Test case of specific Test dialplan
-    testCaseList = db.getTestCase(testDialplanID)
+    testCaseList = db.getTestCaseOfDialplan(testDialplanID)
     
     # Create response
     res = render_template(
@@ -333,7 +338,6 @@ def test_case():
 
 def create_test_case_get():
     testDialplanID = request.args.get("test_dialplan_id")
-
     testDialplan = db.getTestDialplanIdAndName(testDialplanID)
 
     if testDialplan != None:
@@ -356,12 +360,137 @@ def create_test_case_get():
 @login_required
 
 def create_test_case_post():
-
     try:
         id_dialplan = request.form["test_dialplan_id"]
 
+        # Insert test case
         test_case = {
-            "id": uuid4(),
+            "id": uuid4().hex,
+            "id_dialplan": id_dialplan,
+            "name": request.form["name"],
+            "desc": request.form["description"],
+            "create_date": datetime.datetime.today(),
+            "status": False
+        }
+
+        db.addTestCase(test_case)
+        
+        # Get number of call/listen dialplans depend on test case
+        size = int(request.form["size"])
+
+        # Insert call/listen dialplans
+        for i in range(size):
+            call_listen_dialplan = {
+                "id": uuid4().hex,
+                "id_test_case": test_case["id"],
+                "type": request.form["scriptType_%d" % i],
+                "machine": request.form["phone_%d" % i]
+            }
+
+            db.addCallListenDialplan(call_listen_dialplan)
+
+            # Get number of action in each call/listen dialplan
+            size_ = int(request.form["size_%d" % i])
+
+            # Insert actions
+            for j in range(size_):
+                db.addActionDialplan({
+                    "id": uuid4().hex,
+                    "id_call_listen": call_listen_dialplan["id"],
+                    "name": request.form["action_%d_%d" % (i,j)],
+                    "value": request.form["value_%d_%d" % (i,j)],
+                    "result": request.form["result_%d_%d" % (i,j)],
+                    "note": request.form["note_%d_%d"% (i,j)],
+                })
+
+    # Back to test case page
+    finally:
+        return redirect("/test_case?test_dialplan_id=%s" % id_dialplan)
+
+#################################################################
+#
+#       Delete url
+#   Delete a test case and depenedence
+@app.route("/delete_test_case", methods=["GET"])
+@login_required
+
+def delete():
+    try:
+        # Get id of test case
+        id = request.args["id"]
+
+        # Delete
+        db.deleteTestCase(id)
+
+    except Exception as e:
+        print(e)
+
+    finally:
+        # Redirect to test dialplan page of deleted test case
+        test_dialplan_id = request.args["test_dialplan_id"]
+        return redirect("/test_case?" + test_dialplan_id)
+
+
+###################################################################
+#
+#       Edit Test Case Page
+#   Edit info a existed test case
+@app.route("/edit_test_case", methods=["GET"])
+@login_required
+
+def edit_get():
+    try:
+        # Get Test Dialplan of Test Case
+        testDialplanID = request.args.get("test_dialplan_id")
+        testDialplan = db.getTestDialplanIdAndName(testDialplanID)
+        
+        # Get ID of Test Case
+        id = request.args["id"]
+        
+        # Get Test Case and its depended call/listen dialplans
+        test_case = db.getTestCase(id)
+        call_listen_dialplans_list = db.getCallListenDialplansOfTestCase(id)
+        
+        # Get actions for each dialplan
+        call_listen_dialplans = []
+        for i in range(call_listen_dialplans_list.count()):
+            actions = db.getActionsOfCallListenDialplan(call_listen_dialplans_list[i]["id"])
+            call_listen_dialplans.append((call_listen_dialplans_list[i], actions))
+
+        # Create response
+        res = render_template(
+            "edit_test_case.html",
+            info_user = g.user,
+            test_case = test_case,
+            test_dialplan = testDialplan,
+            call_listen_dialplans = call_listen_dialplans
+        )
+        
+        return make_response(res)
+
+    except Exception as e:
+        print(e)
+        return redirect("/")
+
+
+###################################################################
+#
+#       Edit Test Case
+#
+@app.route("/edit_test_case", methods=["POST"])
+@login_required
+
+def edit_post():
+    try:
+        id_dialplan = request.form["test_dialplan_id"]
+        id = request.form["id"]
+
+        # Delete Test Case and its dependents
+        db.deleteTestCase(id)
+
+        # Add new Test Case
+        test_case = {
+            "id": id,
             "id_dialplan": id_dialplan,
             "name": request.form["name"],
             "desc": request.form["description"],
@@ -375,7 +504,7 @@ def create_test_case_post():
 
         for i in range(size):
             call_listen_dialplan = {
-                "id": uuid4(),
+                "id": uuid4().hex,
                 "id_test_case": test_case["id"],
                 "type": request.form["scriptType_%d" % i],
                 "machine": request.form["phone_%d" % i]
@@ -387,7 +516,7 @@ def create_test_case_post():
 
             for j in range(size_):
                 db.addActionDialplan({
-                    "id": uuid4(),
+                    "id": uuid4().hex,
                     "id_call_listen": call_listen_dialplan["id"],
                     "name": request.form["action_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
@@ -395,15 +524,11 @@ def create_test_case_post():
                     "note": request.form["note_%d_%d"% (i,j)],
                 })
 
+    finally:
+        return redirect("/test_case?test_dialplan_id=%s" % id_dialplan)
 
 
-    except Exception as e:
-        print(e)
-
-
-    return redirect("/test_case")
-
-#################################################################
+###################################################################
 
 if __name__ == "__main__":
     try:

@@ -81,11 +81,11 @@
                                     <tbody>
                                         {% for tc in test_case_list %}
                                             <tr class="gradeX">
-                                                {% set id = tc['_id'] %}
+                                                {% set id = tc['id'] %}
                                                 <td>{{tc['name']}}</td>
 
                                                 <td>
-                                                    <input type="checkbox" id="select-one-{{id}}" name="selected_test_cases">
+                                                    <input type="checkbox" id="select-one-{{id}}">
                                                     <label for="select-one-{{id}}">Select</label>
                                                 </td>
 
@@ -97,12 +97,12 @@
                                                     <td class="red">Failed</td>
                                                 {% endif %}
 
-                                                <td><a href="#">Edit</a></td>
+                                                <td><a href="/edit_test_case?id={{id}}&test_dialplan_id={{test_dialplan_id}}">Edit</a></td>
 
                                                 <td>{{tc['desc']}}</td>
                                                
                                                 <td>
-                                                    <button onclick="redirect('delete_test_case?id={{id}}')">
+                                                    <button onclick="redirect('delete_test_case?id={{id}}&test_dialplan_id={{test_dialplan_id}}')">
                                                         <i class="fa fa-minus"></i>
                                                     </button>
                                                 </td>

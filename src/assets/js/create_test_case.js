@@ -77,6 +77,8 @@ class Widget {
     div;
 
     // Getter
+    get phone() { return this.div.getElementsByClassName('phone')[0]; }
+    get scriptTypes() { return this.div.getElementsByClassName('script-type'); }
     get tBody() { return this.div.getElementsByTagName('tbody')[0]; }
     get addButton() { return this.div.getElementsByClassName('add-button')[0]; }
     get deleteWidgetButton() { return this.div.getElementsByClassName('delete-widget')[0]; }
@@ -169,12 +171,11 @@ class Widget {
     }
 
     setDataName(count) {
-        let scriptTypes = this.div.getElementsByClassName('script-type');
-        for (let i = 0; i < scriptTypes.length; ++i) {
-            scriptTypes[i].name = 'scriptType_' + count;
+        for (let i = 0; i < this.scriptTypes.length; ++i) {
+            this.scriptTypes[i].name = 'scriptType_' + count;
         }
 
-        this.div.getElementsByClassName('phone')[0].name = 'phone_' + count;
+        this.phone.name = 'phone_' + count;
 
         for (let i in this.actionList) {
             this.actionList[i].setDataName(count, i);
@@ -199,8 +200,6 @@ class WidgetList {
 
     constructor(div) {
         this.div = div;
-        this.addWidget();
-        this.widgets[0].addAction();
     }
 
     addWidget() {
