@@ -39,7 +39,7 @@
                             
                             <form action="/" method="GET" class="col-sm-offset-4 col-sm-5">
                                 <div class="col-sm-offset-4 col-sm-4">
-                                    <input name="search" class="form-control input-md"/>
+                                    <input name="search" value="{{searchString}}" class="form-control input-md"/>
                                 </div>
                                 
                                 <button class="btn btn-primary"><i class="fa fa-search"></i></button>
@@ -100,13 +100,13 @@
                         <div class="row">
                             <div class="col-sm-offset-9 col-sm-3">
 
-                                <button onclick="redirect('/?page=1')">Đầu</button>
+                                <button onclick="redirect('/?page=1&search={{searchString}}')">Đầu</button>
 
                                 {% for i in range(1, page_count + 1) %}
-                                    <button onclick="redirect('/?page={{i}}')" {{'disabled' if i == page}}>{{i}}</button>
+                                    <button onclick="redirect('/?page={{i}}&search={{searchString}}')" {{'disabled' if i == page}}>{{i}}</button>
                                 {% endfor %}
                                 
-                                <button onclick="redirect('/?page={{page_count}}')">Cuối</button>
+                                <button onclick="redirect('/?page={{page_count}}&search={{searchString}}')">Cuối</button>
 
                             </div>
                         </div>

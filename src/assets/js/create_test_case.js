@@ -211,10 +211,12 @@ class WidgetList {
     div;
     s = 0;
 
+    // Create widget list
     constructor(div) {
         this.div = div;
     }
 
+    // Add a widget
     addWidget() {
         let widget = new Widget(this);
         this.widgets.push(widget);
@@ -222,6 +224,7 @@ class WidgetList {
         ++this.s;
     }
 
+    // 
     removeWidget(widget) {
         this.widgets.splice(this.widgets.indexOf(widget), 1);
         this.div.removeChild(widget.div);

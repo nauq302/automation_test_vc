@@ -89,8 +89,8 @@ def getTestDialplanIdAndName(id):
     return db.tbl_test_dialplan.find_one({ "id": id }, { "id": 1, "name": 1 }) 
 
 
-def getTestDialplanCount():
-    return db.tbl_test_dialplan.count({})
+def getTestDialplanCount(searchString):
+    return db.tbl_test_dialplan.find({ "name": { "$regex": ".*" + searchString + ".*" }}).count(True)
 
 def getTestCase(id):
     return db.tbl_test_case.find_one({ "id": id })

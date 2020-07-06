@@ -265,7 +265,8 @@ def index():
     testDialplanList = db.getTestDialplans(searchString, page, index.pageSize)
 
     # Calculate page count
-    pageCount = testDialplanList.count(True) / index.pageSize + 1
+    count = db.getTestDialplanCount(searchString)
+    pageCount = count // index.pageSize + (0 if count % index.pageSize == 0 else 1)
 
     # Count passed and total test cases
     # And then push all data into a list
@@ -286,7 +287,7 @@ def index():
         info_user = g.user, 
         test_dialplans = testDialplans, 
         page = page, 
-        page_count = pageCount
+        page_count = pageCount,searchString = searchString
     )
 
     return make_response(res)
