@@ -91,6 +91,11 @@ def getTestDialplansIdAndName():
 def getTestDialplanIdAndName(id):
     return db.tbl_test_dialplan.find_one({ "id": id }, { "id": 1, "name": 1 }) 
 
+def deleteTestDialplan(id):
+    db.tbl_test_dialplan.remove({ "id": id })
+
+    for tc in getTestCaseOfDialplan(id):
+        deleteTestCase(tc["id"])
 
 def getTestDialplanCount(searchString):
     return db.tbl_test_dialplan.find({ "name": searchOptions(searchString) }).count(True)

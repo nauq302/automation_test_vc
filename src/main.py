@@ -261,6 +261,11 @@ def index():
     except:
         searchString = ""
 
+    try:
+        err = request.args["err"]
+    except:
+        err = None
+
     # Get dialplans
     testDialplanList = db.getTestDialplans(searchString, page, index.pageSize)
 
@@ -271,7 +276,8 @@ def index():
     # Count passed and total test cases
     # And then push all data into a list
     testDialplans = []
-    for i in range(testDialplanList.count(True)):
+    count = testDialplanList.count(True)
+    for i in range(count):
         id = testDialplanList[i]["id"]
 
         # Get passed and totoal test cases
@@ -281,19 +287,40 @@ def index():
         # Push data to list
         testDialplans.append((testDialplanList[i], passed, total))
 
+    
+
     # Create response
     res = render_template(
         "index.html", 
         info_user = g.user, 
         test_dialplans = testDialplans, 
         page = page, 
-        page_count = pageCount,searchString = searchString
+        page_count = pageCount,
+        searchString = searchString,
+        count = count,
+        err = err
     )
 
     return make_response(res)
 
 # Default page size for index page is 10 row
 index.pageSize = 10
+
+
+
+#################################################################
+#
+#           Delete Test Dialplan
+#   
+@app.route("/delete_test_dialplan", methods=["GET"])
+@login_required
+def delete_test_dialplan():
+    testDialplanID = request.args.get("id")
+    db.deleteTestDialplan(testDialplanID)
+    return redirect("/")
+
+
+
 
 #################################################################
 #
@@ -338,10 +365,10 @@ def test_case():
 @login_required
 
 def create_test_case_get():
-    testDialplanID = request.args.get("test_dialplan_id")
-    testDialplan = db.getTestDialplanIdAndName(testDialplanID)
+    try:
+        testDialplanID = request.args["test_dialplan_id"]
+        testDialplan = db.getTestDialplanIdAndName(testDialplanID)
 
-    if testDialplan != None:
         res = render_template(
             "create_test_case.html",
             info_user = g.user,
@@ -350,8 +377,8 @@ def create_test_case_get():
 
         return make_response(res)
 
-    else:
-        return redirect("/")
+    except:
+        return redirect(u"/?err=Không có Kịch bản Test để tạo Test Case")
 
 #################################################################
 #
