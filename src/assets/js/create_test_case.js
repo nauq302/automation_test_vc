@@ -89,10 +89,17 @@ class Widget {
         this.div.classList.add('row');
         this.setHTML();
 
+        // Set temp name for srciptType
+        for (let i = 0; i < this.scriptTypes.length; ++i) {
+            this.scriptTypes[i].name = "t" + parent.s;
+        }
+
+        // Set add button action
         this.addButton.onclick = function() {
             this.addAction()
         }.bind(this);
 
+        // Set delete button action 
         this.deleteWidgetButton.onclick = function() {
             parent.removeWidget(this);              
         }.bind(this);
@@ -111,6 +118,7 @@ class Widget {
         this.tBody.removeChild(action.row);
     }
 
+    // Set HTML
     setHTML() {
         this.div.innerHTML = /*html*/`
             <div class="widget">
@@ -170,6 +178,7 @@ class Widget {
         `;
     }
 
+    // Set data name for submit
     setDataName(count) {
         for (let i = 0; i < this.scriptTypes.length; ++i) {
             this.scriptTypes[i].name = 'scriptType_' + count;
@@ -184,6 +193,7 @@ class Widget {
         this.addSize(count);
     }
 
+    // Add size
     addSize(count) {
         let input = document.createElement('input');
         input.type = 'hidden';
@@ -193,10 +203,13 @@ class Widget {
     }
 }
 
-
+/**
+ * 
+ */
 class WidgetList {
     widgets = [];
     div;
+    s = 0;
 
     constructor(div) {
         this.div = div;
@@ -206,6 +219,7 @@ class WidgetList {
         let widget = new Widget(this);
         this.widgets.push(widget);
         this.div.appendChild(widget.div);
+        ++this.s;
     }
 
     removeWidget(widget) {
@@ -229,5 +243,4 @@ class WidgetList {
         this.div.appendChild(input);
     }
 }
-
 
