@@ -75,9 +75,12 @@ def login(username, password):
         return False, 'Username  hoặc mật khẩu của bạn không đúng.'
 
 
+def searchOptions(searchString):
+    return { "$regex": "^.*" + searchString + ".*$", "$options": "i" }
+
 def getTestDialplans(searchString, pageIndex, pageSize):
     search_from = (pageIndex - 1) * pageSize
-    test_dialplans = db.tbl_test_dialplan.find({ "name": { "$regex": ".*" + searchString + ".*" }}) \
+    test_dialplans = db.tbl_test_dialplan.find({ "name": searchOptions(searchString) }) \
         .skip(search_from)  \
         .limit(pageSize)
     return test_dialplans
@@ -90,7 +93,7 @@ def getTestDialplanIdAndName(id):
 
 
 def getTestDialplanCount(searchString):
-    return db.tbl_test_dialplan.find({ "name": { "$regex": ".*" + searchString + ".*" }}).count(True)
+    return db.tbl_test_dialplan.find({ "name": searchOptions(searchString) }).count(True)
 
 def getTestCase(id):
     return db.tbl_test_case.find_one({ "id": id })
