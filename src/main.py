@@ -252,7 +252,7 @@ def sign_out():
 def index():
     # Get page index, if not 
     try:
-        page = int(request.args.get("page"))
+        page = int(request.args["page"])
     except:
         page = 1
 
