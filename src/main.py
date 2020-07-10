@@ -250,24 +250,13 @@ def sign_out():
 @login_required
 
 def index():
-    # Get page index, if not 
-    try:
-        page = int(request.args["page"])
-    except:
-        page = 1
-
     try:
         searchString = request.args["search"]
     except:
         searchString = ""
 
-    try:
-        err = request.args["err"]
-    except:
-        err = None
-
     # Get dialplans
-    testDialplanList = db.getTestDialplans(searchString, page, index.pageSize)
+    testDialplanList = db.getTestDialplans(searchString, 1, index.pageSize)
 
     # Calculate page count
     count = db.getTestDialplanCount(searchString)
@@ -294,11 +283,9 @@ def index():
         "index.html", 
         info_user = g.user, 
         test_dialplans = testDialplans, 
-        page = page, 
+        page = 1, 
         page_count = pageCount,
-        searchString = searchString,
-        count = count,
-        err = err
+        searchString = searchString
     )
 
     return make_response(res)
@@ -306,6 +293,45 @@ def index():
 # Default page size for index page is 10 row
 index.pageSize = 10
 
+@app.route("/test_dialplans_list", methods=["POST"])
+def test_dialplans_list():
+    
+    page = int(request.form["page"])
+    searchString = request.form["search"]
+
+    # Get dialplans
+    testDialplanList = db.getTestDialplans(searchString, page, index.pageSize)
+
+    # Calculate page count
+    count = db.getTestDialplanCount(searchString)
+    pageCount = count // index.pageSize + (0 if count % index.pageSize == 0 else 1)
+
+    print(page, searchString)
+
+    # Count passed and total test cases
+    # And then push all data into a list
+    testDialplans = []
+    count = testDialplanList.count(True)
+    for i in range(count):
+        id = testDialplanList[i]["id"]
+
+        # Get passed and totoal test cases
+        passed = db.getTestCasePassedCount(id)
+        total = db.getTestCaseOfDialplan(id).count()
+
+        # Push data to list
+        testDialplans.append((testDialplanList[i], passed, total))
+
+    # Create response
+    res = render_template(
+        "test_dialplans_list.html", 
+        test_dialplans = testDialplans, 
+        page = page, 
+        page_count = pageCount,
+        searchString = searchString
+    )
+
+    return make_response(res)
 
 
 #################################################################
@@ -342,7 +368,7 @@ def test_case():
         testDialplanID = testDialplanList[0]["id"]
 
     # Get all Test case of specific Test dialplan
-    testCaseList = db.getTestCaseOfDialplan(testDialplanID)
+    testCaseList = db.getTestCases()
     
     # Create response
     res = render_template(
@@ -365,20 +391,14 @@ def test_case():
 @login_required
 
 def create_test_case_get():
-    try:
-        testDialplanID = request.args["test_dialplan_id"]
-        testDialplan = db.getTestDialplanIdAndName(testDialplanID)
 
-        res = render_template(
-            "create_test_case.html",
-            info_user = g.user,
-            test_dialplan = testDialplan
-        )
+    res = render_template(
+        "create_test_case.html",
+        info_user = g.user
+    )
 
-        return make_response(res)
+    return make_response(res)
 
-    except:
-        return redirect(u"/?err=Không có Kịch bản Test để tạo Test Case")
 
 #################################################################
 #

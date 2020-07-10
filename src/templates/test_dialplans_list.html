@@ -1,0 +1,25 @@
+{% for p in test_dialplans %}
+    <tr class="gradeX">
+        {% set td = p[0] %}
+        {% set id = td['id'] %}
+        <td>{{td['name']}}</td>
+
+        <td>{{td['create_date'].date()}}</td>
+
+        <td>{{td['test_account']}}</td>
+
+        <td class="{{'green' if p[1] == p[2] else 'red'}}">
+            {{p[1]}}/{{p[2]}}
+        </td>
+
+        <td>{{td['hotline_number']}}</td>
+        
+        <td><a href="/test_case?test_dialplan_id={{id}}">Xem chi tiết</a></td>
+
+        <td>
+            <button onclick="redirect('delete_test_dialplan?id={{id}}')">
+                <i class="fa fa-minus"></i>
+            </button>
+        </td>
+    </tr>
+{% endfor %}

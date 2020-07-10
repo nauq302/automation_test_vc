@@ -27,11 +27,9 @@ for (let i = 0; i < 28; ++i) {
 for (let i = 0; i < 100; ++i) {
     db.tbl_test_case.insert({
         id: "tcid" + i,
-        id_dialplan: "tdid" + Math.floor(Math.random() * 28),
         create_date: new Date("2020-06-" + i),
         name: "name " + i,
-        desc: "Nothing",
-        status: Boolean(i % 2)
+        desc: "Nothing"
     })
 }
 

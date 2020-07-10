@@ -15,12 +15,26 @@
     </style>
 
     <script>
-        {% if err %}
-            alert('{{err}}')
-        {% endif %}
+        function pageChange(page) {
+            let xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById('test-dialplans-list').innerHTML = this.responseText;
+                }
+            };
+
+            xhttp.open('POST', 'test_dialplans_list', true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send('page=' + page + '&search={{searchString}}');
+
+            let pageButtons = document.getElementsByClassName('page-btn');
+            for (let i = 0; i < pageButtons.length; ++i) {
+                pageButtons[i].disabled = pageButtons[i].id == ('b' + page);
+            }
+        }
 
         function redirect(url) {
-            location.href = url
+            location.href = url;
         }
     </script>
 
@@ -38,9 +52,6 @@
 
                         <div class="row">
                             <div class="col-sm-3">
-                                {% set tdid = ('test_dialplan_id=' + test_dialplans[0][0]['id']) if (count != 0) else '' %}
-                                
-                                
                             </div>
                             
                             <form action="/" method="GET" class="col-sm-offset-4 col-sm-5">
@@ -64,39 +75,13 @@
                                             <th>Account Test</th>
                                             <th>Test Case Pass</th>
                                             <th>Hotline Number</th>
-                                            <th>Tạo Tese Case</th>
                                             <th>Chi tiết</th>
                                             <th>Xóa</th>
                                         </tr>
                                     </thead>
 
-                                    <tbody>
-                                        {% for p in test_dialplans %}
-                                            <tr class="gradeX">
-                                                {% set td = p[0] %}
-                                                {% set id = td['id'] %}
-                                                <td>{{td['name']}}</td>
-
-                                                <td>{{td['create_date'].date()}}</td>
-
-                                                <td>{{td['test_account']}}</td>
-
-                                                <td class="{{'green' if p[1] == p[2] else 'red'}}">
-                                                    {{p[1]}}/{{p[2]}}
-                                                </td>
-
-                                                <td>{{td['hotline_number']}}</td>
-                                                <td><button onclick="redirect('/create_test_case?test_dialplan_id={{id}}')" class="btn btn-primary">Tạo Test Case</button></td>
-                                                
-                                                <td><a href="/test_case?test_dialplan_id={{id}}">Xem chi tiết</a></td>
-        
-                                                <td>
-                                                    <button onclick="redirect('delete_test_dialplan?id={{id}}')">
-                                                        <i class="fa fa-minus"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
+                                    <tbody id="test-dialplans-list">
+                                        {% include "test_dialplans_list.html" %}
                                     </tbody>
 
                                 </table>
@@ -108,13 +93,13 @@
                         <div class="row">
                             <div class="col-sm-offset-9 col-sm-3">
 
-                                <button onclick="redirect('/?page=1&search={{searchString}}')">Đầu</button>
+                                <button onclick="pageChange(1)">Đầu</button>
 
                                 {% for i in range(1, page_count + 1) %}
-                                    <button onclick="redirect('/?page={{i}}&search={{searchString}}')" {{'disabled' if i == page}}>{{i}}</button>
+                                    <button class="page-btn" id="b{{i}}" onclick="pageChange({{i}})" {{'disabled' if i == 1}}>{{i}}</button>
                                 {% endfor %}
                                 
-                                <button onclick="redirect('/?page={{page_count}}&search={{searchString}}')">Cuối</button>
+                                <button onclick="pageChange({{page_count}})">Cuối</button>
 
                             </div>
                         </div>
@@ -124,4 +109,5 @@
             </div>
         </div>
     </div>
+    
 {% endblock %}

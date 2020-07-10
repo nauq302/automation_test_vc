@@ -103,6 +103,9 @@ def getTestDialplanCount(searchString):
 def getTestCase(id):
     return db.tbl_test_case.find_one({ "id": id })
 
+def getTestCases():
+    return db.tbl_test_case.find()
+
 def getTestCaseOfDialplan(test_dialplan_id):
     return db.tbl_test_case.find({ "id_dialplan": test_dialplan_id })
 
