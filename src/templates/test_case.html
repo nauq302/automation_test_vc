@@ -16,6 +16,24 @@
         </style>
     
         <script>
+            function pageChange(page) {
+                let xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById('test-cases-list').innerHTML = this.responseText;
+                    }
+                };
+    
+                xhttp.open('POST', 'test_cases_list', true);
+                xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                xhttp.send('page=' + page);
+    
+                let pageButtons = document.getElementsByClassName('page-btn');
+                for (let i = 0; i < pageButtons.length; ++i) {
+                    pageButtons[i].disabled = pageButtons[i].id == ('b' + page);
+                }
+            }
+
             function redirect(url) {
                 location.href = url;
             }
@@ -37,22 +55,11 @@
 
                     <div class="ibox-content">
 
-                        <div class="row">
-                            <label class="col-sm-2 control-label">Chọn Kịch bản Test</label>
 
-                            <form action="test_case" class="col-sm-5">
-                                <select name="test_dialplan_id" onchange="this.form.submit()" class="form-control">
-                                    {% for ts in test_dialplan_list %}
-                                        <option value="{{ts['id']}}" {{'selected' if (ts['id'] == test_dialplan_id)}}>{{ts['name']}}</option>
-                                    {% endfor %}
-                                </select>
-                            </form>
-                        </div>
-                        <div class="hr-line-dashed"></div>
                         
                         <div class="row">
                             <div class="col-sm-4 col-sm-offset-1">
-                                <button class="btn btn-primary" onclick="redirect('/create_test_case?test_dialplan_id={{test_dialplan_id}}')">
+                                <button class="btn btn-primary" onclick="redirect('/create_test_case')">
                                     <i class="fa fa-plus"></i> Thêm Test Case
                                 </button>
                                 <button class="btn btn-primary"><i class="fa fa-play"></i> Run Test Case</button>
@@ -65,24 +72,34 @@
 
                                     <thead class="form-group">
                                         <tr>
+                                            <th>ID</th>
                                             <th>Tên Test Case</th>
-                                            <th>
-                                                <input type="checkbox" id="select-all" onclick="toggle(this)">
-                                                <label for="select-all">Select All</label>
-                                            </th>
                                             <th>Ngày tạo</th>
-                                            <th>Trạng thái</th>
                                             <th>Chỉnh sửa</th>
                                             <th>Note</th>
                                             <th>Xóa</th>
                                         </tr>
                                     </thead>
 
-                                    <tbody>
+                                    <tbody id="test-cases-list">
                                         {% include "test_cases_list.html" %}
                                     </tbody>
 
                                 </table>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-offset-9 col-sm-3">
+
+                                <button onclick="pageChange(1)">Đầu</button>
+
+                                {% for i in range(1, page_count + 1) %}
+                                    <button class="page-btn" id="b{{i}}" onclick="pageChange({{i}})" {{'disabled' if i == 1}}>{{i}}</button>
+                                {% endfor %}
+                                
+                                <button onclick="pageChange({{page_count}})">Cuối</button>
+
                             </div>
                         </div>
                     </div>

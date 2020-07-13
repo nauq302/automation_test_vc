@@ -13,13 +13,24 @@ db.tbl_account_automation.insert({
     email: "liame@gmail.com" 
 }) 
 
+for (let i = 0; i < 4; ++i) {
+    db.tbl_campaign.insert({
+        id: "cid" + i,
+        name: "Campaign " + i,
+        note: "Nothing"
+    })
+}
+
+
 for (let i = 0; i < 28; ++i) {
     db.tbl_test_dialplan.insert({
         id: "tdid" + i,
+        id_campaign: "cid" + Math.floor(Math.random() * 3),
         name: "name " + i,
         create_date: new Date("2020-06-" + i),
         test_account: "Account " + i,
-        hotline_number: "0123456789"
+        hotline_number: "0123456789",
+        info_test_case: []
     })
 }
 
@@ -27,6 +38,7 @@ for (let i = 0; i < 28; ++i) {
 for (let i = 0; i < 100; ++i) {
     db.tbl_test_case.insert({
         id: "tcid" + i,
+        id_campaign: "cid" + Math.floor(Math.random() * 3),
         create_date: new Date("2020-06-" + i),
         name: "name " + i,
         desc: "Nothing"
@@ -37,7 +49,8 @@ for (let i = 0; i < 100; ++i) {
 
 for (let i = 0; i < 10; ++i) {
     db.tbl_call_listen_dialplan.insert({
-        id: UUID(),
+        id: "cldid" + i,
+        id_test_case: "tcid" + Math.floor(Math.random() * 3),
         type: i % 2 ? "Call" : "Listen",
         machine: "name " + i,
     })
@@ -47,7 +60,7 @@ for (let i = 0; i < 10; ++i) {
 for (let i = 0; i < 10; ++i) {
     db.tbl_action_dialplan.insert({
         id: UUID(),
-        id_call_listen: UUID(),
+        id_call_listen: "cldid" + Math.floor(Math.random() * 3),
         name: "name " + i,
         value: "value " + i,
         result: "result " + i,

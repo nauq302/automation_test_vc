@@ -46,6 +46,7 @@ def convert_int_to_date(date_convert):
 
 # check collection
 
+
 def check_collection_exist(collection):
     if collection in db.list_collection_names():
         return True
@@ -78,6 +79,9 @@ def login(username, password):
 def searchOptions(searchString):
     return { "$regex": "^.*" + searchString + ".*$", "$options": "i" }
 
+def getTestDialplan(id):
+    return db.tbl_test_dialplan.find_one({ "id" : id })
+
 def getTestDialplans(searchString, pageIndex, pageSize):
     search_from = (pageIndex - 1) * pageSize
     test_dialplans = db.tbl_test_dialplan.find({ "name": searchOptions(searchString) }) \
@@ -91,11 +95,56 @@ def getTestDialplansIdAndName():
 def getTestDialplanIdAndName(id):
     return db.tbl_test_dialplan.find_one({ "id": id }, { "id": 1, "name": 1 }) 
 
+def getTestCaseInfoOfDialplan(id):
+    return db.tbl_test_dialplan.find_one({ "id": id }, { "info_test_case": 1 }) 
+
+def addTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
+    db.tbl_test_dialplan.find_one_and_update(
+        { "id": testDialplanId },
+        { 
+            "$addToSet" : {
+                "info_test_case": testCaseInfo
+            }
+            
+        }
+    )
+
+def updateTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
+    db.tbl_test_dialplan.find_one_and_update(
+        { 
+            "id": testDialplanId,
+            "info_test_case.id": testCaseInfo["id"]
+        },
+        { 
+            "$set": {
+                "info_test_case.$.status": testCaseInfo["status"],
+                "info_test_case.$.result": testCaseInfo["result"],
+            }
+            
+        }
+    )
+
+def removeTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
+    db.tbl_test_dialplan.find_one_and_update(
+        { 
+            "id": testDialplanId
+        },
+        { 
+            "$pull": {
+                "info_test_case": {
+                    "id": testCaseInfo["id"]
+                }
+            }
+            
+        }
+    )
+
+def getPassedAndTotalTestCase(id):
+    td_list =  getTestCaseInfoOfDialplan(id)
+    return td_list.find({ "status": "passed" }).count(True) , td_list.count(True)
+
 def deleteTestDialplan(id):
     db.tbl_test_dialplan.remove({ "id": id })
-
-    for tc in getTestCaseOfDialplan(id):
-        deleteTestCase(tc["id"])
 
 def getTestDialplanCount(searchString):
     return db.tbl_test_dialplan.find({ "name": searchOptions(searchString) }).count(True)
@@ -103,14 +152,16 @@ def getTestDialplanCount(searchString):
 def getTestCase(id):
     return db.tbl_test_case.find_one({ "id": id })
 
-def getTestCases():
-    return db.tbl_test_case.find()
+def getTestCases(pageIndex, pageSize):
+    search_from = (pageIndex - 1) * pageSize
+    test_cases = db.tbl_test_case.find() \
+        .skip(search_from)  \
+        .limit(pageSize)
+    return test_cases
 
-def getTestCaseOfDialplan(test_dialplan_id):
-    return db.tbl_test_case.find({ "id_dialplan": test_dialplan_id })
-
-def getTestCasePassedCount(test_dialplan_id):
-    return db.tbl_test_case.find({ "id_dialplan": test_dialplan_id, "status": True }).count()
+def getTestCaseOfDialpan(dialplan):
+    testCasesIdAndName = db.tbl_test_case.find({ "id_campaign": dialplan["id_campaign"] }, { "id": 1, "name": 1 })
+    return testCasesIdAndName
 
 def addTestCase(testCase):
     db.tbl_test_case.insert(testCase)

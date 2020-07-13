@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <style>
+            .red {
+                color: red;
+            }
+            .green {
+                color: green;
+            }
+            .right {
+                float: right;
+            }
+        </style>
+
+        <script src="assets/js/dependent_test_case.js"></script>
+    
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h2>Quản lý Test Case</h2>
+                    </div>
+
+                    <div class="ibox-content">
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label">Chọn Kịch bản Test</label>
+
+                            <form action="dependent_test_cases" class="col-sm-5">
+                                <select name="test_dialplan_id" onchange="this.form.submit()" class="form-control">
+                                    {% for ts in testDialplanList %}
+                                        <option value="{{ts['id']}}" {{'selected' if (ts['id'] == testDialplanID)}}>{{ts['name']}}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-1">
+                                <button class="btn btn-primary"><i class="fa fa-play"></i> Run Test Case</button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover" >
+
+                                    <thead class="form-group">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên Test Case</th>
+                                            <th>Trạng thái</th>
+                                            <th>
+                                                <input type="checkbox" id="select-all" onclick="toggle(this)">
+                                                <label for="select-all">Select All</label>
+                                            </th>
+                                            <th>Kết quả</th>
+                                            <th>Update</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="dependent-test-cases-list">
+                                        
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+
+                        <script>
+                            let tcl = new TestCaseList(document.getElementById('dependent-test-cases-list'));
+                            {% for tc in testCaseList %}
+                                tcl.addTestCase("{{tc['id']}}", "{{tc['name']}}", "{{tc['status']}}", {{"true" if tc['checked'] else "false"}}, "{{tc['result']}}");    
+                            {% endfor %}
+                            function redirect(url) {
+                                location.href = url;
+                            }
+                
+                            function toggle(source) {
+                                let checkboxes = document.getElementsByClassName('select');
+                                for (let cb of checkboxes) {
+                                    cb.checked = source.checked;
+                                }
+                            }
+
+                            tdid = "{{testDialplanID}}";
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+{% endblock %}
