@@ -82,13 +82,21 @@
                                 location.href = url;
                             }
                 
+                            
                             function toggle(source) {
-                                let checkboxes = document.getElementsByClassName('select');
-                                for (let cb of checkboxes) {
-                                    cb.checked = source.checked;
+                                let testCaseList = tcl.testCaseList;
+                                console.log(testCaseList);
+
+                                for (let tc of testCaseList) {
+                            
+                                    console.log("ahuhu");
+                                    if (tc.select.checked != source.checked) {
+                                        
+                                        tc.select.checked = source.checked;
+                                        tc.select.changeData();
+                                    }  
                                 }
                             }
-
                             tdid = "{{testDialplanID}}";
                         </script>
                     </div>

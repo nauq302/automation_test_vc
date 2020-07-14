@@ -33,9 +33,17 @@
             }
         }
 
+        function deleteDialplan(id) {
+            if (confirm('Bạn có chắc muốn xóa Kịch bản Test có ID là ' + id + ' không?')) {
+                redirect('delete_test_dialplan?id=' + id);
+            }
+        }
+
         function redirect(url) {
             location.href = url;
         }
+
+
     </script>
 
     <div class="wrapper wrapper-content animated fadeInRight">

@@ -28,7 +28,19 @@
 
                             <div class="row">
                                 <label class="col-sm-2 control-label">Tên Test Case</label>
-                                <div class="col-sm-5"><input type="text" name="name" class="form-control"></div>
+                                <div class="col-sm-5"><input type="text" name="name" class="form-control" required/></div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+
+                            <div class="row">
+                                <label class="col-lg-2 control-label">Chiến dịch</label>
+                                <div class="col-lg-4">
+                                    <select name="campaign_id" class="form-control">
+                                        {% for c in campaigns %}
+                                            <option value="{{c["id"]}}">{{c["name"]}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                             <div class="hr-line-dashed"></div>
 
@@ -51,7 +63,7 @@
 
                             <div class="row">
                                 <div class="col-lg-3 col-lg-offset-3">
-                                    <button type="button" onclick="sm()" class="btn btn-primary">
+                                    <button type="submit" onclick="sm()" class="btn btn-primary">
                                         <i class="fa fa-save"></i> Lưu và tiếp tục
                                     </button>
                                 </div>
@@ -74,8 +86,8 @@
             function sm() {
                 widgetList.setDataName();
                 
-                if (confirm("Wanna Submit")) {
-                    document.getElementById('form').submit();
+                if (confirm("Bạn có chắc mình muốn tạo 1 Test Case đáng yêu như vậy? Hành động này sẽ không thể quay lại")) {
+                    return document.forms['form'].checkValidity();
                 }
                 
             }

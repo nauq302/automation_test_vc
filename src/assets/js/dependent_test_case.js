@@ -49,17 +49,21 @@ class SelectChechbox {
         this.parent = parent;
 
         this.cbx.onclick = function() {
-            if (cbx.checked) {
-                this.sendRequestAddTestCase();
-                parent.status.disabled = false;
-                parent.result.disabled = false;
-            } else {
-                this.sendRequestRemoveTestCase();
-                parent.status.disabled = true;
-                parent.result.disabled = true;
-                parent.update.disabled = true;
-            }
+            this.changeData();
         }.bind(this);
+    }
+
+    changeData() {
+        if (this.cbx.checked) {
+            this.sendRequestAddTestCase();
+            this.parent.status.disabled = false;
+            this.parent.result.disabled = false;
+        } else {
+            this.sendRequestRemoveTestCase();
+            this.parent.status.disabled = true;
+            this.parent.result.disabled = true;
+            this.parent.update.disabled = true;
+        }
     }
 
     get checked() { return this.cbx.checked; }
@@ -174,5 +178,8 @@ class TestCaseList {
 
         tc.update.disabled = true;
         this.tbody.appendChild(tc.tr);
+        this.testCaseList.push(tc);
     }
 }
+
+

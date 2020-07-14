@@ -6,12 +6,12 @@
         <td>{{tc['name']}}</td>
 
         <td>{{tc['create_date'].date()}}</td>
-        <td><a href="/edit_test_case?id={{id}}">Edit</a></td>
+        <td><a href="/edit_test_case?id={{tc['id']}}">Edit</a></td>
 
         <td>{{tc['desc']}}</td>
         
         <td>
-            <button onclick="redirect(`delete_test_case?id={{tc['id']}}`)">
+            <button onclick="deleteTestCase(`{{tc['id']}}`)">
                 <i class="fa fa-minus"></i>
             </button>
         </td>

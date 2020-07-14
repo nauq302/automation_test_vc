@@ -518,9 +518,13 @@ def test_cases_list():
 @login_required
 
 def create_test_case_get():
+
+    campaigns = db.getCapaignsIdAndName()
+
     res = render_template(
         "create_test_case.html",
-        info_user = g.user
+        info_user = g.user,
+        campaigns = campaigns
     )
 
     return make_response(res)
@@ -539,6 +543,7 @@ def create_test_case_post():
         test_case = {
             "id": uuid4().hex,
             "name": request.form["name"],
+            "id_campaign": request.form["campaign_id"],
             "desc": request.form["description"],
             "create_date": datetime.datetime.today(),
             "status": False
@@ -610,6 +615,8 @@ def delete():
 
 def edit_get():
     try:
+        campaigns = db.getCapaignsIdAndName()
+
         # Get ID of Test Case
         id = request.args["id"]
         
@@ -628,7 +635,8 @@ def edit_get():
             "edit_test_case.html",
             info_user = g.user,
             test_case = test_case,
-            call_listen_dialplans = call_listen_dialplans
+            call_listen_dialplans = call_listen_dialplans,
+            campaigns = campaigns
         )
         
         return make_response(res)
@@ -650,19 +658,20 @@ def edit_post():
         id = request.form["id"]
 
         # Delete Test Case and its dependents
-        db.deleteTestCase(id)
+        db.deleteTestCaseDependInfo(id)
 
         # Add new Test Case
         test_case = {
             "id": id,
             "name": request.form["name"],
+            "id_campaign": request.form["campaign_id"],
             "desc": request.form["description"],
             "create_date": datetime.datetime.today(),
             "status": False
         }
 
-        db.addTestCase(test_case)
-        
+        db.updateTestCase(test_case)
+
         size = int(request.form["size"])
 
         for i in range(size):
@@ -686,6 +695,8 @@ def edit_post():
                     "result": request.form["result_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
                 })
+    except Exception as e:
+        print(e)
 
     finally:
         return redirect("/test_case")

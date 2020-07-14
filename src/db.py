@@ -79,6 +79,9 @@ def login(username, password):
 def searchOptions(searchString):
     return { "$regex": "^.*" + searchString + ".*$", "$options": "i" }
 
+def getCapaignsIdAndName():
+    return db.tbl_campaign.find({}, { "id": 1, "name": 1 }) 
+
 def getTestDialplan(id):
     return db.tbl_test_dialplan.find_one({ "id" : id })
 
@@ -101,13 +104,13 @@ def getTestCaseInfoOfDialplan(id):
 def addTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
     if getTestCaseInfoOfDialplan(testDialplanId).get("info_test_case") == None:
         db.tbl_test_dialplan.find_one_and_update(
-        { "id": testDialplanId },
-        { 
-            "$set" : {
-                "info_test_case": []
+            { "id": testDialplanId },
+            { 
+                "$set" : {
+                    "info_test_case": []
+                }
             }
-        }
-    )
+        )
 
     db.tbl_test_dialplan.find_one_and_update(
         { "id": testDialplanId },
@@ -176,6 +179,23 @@ def getTestCaseOfDialpan(dialplan):
 def addTestCase(testCase):
     db.tbl_test_case.insert(testCase)
 
+def updateTestCase(testCase):
+    db.tbl_test_case.update_one(
+        { "id": testCase["id"] },
+        {
+            "$set": {
+                "name": testCase["name"],
+                "id_campaign": testCase["id_campaign"],
+                "create_date": testCase["create_date"],
+                "desc": testCase["desc"]
+            }
+        }
+    )
+
+def deleteTestCase(id):
+    db.tbl_test_case.remove({ "id": id })
+    deleteTestCaseDependInfo(id)
+
 def getCallListenDialplan(id):
     return db.tbl_call_listen_dialplan.find({ "id": id })
 
@@ -191,14 +211,26 @@ def getActionsOfCallListenDialplan(call_listen_dialplan_id):
 def addActionDialplan(action_dialplan):
     db.tbl_action_dialplan.insert(action_dialplan)
 
-def deleteTestCase(id):
+def deleteTestCaseDependInfo(id):
     call_listen_dialplan_id_list = db.tbl_call_listen_dialplan.find({ "id_test_case": id }, { "id": 1 })
     for cldi in call_listen_dialplan_id_list:
         db.tbl_action_dialplan.delete_many({ "id_call_listen": cldi["id"] })
 
     db.tbl_call_listen_dialplan.delete_many({ "id_test_case": id })
 
-    db.tbl_test_case.delete_one({ "id": id })
+    db.tbl_test_dialplan.update_many(
+        {},
+        { 
+            "$pull": {
+                "info_test_case": {
+                    "id": id
+                }
+            }
+            
+        }
+    )
+
+
 
 
 

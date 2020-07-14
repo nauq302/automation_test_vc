@@ -37,9 +37,9 @@ for (let i = 0; i < 28; ++i) {
 for (let i = 0; i < 100; ++i) {
     db.tbl_test_case.insert({
         id: "tcid" + i,
+        name: "name " + i,
         id_campaign: "cid" + Math.floor(Math.random() * 3),
         create_date: new Date("2020-06-" + i),
-        name: "name " + i,
         desc: "Nothing"
     })
 }
@@ -50,7 +50,7 @@ for (let i = 0; i < 10; ++i) {
     db.tbl_call_listen_dialplan.insert({
         id: "cldid" + i,
         id_test_case: "tcid" + Math.floor(Math.random() * 3),
-        type: i % 2 ? "Call" : "Listen",
+        type: i % 2 ? "call" : "listen",
         machine: "name " + i,
     })
 }

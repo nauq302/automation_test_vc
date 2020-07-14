@@ -38,10 +38,9 @@
                 location.href = url;
             }
 
-            function toggle(source) {
-                let checkboxes = document.getElementsByClassName('select');
-                for (let cb of checkboxes) {
-                    cb.checked = source.checked;
+            function deleteTestCase(id) {
+                if (confirm('Bạn có chắc muốn xóa Test Case có ID là ' + id + ' không?')) {
+                    redirect('delete_test_case?id=' + id);
                 }
             }
         </script>
