@@ -267,10 +267,17 @@ def index():
     testDialplans = []
     count = testDialplanList.count(True)
     for i in range(count):
-        info_test_case = testDialplanList[i]["info_test_case"]
-        passed = len([x for x in info_test_case if x["status"] == "passed"])
-        total = len(info_test_case)
-        # Push data to list
+        # Get passed and total test cases
+        info_test_case = testDialplanList[i].get("info_test_case")
+
+        if info_test_case != None:
+            passed = len([x for x in info_test_case if x["status"] == "passed"])
+            total = len(info_test_case)
+        else:
+            passed = 0
+            total = 0
+
+            # Push data to list
         testDialplans.append((testDialplanList[i], passed, total))
 
     # Create response
@@ -307,9 +314,14 @@ def test_dialplans_list():
     count = testDialplanList.count(True)
     for i in range(count):
         # Get passed and totoal test cases
-        info_test_case = testDialplanList[i]["info_test_case"]
-        passed = len([x for x in info_test_case if x["status"] == "passed"])
-        total = len(info_test_case)
+        info_test_case = testDialplanList[i].get("info_test_case")
+
+        if info_test_case != None:
+            passed = len([x for x in info_test_case if x["status"] == "passed"])
+            total = len(info_test_case)
+        else:
+            passed = 0
+            total = 0
 
         # Push data to list
         testDialplans.append((testDialplanList[i], passed, total))
@@ -345,17 +357,26 @@ def dependent_test_cases():
 
     testCaseList = []
     for tc in testCaseOfDialplan:
-        e = next((e for e in testDialplan['info_test_case'] if e["id"] == tc["id"]), None)
-        if e:
-            s = {
-                "id": tc["id"],
-                "name": tc["name"],
-                "status": e["status"],
-                "checked": True,
-                "result": e["result"]
-            } 
-            testCaseList.append(s)
-            
+
+        if testDialplan.get('info_test_case') != None: 
+            e = next((e for e in testDialplan['info_test_case'] if e["id"] == tc["id"]), None)
+            if e:
+                testCaseList.append({
+                    "id": tc["id"],
+                    "name": tc["name"],
+                    "status": e["status"],
+                    "checked": True,
+                    "result": e["result"]
+                })
+                
+            else:
+                testCaseList.append({
+                    "id": tc["id"],
+                    "name": tc["name"],
+                    "status": "",
+                    "checked": False,
+                    "result": ""
+                })
         else:
             testCaseList.append({
                 "id": tc["id"],

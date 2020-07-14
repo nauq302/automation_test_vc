@@ -99,6 +99,16 @@ def getTestCaseInfoOfDialplan(id):
     return db.tbl_test_dialplan.find_one({ "id": id }, { "info_test_case": 1 }) 
 
 def addTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
+    if getTestCaseInfoOfDialplan(testDialplanId).get("info_test_case") == None:
+        db.tbl_test_dialplan.find_one_and_update(
+        { "id": testDialplanId },
+        { 
+            "$set" : {
+                "info_test_case": []
+            }
+        }
+    )
+
     db.tbl_test_dialplan.find_one_and_update(
         { "id": testDialplanId },
         { 

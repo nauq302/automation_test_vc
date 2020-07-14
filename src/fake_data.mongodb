@@ -29,8 +29,7 @@ for (let i = 0; i < 28; ++i) {
         name: "name " + i,
         create_date: new Date("2020-06-" + i),
         test_account: "Account " + i,
-        hotline_number: "0123456789",
-        info_test_case: []
+        hotline_number: "0123456789"
     })
 }
 
