@@ -52,6 +52,12 @@
                             <div class="hr-line-dashed"></div>
 
                             <div class="row">
+                                <label class="col-sm-2 control-label">Bắt buộc</label>
+                                <div class="col-sm-5"><input type="checkbox" name="require" value="1" class="form-control" {{'checked' if test_case['require']}}/></div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+
+                            <div class="row">
                                 <div class="col-lg-3 col-lg-offset-3">
                                     <button type="button" onclick="widgetList.addWidget()" class="btn btn-primary">
                                         <i class="fa fa-save"></i> Thêm Kịch bản Nghe/Gọi
@@ -87,7 +93,7 @@
             let last;
             let item;
             let back;
-            {% for cld in call_listen_dialplans %}
+            {% for cld in call_listen_scripts %}
                 widgetList.addWidget();
                 last = widgetList.widgets.length - 1;
                 item = widgetList.widgets[last]

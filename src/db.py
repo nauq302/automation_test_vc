@@ -165,9 +165,9 @@ def getTestDialplanCount(searchString):
 def getTestCase(id):
     return db.tbl_test_case.find_one({ "id": id })
 
-def getTestCases(pageIndex, pageSize):
+def getTestCasesOfCampaign(campaign, pageIndex, pageSize):
     search_from = (pageIndex - 1) * pageSize
-    test_cases = db.tbl_test_case.find() \
+    test_cases = db.tbl_test_case.find({ "id_campaign": campaign["id"] }) \
         .skip(search_from)  \
         .limit(pageSize)
     return test_cases
@@ -196,27 +196,27 @@ def deleteTestCase(id):
     db.tbl_test_case.remove({ "id": id })
     deleteTestCaseDependInfo(id)
 
-def getCallListenDialplan(id):
-    return db.tbl_call_listen_dialplan.find({ "id": id })
+def getCallListenScript(id):
+    return db.call_listen_script.find({ "id": id })
 
-def getCallListenDialplansOfTestCase(test_case_id):
-    return db.tbl_call_listen_dialplan.find({ "id_test_case": test_case_id })
+def getCallListenScriptsOfTestCase(test_case_id):
+    return db.call_listen_script.find({ "id_test_case": test_case_id })
 
-def addCallListenDialplan(call_listen_dialplan):
-    db.tbl_call_listen_dialplan.insert(call_listen_dialplan)
+def addCallListenScript(call_listen_script):
+    db.call_listen_script.insert(call_listen_script)
 
-def getActionsOfCallListenDialplan(call_listen_dialplan_id):
-    return db.tbl_action_dialplan.find({ "id_call_listen": call_listen_dialplan_id })
+def getActionsOfCallListenScript(call_listen_script_id):
+    return db.tbl_action_dialplan.find({ "id_call_listen": call_listen_script_id })
 
 def addActionDialplan(action_dialplan):
     db.tbl_action_dialplan.insert(action_dialplan)
 
 def deleteTestCaseDependInfo(id):
-    call_listen_dialplan_id_list = db.tbl_call_listen_dialplan.find({ "id_test_case": id }, { "id": 1 })
-    for cldi in call_listen_dialplan_id_list:
+    call_listen_script_id_list = db.call_listen_script.find({ "id_test_case": id }, { "id": 1 })
+    for cldi in call_listen_script_id_list:
         db.tbl_action_dialplan.delete_many({ "id_call_listen": cldi["id"] })
 
-    db.tbl_call_listen_dialplan.delete_many({ "id_test_case": id })
+    db.call_listen_script.delete_many({ "id_test_case": id })
 
     db.tbl_test_dialplan.update_many(
         {},

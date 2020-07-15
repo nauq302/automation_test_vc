@@ -96,12 +96,13 @@ class SelectChechbox {
 }
 
 class Status {
-    static get PASSED() { return 0; }
-    static get FAILED() { return 1; }
+    static get FAILED() { return 0; }
+    static get PASSED() { return 1; }
+    
 
     static dict = {
+        "failed": Status.FAILED,
         "passed": Status.PASSED,
-        "failed": Status.FAILED
     };
 }
 
@@ -130,21 +131,19 @@ class TestCase {
 
 
     setHTML() {
-
         let html = /*html*/`
-            <td><span class="id" name="id"></span></td>
-            <td><span class="name"></span></td>
-            <td>
-                <select name="status" class="status form-control">
-                    <option value="passed">Passed</option>
-                    <option value="failed">Failed</option>
-                </select>
-            </td>
             <td>
                 <input type="checkbox" class="select">
                 <label>Select</label>
             </td>
-
+            <td><span class="id" name="id"></span></td>
+            <td><span class="name"></span></td>
+            <td>
+                <select name="status" class="status form-control">
+                    <option value="failed" class="red">Failed</option>
+                    <option value="passed" class="green">Passed</option>        
+                </select>
+            </td>
             <td><input type="text" name="result" class="result form-control"></td>
             <td><button type="button" class="update btn btn-primary">Update</button></td>
         `;
@@ -182,4 +181,29 @@ class TestCaseList {
     }
 }
 
+function readJsonFile(file) {
+    let xhttp = new XMLHttpRequest();
 
+    xhttp.open('GET', file, false);
+    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhttp.send();
+
+    return xhttp.responseText;
+}
+
+function runTestCase() {
+    let data = readJsonFile('assets/js/fake_run_test_case_data.json');
+    
+    data = JSON.parse(data)
+
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            alert("Success");
+        } else {
+            alert("Failed");
+        }
+    };
+    xhttp.open("GET", "run_test_case", true);
+    xhttp.send(JSON.stringify(data));
+}

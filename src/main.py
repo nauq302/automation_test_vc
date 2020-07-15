@@ -358,25 +358,19 @@ def dependent_test_cases():
     testCaseList = []
     for tc in testCaseOfDialplan:
 
+        i = None
         if testDialplan.get('info_test_case') != None: 
-            e = next((e for e in testDialplan['info_test_case'] if e["id"] == tc["id"]), None)
-            if e:
-                testCaseList.append({
-                    "id": tc["id"],
-                    "name": tc["name"],
-                    "status": e["status"],
-                    "checked": True,
-                    "result": e["result"]
-                })
-                
-            else:
-                testCaseList.append({
-                    "id": tc["id"],
-                    "name": tc["name"],
-                    "status": "",
-                    "checked": False,
-                    "result": ""
-                })
+            i = next((i for i in testDialplan['info_test_case'] if i["id"] == tc["id"]), None)
+
+        if i:
+            testCaseList.append({
+                "id": tc["id"],
+                "name": tc["name"],
+                "status": i["status"],
+                "checked": True,
+                "result": i["result"]
+            })
+            
         else:
             testCaseList.append({
                 "id": tc["id"],
@@ -385,6 +379,7 @@ def dependent_test_cases():
                 "checked": False,
                 "result": ""
             })
+        
 
     # Create response
     res = render_template(
@@ -428,17 +423,25 @@ def update_dependent_test_case():
 @app.route("/remove_dependent_test_case", methods = ["POST"])
 @login_required
 def remove_dependent_test_case():
-    db.removeTestCaseInfoOfDialplan(
-        request.form["test_dialplan_id"],
-        {
-            "id": request.form["id"]
-            
-        }
-    )
+    try:
+        db.removeTestCaseInfoOfDialplan(
+            request.form["test_dialplan_id"],
+            {
+                "id": request.form["id"]
+            }
+        )
 
-    return "true"
+        return "true"
+
+    except Exception as e:
+        print(e)
+        return "false"
 
 
+@app.route("/run_test_case", methods = ["POST"])
+@login_required
+def run_test_case():
+    pass
 #################################################################
 #
 #           Delete Test Dialplan
@@ -463,19 +466,20 @@ def delete_test_dialplan():
 def test_case():
     
     # Get Test dialplan ID from request
-    testDialplanID = request.args.get("test_dialplan_id")
+    campaignID = request.args.get("campaign_id")
     
     # Get list of ID and Name of Test dialplan
-    testDialplanList = db.getTestDialplansIdAndName()
+    campaignList = db.getCapaignsIdAndName()
 
     # If not found Test dialplan ID from request then set it as the first of list
-    if testDialplanID == None:
-        testDialplanID = testDialplanList[0]["id"]
+    if campaignID == None:
+        campaignID = campaignList[0]["id"]
 
     # Get all Test case of specific Test dialplan
-    testCaseList = db.getTestCases(1,test_case.pageSize)
+    testCaseList = db.getTestCasesOfCampaign({"id": campaignID}, 1,test_case.pageSize)
     
     count = testCaseList.count()
+    print(count)
     page_count = count // test_case.pageSize + (0 if count % test_case.pageSize == 0 else 1)
 
     # Create response
@@ -483,8 +487,8 @@ def test_case():
         "test_case.html",
         info_user = g.user,
         test_case_list = testCaseList,
-        test_dialplan_list = testDialplanList,
-        test_dialplan_id = testDialplanID,
+        campaign_id = campaignID,
+        campaigns = campaignList,
         page_count = page_count
     )
 
@@ -496,11 +500,13 @@ test_case.pageSize = 10
 @login_required
 
 def test_cases_list():
+    # Get Test dialplan ID from request
+    campaignID = request.form["campaign_id"]
     
     page = int(request.form["page"])
 
     # Get all Test case
-    testCaseList = db.getTestCases(page,test_case.pageSize)
+    testCaseList = db.getTestCasesOfCampaign({"id": campaignID}, page, test_case.pageSize)
 
     # Create response
     res = render_template(
@@ -540,30 +546,31 @@ def create_test_case_get():
 def create_test_case_post():
     try:
         # Insert test case
-        test_case = {
+        testCase = {
             "id": uuid4().hex,
             "name": request.form["name"],
             "id_campaign": request.form["campaign_id"],
             "desc": request.form["description"],
+            "require": bool(request.form["require"]),
             "create_date": datetime.datetime.today(),
             "status": False
         }
 
-        db.addTestCase(test_case)
+        db.addTestCase(testCase)
         
         # Get number of call/listen dialplans depend on test case
         size = int(request.form["size"])
 
         # Insert call/listen dialplans
         for i in range(size):
-            call_listen_dialplan = {
+            callListenScript = {
                 "id": uuid4().hex,
-                "id_test_case": test_case["id"],
+                "id_test_case": testCase["id"],
                 "type": request.form["scriptType_%d" % i],
                 "machine": request.form["phone_%d" % i]
             }
 
-            db.addCallListenDialplan(call_listen_dialplan)
+            db.addCallListenScript(callListenScript)
 
             # Get number of action in each call/listen dialplan
             size_ = int(request.form["size_%d" % i])
@@ -572,7 +579,7 @@ def create_test_case_post():
             for j in range(size_):
                 db.addActionDialplan({
                     "id": uuid4().hex,
-                    "id_call_listen": call_listen_dialplan["id"],
+                    "id_call_listen": callListenScript["id"],
                     "name": request.form["action_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
                     "result": request.form["result_%d_%d" % (i,j)],
@@ -621,21 +628,21 @@ def edit_get():
         id = request.args["id"]
         
         # Get Test Case and its dependent call/listen dialplans
-        test_case = db.getTestCase(id)
-        call_listen_dialplans_list = db.getCallListenDialplansOfTestCase(id)
+        testCase = db.getTestCase(id)
+        callListenScriptsList = db.getCallListenScriptsOfTestCase(id)
         
         # Get actions for each dialplan
-        call_listen_dialplans = []
-        for i in range(call_listen_dialplans_list.count()):
-            actions = db.getActionsOfCallListenDialplan(call_listen_dialplans_list[i]["id"])
-            call_listen_dialplans.append((call_listen_dialplans_list[i], actions))
+        callListenScripts = []
+        for i in range(callListenScriptsList.count()):
+            actions = db.getActionsOfCallListenScript(callListenScriptsList[i]["id"])
+            callListenScripts.append((callListenScriptsList[i], actions))
 
         # Create response
         res = render_template(
             "edit_test_case.html",
             info_user = g.user,
-            test_case = test_case,
-            call_listen_dialplans = call_listen_dialplans,
+            test_case = testCase,
+            call_listen_scripts = callListenScripts,
             campaigns = campaigns
         )
         
@@ -675,21 +682,21 @@ def edit_post():
         size = int(request.form["size"])
 
         for i in range(size):
-            call_listen_dialplan = {
+            call_listen_script = {
                 "id": uuid4().hex,
                 "id_test_case": test_case["id"],
                 "type": request.form["scriptType_%d" % i],
                 "machine": request.form["phone_%d" % i]
             }
 
-            db.addCallListenDialplan(call_listen_dialplan)
+            db.addCallListenScript(call_listen_script)
 
             size_ = int(request.form["size_%d" % i])
 
             for j in range(size_):
                 db.addActionDialplan({
                     "id": uuid4().hex,
-                    "id_call_listen": call_listen_dialplan["id"],
+                    "id_call_listen": call_listen_script["id"],
                     "name": request.form["action_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
                     "result": request.form["result_%d_%d" % (i,j)],

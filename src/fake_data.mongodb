@@ -47,17 +47,22 @@ for (let i = 0; i < 100; ++i) {
 
 
 for (let i = 0; i < 10; ++i) {
-    db.tbl_call_listen_dialplan.insert({
+    db.tbl_call_listen_script.insert({
         id: "cldid" + i,
         id_test_case: "tcid" + Math.floor(Math.random() * 3),
         type: i % 2 ? "call" : "listen",
         machine: "name " + i,
+        real_state: (Math.random() * 2 > 0.5) ? "miss" : "success",
+        status: Math.random() * 2 > 0.5,
+        expected_callee: [],
+        expected_state: (Math.random() * 2 > 0.5) ? "miss" : "success",
+        real_callee: null
     })
 }
 
 
 for (let i = 0; i < 10; ++i) {
-    db.tbl_action_dialplan.insert({
+    db.tbl_call_listen_action.insert({
         id: UUID(),
         id_call_listen: "cldid" + Math.floor(Math.random() * 3),
         name: "name " + i,
