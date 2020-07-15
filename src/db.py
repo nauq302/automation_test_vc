@@ -186,6 +186,7 @@ def updateTestCase(testCase):
             "$set": {
                 "name": testCase["name"],
                 "id_campaign": testCase["id_campaign"],
+                "require": testCase["require"], 
                 "create_date": testCase["create_date"],
                 "desc": testCase["desc"]
             }

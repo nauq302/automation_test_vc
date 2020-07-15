@@ -479,7 +479,6 @@ def test_case():
     testCaseList = db.getTestCasesOfCampaign({"id": campaignID}, 1,test_case.pageSize)
     
     count = testCaseList.count()
-    print(count)
     page_count = count // test_case.pageSize + (0 if count % test_case.pageSize == 0 else 1)
 
     # Create response
@@ -631,6 +630,8 @@ def edit_get():
         testCase = db.getTestCase(id)
         callListenScriptsList = db.getCallListenScriptsOfTestCase(id)
         
+        print(testCase.get("require"))
+
         # Get actions for each dialplan
         callListenScripts = []
         for i in range(callListenScriptsList.count()):
@@ -642,6 +643,7 @@ def edit_get():
             "edit_test_case.html",
             info_user = g.user,
             test_case = testCase,
+            
             call_listen_scripts = callListenScripts,
             campaigns = campaigns
         )
@@ -673,6 +675,7 @@ def edit_post():
             "name": request.form["name"],
             "id_campaign": request.form["campaign_id"],
             "desc": request.form["description"],
+            "require": bool(request.form.get("require")),
             "create_date": datetime.datetime.today(),
             "status": False
         }
