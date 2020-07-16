@@ -100,6 +100,10 @@
                 item = widgetList.widgets[last]
                 item.phone.value = "{{cld[0]['machine']}}";
                 item.status.value = "{{cld[0]['status']}}";
+                item.expectedState.value = "{{cld[0]['expected_state']}}";
+                item.realCallee.value = "{{cld[0]['real_callee']}}";
+                item.expectedCallee.value = "{{''.join(cld[0]['expected_callee'])}}";
+                item.realState.value = "{{cld[0]['real_state']}}";
                 item.scriptTypes[{{0 if cld[0]['type'] == 'call' else 1}}].checked = true;
                 item.scriptTypes[{{1 if cld[0]['type'] == 'call' else 0}}].checked = false;
                 
@@ -108,7 +112,6 @@
                     back = item.actionList[item.actionList.length - 1];
                     back.action.value = "{{a['name']}}";
                     back.value.value = "{{a['value']}}";
-                    back.result.value = "{{a['result']}}";
                     back.note.value = "{{a['note']}}";
                 {% endfor %}
             {% endfor %}

@@ -447,9 +447,11 @@ def run_test_case():
 
     testDialplanId = request.form.get('test_dialplan_id')
 
-    
+    with open('fak_run_test_case_data.json') as jsonFile:
+        data = loads(jsonFile.read())
+        response = requests.post("http://103.69.195.70/test_case", json=data)
 
-    pass
+    return response
 #################################################################
 #
 #           Delete Test Dialplan
@@ -574,6 +576,10 @@ def create_test_case_post():
                 "type": request.form["scriptType_%d" % i],
                 "machine": request.form["phone_%d" % i],
                 "status": request.form["status_%d" % i],
+                "real_state": request.form["realState_%d" % i],
+                "expected_state": request.form["expectedState_%d" % i],
+                "real_callee": request.form["realCallee_%d" % i],
+                "expected_callee": request.form["expectedCallee_%d" % i].split(","),
             }
 
             db.addCallListenScript(callListenScript)
@@ -588,7 +594,6 @@ def create_test_case_post():
                     "id_call_listen": callListenScript["id"],
                     "name": request.form["action_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
-                    "result": request.form["result_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
                 })
     except Exception as e:
@@ -696,6 +701,10 @@ def edit_post():
                 "id_test_case": test_case["id"],
                 "type": request.form["scriptType_%d" % i],
                 "status": request.form["status_%d" % i],
+                "real_state": request.form["realState_%d" % i],
+                "expected_state": request.form["expectedState_%d" % i],
+                "real_callee": request.form["realCallee_%d" % i],
+                "expected_callee": request.form["expectedCallee_%d" % i].split(","),
                 "machine": request.form["phone_%d" % i]
             }
 
@@ -711,7 +720,6 @@ def edit_post():
                     "id_call_listen": call_listen_script["id"],
                     "name": request.form["action_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
-                    "result": request.form["result_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
                 })
     except Exception as e:

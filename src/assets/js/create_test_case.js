@@ -4,7 +4,6 @@ class Action {
 
     get action() { return this.row.getElementsByClassName('action')[0]; }
     get value() { return this.row.getElementsByClassName('value')[0]; }
-    get result() { return this.row.getElementsByClassName('result')[0]; }
     
     get note() { return this.row.getElementsByClassName('note')[0]; }
     get delete() { return this.row.getElementsByClassName('delete')[0]; }
@@ -52,7 +51,6 @@ class Action {
                 </select>
             </td>
             <td class="col-sm-2"><input type="text" class="value form-control"/></td>
-            <td class="col-sm-2"><input type="text" class="result form-control"/></td>
             <td class="col-sm-3"><textarea class="note form-control"></textarea></td>
             <td class="col-sm-1">
                 <button type="button" class="delete form-control">
@@ -65,7 +63,6 @@ class Action {
     setDataName(widgetCount, actionCount) {
         this.action.name = 'action_' + widgetCount + '_' + actionCount;
         this.value.name = 'value_' + widgetCount + '_' + actionCount;
-        this.result.name = 'result_' + widgetCount + '_' + actionCount;
         this.note.name = 'note_' + widgetCount + '_' + actionCount;
     }
 }
@@ -81,6 +78,10 @@ class Widget {
     get phone() { return this.div.getElementsByClassName('phone')[0]; }
     get scriptTypes() { return this.div.getElementsByClassName('script-type'); }
     get status() { return this.div.getElementsByClassName('status')[0]; }
+    get expectedState() { return this.div.getElementsByClassName('expected-state')[0]; }
+    get realState() { return this.div.getElementsByClassName('real-state')[0]; }
+    get expectedCallee() { return this.div.getElementsByClassName('expected-callee')[0]; }
+    get realCallee() { return this.div.getElementsByClassName('real-callee')[0]; }
     get tBody() { return this.div.getElementsByTagName('tbody')[0]; }
     get addButton() { return this.div.getElementsByClassName('add-button')[0]; }
     get deleteWidgetButton() { return this.div.getElementsByClassName('delete-widget')[0]; }
@@ -161,6 +162,30 @@ class Widget {
                 <div class="hr-line-dashed"></div>
 
                 <div class="row">
+                    <label class="col-sm-2 control-label">Kết quả dự kiến</label>
+                    <div class="col-sm-5"><input type="text" class="expected-state form-control"></div>
+                </div>
+                <div class="hr-line-dashed"></div>
+
+                <div class="row">
+                    <label class="col-sm-2 control-label">Kết quả thực tế</label>
+                    <div class="col-sm-5"><input type="text" class="real-state form-control"></div>
+                </div>
+                <div class="hr-line-dashed"></div>
+
+                <div class="row">
+                    <label class="col-sm-2 control-label">Máy nghe dự kiến</label>
+                    <div class="col-sm-5"><input type="text" class="expected-callee form-control"></div>
+                </div>
+                <div class="hr-line-dashed"></div>
+
+                <div class="row">
+                    <label class="col-sm-2 control-label">Máy nghe thực tế</label>
+                    <div class="col-sm-5"><input type="text" class="real-callee form-control"></div>
+                </div>
+                <div class="hr-line-dashed"></div>
+
+                <div class="row">
                     <label class="col-sm-3 control-label">Danh sách Hành động</label>
                     <button class="add-button col-sm-2 btn btn-primary" type="button">Thêm Hành động</button>
                 </div>
@@ -172,7 +197,6 @@ class Widget {
                                 <tr>
                                     <th>Hành động</th>
                                     <th>Giá trị</th>
-                                    <th>Kết quả</th>
                                     <th>Note</th>
                                     <th>Xóa</th>
                                 </tr>
@@ -194,6 +218,10 @@ class Widget {
 
         this.phone.name = 'phone_' + count;
         this.status.name = 'status_' + count;
+        this.expectedState.name = 'expectedState_' + count;
+        this.realState.name = 'realState_' + count;
+        this.expectedCallee.name = 'expectedCallee_' + count;
+        this.realCallee.name = 'realCallee_' + count;
 
         for (let i in this.actionList) {
             this.actionList[i].setDataName(count, i);

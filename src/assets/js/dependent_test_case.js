@@ -95,10 +95,10 @@ class SelectChechbox {
     }
 }
 
-class Status {}
-
-Status.FAILED = 0;
-Status.PASSED = 1;
+class Status {
+    static get FAILED() { return 0; }
+    static get PASSED() { return 1; }
+}
 
 Status.dict = {
     "failed": Status.FAILED,
