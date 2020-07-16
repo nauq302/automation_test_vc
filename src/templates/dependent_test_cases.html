@@ -43,7 +43,7 @@
                         
                         <div class="row">
                             <div class="col-sm-4 col-sm-offset-1">
-                                <button type="button" class="btn btn-primary" onclick="runTestCase()"><i class="fa fa-play"></i> Run Test Case</button>
+                                <button type="button" class="btn btn-primary" onclick="runTestCase('{{testDialplanID}}')"><i class="fa fa-play"></i> Run Test Case</button>
                             </div>
                         </div>
 
@@ -86,6 +86,7 @@
                             {% for tc in testCaseList %}
                                 tcl.addTestCase("{{tc['id']}}", "{{tc['name']}}", "{{tc['status']}}", {{"true" if tc['checked'] else "false"}}, "{{tc['result']}}");    
                             {% endfor %}
+                            
                             function redirect(url) {
                                 location.href = url;
                             }

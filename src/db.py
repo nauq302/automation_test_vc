@@ -166,8 +166,9 @@ def getTestCase(id):
     return db.tbl_test_case.find_one({ "id": id })
 
 def getTestCasesOfCampaign(campaign, pageIndex, pageSize):
+    filter = { "id_campaign": campaign["id"] } if campaign["id"] != "" else {}
     search_from = (pageIndex - 1) * pageSize
-    test_cases = db.tbl_test_case.find({ "id_campaign": campaign["id"] }) \
+    test_cases = db.tbl_test_case.find(filter) \
         .skip(search_from)  \
         .limit(pageSize)
     return test_cases

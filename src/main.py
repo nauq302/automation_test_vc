@@ -441,6 +441,11 @@ def remove_dependent_test_case():
 @app.route("/run_test_case", methods = ["POST"])
 @login_required
 def run_test_case():
+
+    testDialplanId = request.form.get('test_dialplan_id')
+
+    
+
     pass
 #################################################################
 #
@@ -467,13 +472,11 @@ def test_case():
     
     # Get Test dialplan ID from request
     campaignID = request.args.get("campaign_id")
-    
+    if campaignID == None:
+        campaignID = ""
+
     # Get list of ID and Name of Test dialplan
     campaignList = db.getCapaignsIdAndName()
-
-    # If not found Test dialplan ID from request then set it as the first of list
-    if campaignID == None:
-        campaignID = campaignList[0]["id"]
 
     # Get all Test case of specific Test dialplan
     testCaseList = db.getTestCasesOfCampaign({"id": campaignID}, 1,test_case.pageSize)
@@ -501,7 +504,7 @@ test_case.pageSize = 10
 def test_cases_list():
     # Get Test dialplan ID from request
     campaignID = request.form["campaign_id"]
-    
+
     page = int(request.form["page"])
 
     # Get all Test case

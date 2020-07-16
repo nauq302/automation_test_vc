@@ -5,6 +5,7 @@ class Action {
     get action() { return this.row.getElementsByClassName('action')[0]; }
     get value() { return this.row.getElementsByClassName('value')[0]; }
     get result() { return this.row.getElementsByClassName('result')[0]; }
+    get status() { return this.row.getElementsByClassName('status')[0]; }
     get note() { return this.row.getElementsByClassName('note')[0]; }
     get delete() { return this.row.getElementsByClassName('delete')[0]; }
 
@@ -65,6 +66,7 @@ class Action {
         this.action.name = 'action_' + widgetCount + '_' + actionCount;
         this.value.name = 'value_' + widgetCount + '_' + actionCount;
         this.result.name = 'result_' + widgetCount + '_' + actionCount;
+        this.status.name = 'status_' + widgetCount + '_' + actionCount;
         this.note.name = 'note_' + widgetCount + '_' + actionCount;
     }
 }
@@ -149,6 +151,12 @@ class Widget {
                 <div class="row">
                     <label class="col-sm-2 control-label">Chọn máy</label>
                     <div class="col-sm-5"><input type="text" class="phone form-control"></div>
+                </div>
+                <div class="hr-line-dashed"></div>
+
+                <div class="row">
+                    <label class="col-sm-2 control-label">Trạng thái</label>
+                    <div class="col-sm-5"><input type="text" class="status form-control"></div>
                 </div>
                 <div class="hr-line-dashed"></div>
 

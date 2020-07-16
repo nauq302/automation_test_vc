@@ -21,7 +21,7 @@
             <div class="col-lg-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h2>Quản lý Test Case</h2>
+                        <h2>Quản lý Test Case - Thông tin chung</h2>
                     </div>
 
                     <div class="ibox-content">
@@ -31,6 +31,7 @@
 
                             <form action="test_case" class="col-sm-5">
                                 <select name="campaign_id" onchange="this.form.submit()" class="form-control">
+                                    <option value="">Tất cả</option>
                                     {% for c in campaigns %}
                                         <option value="{{c['id']}}" {{'selected' if (c['id'] == campaign_id)}}>{{c['name']}}</option>
                                     {% endfor %}

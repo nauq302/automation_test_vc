@@ -139,7 +139,7 @@ class TestCase {
             <td><span class="id" name="id"></span></td>
             <td><span class="name"></span></td>
             <td>
-                <select name="status" class="status form-control">
+                <select name="status" class="status form-control" onchange="changeColor(this)">
                     <option value="failed" class="red">Failed</option>
                     <option value="passed" class="green">Passed</option>        
                 </select>
@@ -181,21 +181,12 @@ class TestCaseList {
     }
 }
 
-function readJsonFile(file) {
-    let xhttp = new XMLHttpRequest();
-
-    xhttp.open('GET', file, false);
-    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhttp.send();
-
-    return xhttp.responseText;
+function changeColor(select) {
+    select.classList.pop();
+    select.classList.push(select.selected)
 }
 
-function runTestCase() {
-    let data = readJsonFile('assets/js/fake_run_test_case_data.json');
-    
-    data = JSON.parse(data)
-
+function runTestCase(test_dialplan_id) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
@@ -205,5 +196,5 @@ function runTestCase() {
         }
     };
     xhttp.open("GET", "run_test_case", true);
-    xhttp.send(JSON.stringify(data));
+    xhttp.send("test_dialplan_id=" + test_dialplan_id);
 }
