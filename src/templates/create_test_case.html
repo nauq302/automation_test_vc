@@ -70,7 +70,7 @@
 
                             <div class="row">
                                 <div class="col-lg-3 col-lg-offset-3">
-                                    <button type="submit" onclick="sm()" class="btn btn-primary">
+                                    <button type="button" onclick="sm()" class="btn btn-primary">
                                         <i class="fa fa-save"></i> Lưu và tiếp tục
                                     </button>
                                 </div>
@@ -94,7 +94,7 @@
                 widgetList.setDataName();
                 
                 if (confirm("Bạn có chắc mình muốn tạo 1 Test Case đáng yêu như vậy? Hành động này sẽ không thể quay lại")) {
-                    return document.forms['form'].checkValidity();
+                    return document.forms['form'].submit();
                 }
                 
             }

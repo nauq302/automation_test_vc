@@ -553,11 +553,11 @@ def create_test_case_post():
             "name": request.form["name"],
             "id_campaign": request.form["campaign_id"],
             "desc": request.form["description"],
-            "require": bool(request.form["require"]),
+            "require": bool(request.form.get("require")),
             "create_date": datetime.datetime.today(),
             "status": False
         }
-
+        
         db.addTestCase(testCase)
         
         # Get number of call/listen dialplans depend on test case
@@ -569,7 +569,8 @@ def create_test_case_post():
                 "id": uuid4().hex,
                 "id_test_case": testCase["id"],
                 "type": request.form["scriptType_%d" % i],
-                "machine": request.form["phone_%d" % i]
+                "machine": request.form["phone_%d" % i],
+                "status": request.form["status_%d" % i],
             }
 
             db.addCallListenScript(callListenScript)
@@ -587,6 +588,8 @@ def create_test_case_post():
                     "result": request.form["result_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
                 })
+    except Exception as e:
+        print(e)
 
     # Back to test case page
     finally:
@@ -632,8 +635,6 @@ def edit_get():
         # Get Test Case and its dependent call/listen dialplans
         testCase = db.getTestCase(id)
         callListenScriptsList = db.getCallListenScriptsOfTestCase(id)
-        
-        print(testCase.get("require"))
 
         # Get actions for each dialplan
         callListenScripts = []
@@ -646,7 +647,6 @@ def edit_get():
             "edit_test_case.html",
             info_user = g.user,
             test_case = testCase,
-            
             call_listen_scripts = callListenScripts,
             campaigns = campaigns
         )
@@ -692,9 +692,12 @@ def edit_post():
                 "id": uuid4().hex,
                 "id_test_case": test_case["id"],
                 "type": request.form["scriptType_%d" % i],
+                "status": request.form["status_%d" % i],
                 "machine": request.form["phone_%d" % i]
             }
 
+
+            
             db.addCallListenScript(call_listen_script)
 
             size_ = int(request.form["size_%d" % i])
