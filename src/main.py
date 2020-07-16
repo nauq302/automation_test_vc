@@ -346,6 +346,8 @@ def dependent_test_cases():
     testDialplanID = request.args.get("test_dialplan_id")
     testDialplan = db.getTestDialplan(testDialplanID)
 
+    campaignName = db.getCampaignNameOfDialplan(testDialplanID)
+
     # Get list of ID and Name of Test dialplan
     testDialplanList = db.getTestDialplansIdAndName()
 
@@ -387,7 +389,8 @@ def dependent_test_cases():
         info_user = g.user,
         testDialplanList = testDialplanList,
         testDialplanID = testDialplanID,
-        testCaseList = testCaseList
+        testCaseList = testCaseList,
+        campaignName = campaignName
     )
 
     return make_response(res)
@@ -697,7 +700,7 @@ def edit_post():
             }
 
 
-            
+
             db.addCallListenScript(call_listen_script)
 
             size_ = int(request.form["size_%d" % i])

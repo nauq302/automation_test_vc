@@ -31,13 +31,15 @@
                         <div class="row">
                             <label class="col-sm-2 control-label">Chọn Kịch bản Test</label>
 
-                            <form action="test_cases" class="col-sm-5">
+                            <form action="dependent_test_cases" class="col-sm-5">
                                 <select name="test_dialplan_id" onchange="this.form.submit()" class="form-control">
                                     {% for ts in testDialplanList %}
                                         <option value="{{ts['id']}}" {{'selected' if (ts['id'] == testDialplanID)}}>{{ts['name']}}</option>
                                     {% endfor %}
                                 </select>
                             </form>
+
+                            {{campaignName}}
                         </div>
                         <div class="hr-line-dashed"></div>
                         

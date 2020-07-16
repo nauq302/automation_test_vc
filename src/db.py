@@ -152,6 +152,9 @@ def removeTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
         }
     )
 
+def getCampaignNameOfDialplan(dialplan_id):
+    return db.tbl_test_dialplan.find_one({ "id": dialplan_id }, { "id_campaign": 1 })["id_campaign"]
+
 def getPassedAndTotalTestCase(id):
     td_list =  getTestCaseInfoOfDialplan(id)
     return td_list.find({ "status": "passed" }).count(True) , td_list.count(True)
