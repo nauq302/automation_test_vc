@@ -39,7 +39,9 @@
                                 </select>
                             </form>
 
-                            {{campaignName}}
+                            <small class="col-sm-offset-3 col-sm-2">Kịch bản: {{campaignName}}</small>
+
+                            
                         </div>
                         <div class="hr-line-dashed"></div>
                         
@@ -64,6 +66,7 @@
                                             <th>Trạng thái</th>
                                             <th>Kết quả</th>
                                             <th>Update</th>
+                                            <th>Thông tin chi tiết</th>
                                         </tr>
                                     </thead>
 
@@ -77,6 +80,7 @@
                                             <th>Trạng thái</th>
                                             <th>Kết quả</th>
                                             <th>Update</th>
+                                            <th>Thông tin chi tiết</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -96,13 +100,9 @@
                             
                             function toggle(source) {
                                 let testCaseList = tcl.testCaseList;
-                                console.log(testCaseList);
 
                                 for (let tc of testCaseList) {
-                            
-                                    console.log("ahuhu");
                                     if (tc.select.checked != source.checked) {
-                                        
                                         tc.select.checked = source.checked;
                                         tc.select.changeData();
                                     }  

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+        <style>
+            .widget {
+                background-color:#eeeeee; 
+                border-radius: 10px;
+                margin: auto;
+            }
+        </style>
+
+        <script src="assets/js/info_test_case.js" type="text/javascript"></script>
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h2>Thông tin Test Case</h2>
+                        <button onclick="location.href=`edit_test_case?id={{test_case['id']}}`"><i class="fa fa-pencil"></i></button>
+                    </div>
+
+                    <div class="ibox-content">
+                        <form action="edit_test_case" id="form" method="POST">  
+
+                            <div class="row">
+                                <label class="col-lg-2 control-label">Chiến dịch</label>
+                                <div class="col-sm-5"><input type="text" value="{{campaignName}}" class="form-control" disabled></div>
+                                    
+                            </div>
+                            <div class="hr-line-dashed"></div>
+
+                            <div class="row">
+                                <label class="col-sm-2 control-label">Tên Test Case</label>
+                                <div class="col-sm-5"><input type="text" value="{{test_case['name']}}" class="form-control" disabled></div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+
+                            <div class="row">
+                                <label class="col-sm-2 control-label">Tên Kịch bản</label>
+                                <div class="col-sm-5"><input type="text" value="{{testDialplanName}}" class="form-control" disabled></div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+
+                            <div class="row">
+                                <label class="col-lg-2 control-label">Mô tả</label>
+                                <div class="col-lg-4"><textarea class="form-control" disabled>{{test_case['desc']}}</textarea></div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+
+                            <div class="row">
+                                <label class="col-sm-2 control-label">Bắt buộc</label>
+                                <div class="col-sm-5">
+                                    <input type="checkbox" value="1" class="form-control" {{'checked' if test_case['require']}} disabled/>
+                                </div>
+                                
+                            </div>
+                            <div class="hr-line-dashed"></div>
+
+                            <div id="widget-list">
+
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        
+
+        <script>
+            var widgetList = new WidgetList(document.getElementById('widget-list'));
+
+            let last;
+            let item;
+            let back;
+            {% for cld in call_listen_scripts %}
+                widgetList.addWidget();
+                last = widgetList.widgets.length - 1;
+                item = widgetList.widgets[last]
+                item.phone.value = "{{cld[0]['machine']}}";
+                item.status.value = "{{cld[0]['status']}}";
+                item.expectedState.value = "{{cld[0]['expected_state']}}";
+                item.expectedCallee.value = "{{''.join(cld[0]['expected_callee'])}}";
+                item.realState.value = "{{cld[2]['real_state']}}";
+                item.realCallee.value = "{{cld[2]['real_callee']}}";
+                item.scriptTypes[{{0 if cld[0]['type'] == 'call' else 1}}].checked = true;
+                item.scriptTypes[{{1 if cld[0]['type'] == 'call' else 0}}].checked = false;
+                
+                {% for a in cld[1] %}
+                    item.addAction();
+                    back = item.actionList[item.actionList.length - 1];
+                    back.action.value = Action.typeDict["{{a['name']}}"];
+                    back.value.value = "{{a['value']}}";
+                    back.note.value = "{{a['note']}}";
+                {% endfor %}
+            {% endfor %}
+        </script>
+
+    </div>
+
+{% endblock %}

@@ -3,6 +3,7 @@ db.createCollection("tbl_account_automation");
 db.createCollection("tbl_test_dialplan");
 db.createCollection("tbl_test_case");
 db.createCollection("tbl_call_listen_dialplan");
+db.createCollection("tbl_call_listen_result");
 db.createCollection("tbl_action_dialplan");
 
 
@@ -11,26 +12,30 @@ db.tbl_account_automation.insert({
     username: "username", 
     password: hex_md5("password"), 
     email: "liame@gmail.com" 
-}) 
+});
 
 for (let i = 0; i < 4; ++i) {
     db.tbl_campaign.insert({
         id: "cid" + i,
         name: "Campaign " + i,
         note: "Nothing"
-    })
+    });
 }
 
 
 for (let i = 0; i < 28; ++i) {
-    db.tbl_test_dialplan.insert({
+    let td = {
         id: "tdid" + i,
         id_campaign: "cid" + Math.floor(Math.random() * 3),
         name: "name " + i,
         create_date: new Date("2020-06-" + i),
         test_account: "Account " + i,
-        hotline_number: "0123456789"
-    })
+        hotline_number: "0123456789",
+        state: "",
+        info_test_case: []
+    }
+
+    db.tbl_test_dialplan.insert(td);
 }
 
 
@@ -41,25 +46,30 @@ for (let i = 0; i < 100; ++i) {
         id_campaign: "cid" + Math.floor(Math.random() * 3),
         create_date: new Date("2020-06-" + i),
         desc: "Nothing"
-    })
+    });
 }
 
 
 
-for (let i = 0; i < 10; ++i) {
-    db.tbl_call_listen_script.insert({
-        id: "cldid" + i,
-        id_test_case: "tcid" + Math.floor(Math.random() * 3),
+
+for (let i = 0; i < 100; ++i) {
+    let cls = {
+        id: "cldis" + i,
+        id_test_case: "tcid" + Math.floor(Math.random() * 50),
         type: i % 2 ? "call" : "listen",
         machine: "name " + i,
-        real_state: (Math.random() * 2 > 0.5) ? "miss" : "success",
         status: Math.random() * 2 > 0.5,
         expected_callee: [],
         expected_state: (Math.random() * 2 > 0.5) ? "miss" : "success",
-        real_callee: null
-    })
+        
+    };
+
+    db.tbl_call_listen_script.insert(cls);
 }
 
+
+//        real_state: (Math.random() * 2 > 0.5) ? "miss" : "success",
+//          real_callee: null
 
 for (let i = 0; i < 10; ++i) {
     db.tbl_call_listen_action.insert({
@@ -67,8 +77,7 @@ for (let i = 0; i < 10; ++i) {
         id_call_listen: "cldid" + Math.floor(Math.random() * 3),
         name: "name " + i,
         value: "value " + i,
-        result: "result " + i,
         note: "Nothing"
-    })
+    });
 }
 

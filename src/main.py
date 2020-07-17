@@ -452,6 +452,51 @@ def run_test_case():
         response = requests.post("http://103.69.195.70/test_case", json=data)
 
     return response
+
+#################################################################
+
+
+@app.route("/info_test_case", methods = ["GET"])
+@login_required
+def info_test_case():
+    try:
+        testDialplanId = request.args["test_dialplan_id"]
+
+        campaignName = db.getCampaignNameOfDialplan(testDialplanId)
+
+        # Get ID of Test Case
+        testCaseId = request.args["test_case_id"]
+
+        testDialplanName = db.getTestDialplanName(testDialplanId)
+        
+        # Get Test Case and its dependent call/listen dialplans
+        testCase = db.getTestCase(testCaseId)
+        callListenScriptsList = db.getCallListenScriptsOfTestCase(testCaseId)
+
+        # Get actions for each dialplan
+        callListenScripts = []
+        for i in range(callListenScriptsList.count()):
+            result = db.getCallListenResult(callListenScriptsList[i]["id"], testDialplanId)
+            actions = db.getActionsOfCallListenScript(callListenScriptsList[i]["id"])
+            callListenScripts.append((callListenScriptsList[i], actions, result))
+
+        # Create response
+        res = render_template(
+            "info_test_case.html",
+            info_user = g.user,
+            test_case = testCase,
+            call_listen_scripts = callListenScripts,
+            campaignName = campaignName,
+            testDialplanName = testDialplanName
+        )
+
+        return make_response(res)
+
+    except Exception as e:
+        print(e)
+        return redirect("/")
+
+    
 #################################################################
 #
 #           Delete Test Dialplan
@@ -576,9 +621,7 @@ def create_test_case_post():
                 "type": request.form["scriptType_%d" % i],
                 "machine": request.form["phone_%d" % i],
                 "status": request.form["status_%d" % i],
-                "real_state": request.form["realState_%d" % i],
                 "expected_state": request.form["expectedState_%d" % i],
-                "real_callee": request.form["realCallee_%d" % i],
                 "expected_callee": request.form["expectedCallee_%d" % i].split(","),
             }
 
@@ -701,9 +744,7 @@ def edit_post():
                 "id_test_case": test_case["id"],
                 "type": request.form["scriptType_%d" % i],
                 "status": request.form["status_%d" % i],
-                "real_state": request.form["realState_%d" % i],
                 "expected_state": request.form["expectedState_%d" % i],
-                "real_callee": request.form["realCallee_%d" % i],
                 "expected_callee": request.form["expectedCallee_%d" % i].split(","),
                 "machine": request.form["phone_%d" % i]
             }

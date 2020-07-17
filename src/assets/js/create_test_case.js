@@ -79,9 +79,7 @@ class Widget {
     get scriptTypes() { return this.div.getElementsByClassName('script-type'); }
     get status() { return this.div.getElementsByClassName('status')[0]; }
     get expectedState() { return this.div.getElementsByClassName('expected-state')[0]; }
-    get realState() { return this.div.getElementsByClassName('real-state')[0]; }
     get expectedCallee() { return this.div.getElementsByClassName('expected-callee')[0]; }
-    get realCallee() { return this.div.getElementsByClassName('real-callee')[0]; }
     get tBody() { return this.div.getElementsByTagName('tbody')[0]; }
     get addButton() { return this.div.getElementsByClassName('add-button')[0]; }
     get deleteWidgetButton() { return this.div.getElementsByClassName('delete-widget')[0]; }
@@ -150,7 +148,7 @@ class Widget {
                 <div class="hr-line-dashed"></div>
 
                 <div class="row">
-                    <label class="col-sm-2 control-label">Chọn máy <br> <small>Mỗi máy cách nhau bởi dấu ,</small></label>
+                    <label class="col-sm-2 control-label">Chọn máy</label>
                     <div class="col-sm-5"><input type="text" class="phone form-control"></div>
                 </div>
                 <div class="hr-line-dashed"></div>
@@ -168,22 +166,14 @@ class Widget {
                 <div class="hr-line-dashed"></div>
 
                 <div class="row">
-                    <label class="col-sm-2 control-label">Kết quả thực tế</label>
-                    <div class="col-sm-5"><input type="text" class="real-state form-control"></div>
-                </div>
-                <div class="hr-line-dashed"></div>
-
-                <div class="row">
                     <label class="col-sm-2 control-label">Máy nghe dự kiến</label>
-                    <div class="col-sm-5"><input type="text" class="expected-callee form-control"></div>
+                    <div class="col-sm-5">
+                        <input type="text" class="expected-callee form-control">
+                        <small>Mỗi máy cách nhau bởi dấu ,</small>
+                    </div>
                 </div>
                 <div class="hr-line-dashed"></div>
 
-                <div class="row">
-                    <label class="col-sm-2 control-label">Máy nghe thực tế</label>
-                    <div class="col-sm-5"><input type="text" class="real-callee form-control"></div>
-                </div>
-                <div class="hr-line-dashed"></div>
 
                 <div class="row">
                     <label class="col-sm-3 control-label">Danh sách Hành động</label>
@@ -192,7 +182,7 @@ class Widget {
 
                 <div class="row">
                     <div class="table-responsive col-sm-11">
-                        <table class="table table-striped table-bordered table-hover" >
+                        <table class="table table-striped table-bordered table-hover">
                             <thead class="form-group">
                                 <tr>
                                     <th>Hành động</th>
@@ -219,9 +209,7 @@ class Widget {
         this.phone.name = 'phone_' + count;
         this.status.name = 'status_' + count;
         this.expectedState.name = 'expectedState_' + count;
-        this.realState.name = 'realState_' + count;
         this.expectedCallee.name = 'expectedCallee_' + count;
-        this.realCallee.name = 'realCallee_' + count;
 
         for (let i in this.actionList) {
             this.actionList[i].setDataName(count, i);

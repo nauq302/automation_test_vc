@@ -15,15 +15,7 @@ class UpdateButton {
     }
 
     get disabled() { return this.btn.disabled; }
-    set disabled(value) {
-        if (value == this.disabled) { return; }
-
-        if (value) {
-            this.btn.disabled = true;
-        } else {
-            this.btn.disabled = false;
-        }
-    }
+    set disabled(value) { this.btn.disabled = value; }
 
     sendRequestUpdateTestCase() {
         let xhttp = new XMLHttpRequest();
@@ -40,7 +32,7 @@ class UpdateButton {
 }
 
 
-class SelectChechbox {
+class SelectCheckbox {
     cbx;
     parent;
 
@@ -58,11 +50,13 @@ class SelectChechbox {
             this.sendRequestAddTestCase();
             this.parent.status.disabled = false;
             this.parent.result.disabled = false;
+            this.parent.status.setColor();
         } else {
             this.sendRequestRemoveTestCase();
             this.parent.status.disabled = true;
             this.parent.result.disabled = true;
             this.parent.update.disabled = true;
+            this.parent.status.removeColor();
         }
     }
 
@@ -98,6 +92,32 @@ class SelectChechbox {
 class Status {
     static get FAILED() { return 0; }
     static get PASSED() { return 1; }
+
+    select;
+    parent;
+
+    constructor(select, parent) {
+        this.select = select;
+        this.parent = parent;
+
+        this.select.onchange = function() {
+            this.setColor();
+            parent.update.disabled = false;
+        }.bind(this);
+    }
+
+    get selectedIndex() { return this.select.selectedIndex; }
+    set selectedIndex(index) { this.select.selectedIndex = index; }
+    set disabled(disabled) { this.select.disabled = disabled; }
+    get value() { return this.select.value; }
+
+    setColor() {
+        this.select.style.color = this.select.selectedIndex == Status.FAILED ? "red" : "green";
+    }
+
+    removeColor() {
+        this.select.style.color = "";
+    }
 }
 
 Status.dict = {
@@ -105,16 +125,17 @@ Status.dict = {
     "passed": Status.PASSED,
 };
 
+
 class TestCase {
     tr;
     update;
     select;
+    status;
     
-    get form() { return this.tr.getElementsByTagName('form')[0]; }
     get id() { return this.tr.getElementsByClassName('id')[0]; }
     get name() { return this.tr.getElementsByClassName('name')[0]; }
-    get status() { return this.tr.getElementsByClassName('status')[0]; }
     get result() { return this.tr.getElementsByClassName('result')[0]; }
+    get info() { return this.tr.getElementsByClassName('info')[0]; }
 
     constructor() {
         this.tr = document.createElement('tr');
@@ -122,12 +143,15 @@ class TestCase {
 
         this.setHTML();
         this.update = new UpdateButton(this.tr.getElementsByClassName('update')[0], this);
-        this.select = new SelectChechbox(this.tr.getElementsByClassName('select')[0], this);
+        this.select = new SelectCheckbox(this.tr.getElementsByClassName('select')[0], this);
 
-        this.status.onchange = function() { this.update.disabled = false; }.bind(this);
+        this.status = new Status(this.tr.getElementsByClassName('status')[0], this);
         this.result.onchange = function() { this.update.disabled = false; }.bind(this);
-    }
 
+        this.info.onclick = function() { 
+            location.href = "/info_test_case?test_case_id=" + this.id.innerHTML + "&test_dialplan_id=" + tdid; 
+        }.bind(this);
+    }
 
     setHTML() {
         let html = /*html*/`
@@ -138,13 +162,14 @@ class TestCase {
             <td><span class="id" name="id"></span></td>
             <td><span class="name"></span></td>
             <td>
-                <select name="status" class="status form-control" onchange="changeColor(this)">
+                <select name="status" class="status form-control">
                     <option value="failed" class="red">Failed</option>
                     <option value="passed" class="green">Passed</option>        
                 </select>
             </td>
             <td><input type="text" name="result" class="result form-control"></td>
             <td><button type="button" class="update btn btn-primary">Update</button></td>
+            <td><button type="button" class="info btn btn-primary">Xem</button></td>
         `;
 
         this.tr.innerHTML = html;
@@ -168,6 +193,10 @@ class TestCaseList {
 
         tc.status.selectedIndex = Status.dict[status];
         tc.status.disabled = !select;
+        if (select) {
+            tc.status.setColor();
+        }
+        
 
         tc.select.checked = select;
         
@@ -178,11 +207,6 @@ class TestCaseList {
         this.tbody.appendChild(tc.tr);
         this.testCaseList.push(tc);
     }
-}
-
-function changeColor(select) {
-    select.classList.pop();
-    select.classList.push(select.selected)
 }
 
 function runTestCase(test_dialplan_id) {

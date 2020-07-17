@@ -85,6 +85,9 @@ def getCapaignsIdAndName():
 def getTestDialplan(id):
     return db.tbl_test_dialplan.find_one({ "id" : id })
 
+def getTestDialplanName(id):
+    return db.tbl_test_dialplan.find_one({ "id" : id }, { "name":1 })["name"]
+
 def getTestDialplans(searchString, pageIndex, pageSize):
     search_from = (pageIndex - 1) * pageSize
     test_dialplans = db.tbl_test_dialplan.find({ "name": searchOptions(searchString) }) \
@@ -153,7 +156,8 @@ def removeTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
     )
 
 def getCampaignNameOfDialplan(dialplan_id):
-    return db.tbl_test_dialplan.find_one({ "id": dialplan_id }, { "id_campaign": 1 })["id_campaign"]
+    campaignID = db.tbl_test_dialplan.find_one({ "id": dialplan_id }, { "id_campaign": 1 })["id_campaign"]
+    return db.tbl_campaign.find_one({ "id": campaignID }, { "name": 1 })["name"]
 
 def getPassedAndTotalTestCase(id):
     td_list =  getTestCaseInfoOfDialplan(id)
@@ -207,8 +211,11 @@ def getCallListenScript(id):
 def getCallListenScriptsOfTestCase(test_case_id):
     return db.call_listen_script.find({ "id_test_case": test_case_id })
 
+def getCallListenResult(call_listen_id, test_dialplan_id):
+    return db.call_listen_result.find_one({ "id_call_listen": call_listen_id, "id_test_dialplan": test_dialplan_id })
+
 def addCallListenScript(call_listen_script):
-    db.call_listen_script.insert(call_listen_script)
+    db.tbl_call_listen_script.insert(call_listen_script)
 
 def getActionsOfCallListenScript(call_listen_script_id):
     return db.tbl_action_dialplan.find({ "id_call_listen": call_listen_script_id })
