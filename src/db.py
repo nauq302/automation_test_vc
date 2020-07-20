@@ -155,6 +155,14 @@ def removeTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
         }
     )
 
+    db.tbl_call_listen_result.remove({
+        "id_test_dialplan": testDialplanId,
+        "id_test_case": testCaseInfo["id"]
+    })
+
+
+    
+
 def getCampaignNameOfDialplan(dialplan_id):
     campaignID = db.tbl_test_dialplan.find_one({ "id": dialplan_id }, { "id_campaign": 1 })["id_campaign"]
     return db.tbl_campaign.find_one({ "id": campaignID }, { "name": 1 })["name"]
@@ -211,11 +219,21 @@ def getCallListenScript(id):
 def getCallListenScriptsOfTestCase(test_case_id):
     return db.tbl_call_listen_script.find({ "id_test_case": test_case_id })
 
+def getCallListenScriptIdsOfTestCase(test_case_id):
+    return db.tbl_call_listen_script.find({ "id_test_case": test_case_id }, { "id": 1 })
+
 def getCallListenResult(call_listen_id, test_dialplan_id):
+    print(call_listen_id, test_dialplan_id)
     return db.tbl_call_listen_result.find_one({ "id_call_listen": call_listen_id, "id_test_dialplan": test_dialplan_id })
 
 def initCallListenResult(test_case_id, test_dialplan_id):
-    callListenScripts = db.tbl_call_listen_script.find({ "id_test_case": test_case_id }, { "id": 1, "default_callee": 1, "default_state": 1})
+    callListenScripts = db.tbl_call_listen_script.find({ 
+            "id_test_case": test_case_id 
+        }, {
+            "id": 1, 
+            "default_callee": 1, 
+            "default_state": 1
+    })
 
     for cl in callListenScripts:
         db.tbl_call_listen_result.insert_one({
@@ -237,13 +255,14 @@ def getActionsOfCallListenScript(call_listen_script_id):
 def addActionDialplan(action_dialplan):
     db.tbl_action_dialplan.insert(action_dialplan)
 
-def deleteTestCaseDependInfo(id):
+def deleteTestCaseDepend(id):
     call_listen_script_id_list = db.tbl_call_listen_script.find({ "id_test_case": id }, { "id": 1 })
     for cldi in call_listen_script_id_list:
         db.tbl_action_dialplan.delete_many({ "id_call_listen": cldi["id"] })
 
     db.tbl_call_listen_script.delete_many({ "id_test_case": id })
 
+def deleteTestCaseDependInfo(id):
     db.tbl_test_dialplan.update_many(
         {},
         { 
@@ -251,12 +270,25 @@ def deleteTestCaseDependInfo(id):
                 "info_test_case": {
                     "id": id
                 }
-            }
-            
+            } 
         }
     )
 
-
+def updateCallListenResult(callListenResults):
+    for clr in callListenResults:
+        print("x")
+        db.tbl_call_listen_result.update({
+            "id_test_dialplan": clr["id_test_dialplan"],
+            "id_call_listen": clr["id_call_listen"],
+        },
+        {
+            "$set": {
+                "expected_state": clr["expected_state"],
+                "real_state": clr["real_state"],
+                "expected_callee": clr["expected_callee"],
+                "real_callee": clr["real_callee"],
+            }
+        })
 
 
 

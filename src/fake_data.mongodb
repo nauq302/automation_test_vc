@@ -2,7 +2,7 @@ use voice_db;
 db.createCollection("tbl_account_automation");
 db.createCollection("tbl_test_dialplan");
 db.createCollection("tbl_test_case");
-db.createCollection("tbl_call_listen_dialplan");
+db.createCollection("tbl_call_listen_script");
 db.createCollection("tbl_call_listen_result");
 db.createCollection("tbl_action_dialplan");
 
@@ -62,9 +62,6 @@ for (let i = 0; i < 100; ++i) {
         default_callee: [],
         default_state: (Math.random() * 2 > 0.5) ? "miss" : "success",
     };
-
-    
-
 
     db.tbl_call_listen_script.insert(cls);
 }

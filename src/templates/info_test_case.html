@@ -20,11 +20,14 @@
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <h2>Thông tin Test Case</h2>
-                        <button onclick="location.href=`edit_test_case?id={{test_case['id']}}`"><i class="fa fa-pencil"></i></button>
+                        <button onclick="editTestCase(`{{test_case['id']}}`)"><i class="fa fa-pencil"></i></button>
                     </div>
 
                     <div class="ibox-content">
-                        <form action="edit_test_case" id="form" method="POST">  
+                        <form action="update_info" id="form" method="POST">  
+
+                            <input type="hidden" name="test_dialplan_id" value="{{testDialplan['id']}}">
+                            <input type="hidden" name="test_case_id" value="{{test_case['id']}}">
 
                             <div class="row">
                                 <label class="col-lg-2 control-label">Chiến dịch</label>
@@ -41,7 +44,7 @@
 
                             <div class="row">
                                 <label class="col-sm-2 control-label">Tên Kịch bản</label>
-                                <div class="col-sm-5"><input type="text" value="{{testDialplanName}}" class="form-control" disabled></div>
+                                <div class="col-sm-5"><input type="text" value="{{testDialplan['name']}}" class="form-control" disabled></div>
                             </div>
                             <div class="hr-line-dashed"></div>
 
@@ -60,9 +63,17 @@
                             </div>
                             <div class="hr-line-dashed"></div>
 
-                            <div id="widget-list">
+                            <div id="widget-list"></div>
 
-                            </div>
+                            {% if active %}
+                                <div class="row">
+                                    <div class="col-lg-3 col-lg-offset-3">
+                                        <button type="button" onclick="sm()" class="btn btn-primary">
+                                            <i class="fa fa-save"></i> Lưu và tiếp tục
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endif %}
                         </form>
                     </div>
 
@@ -74,6 +85,7 @@
         
 
         <script>
+            active = {{'true' if active else 'false'}};
             var widgetList = new WidgetList(document.getElementById('widget-list'));
 
             let last;
@@ -82,11 +94,12 @@
             {% for cld in call_listen_scripts %}
                 widgetList.addWidget();
                 last = widgetList.widgets.length - 1;
-                item = widgetList.widgets[last]
+                item = widgetList.widgets[last];
+                item.id.value = "{{cld[0]['id']}}";
                 item.phone.value = "{{cld[0]['machine']}}";
                 item.status.value = "{{cld[0]['status']}}";
                 item.expectedState.value = "{{cld[2]['expected_state']}}";
-                item.expectedCallee.value = "{{''.join(cld[2]['expected_callee'])}}";
+                item.expectedCallee.value = "{{','.join(cld[2]['expected_callee'])}}";
                 item.realState.value = "{{cld[2]['real_state']}}";
                 item.realCallee.value = "{{cld[2]['real_callee']}}";
                 item.scriptTypes[{{0 if cld[0]['type'] == 'call' else 1}}].checked = true;
@@ -100,6 +113,22 @@
                     back.note.value = "{{a['note']}}";
                 {% endfor %}
             {% endfor %}
+
+            function editTestCase(id) {
+                if (confirm("Hành động này sẽ loại bỏ toàn bộ thông tin đã được sửa dụng trước đây, bao gồm cả kết quả đã chạy. Bạn có chắc muốn tiếp tục?")) {
+                    location.href = "edit_test_case?id=" + id;
+                }     
+            }
+
+            function sm() {
+                if (confirm("Bạn có chắc muốn cập nhật thông tin cho test case không?")) {
+                    widgetList.setDataName();
+
+                    document.forms['form'].submit();
+                }
+            }
+
+            
         </script>
 
     </div>

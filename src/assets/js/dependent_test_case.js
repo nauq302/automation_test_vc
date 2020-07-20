@@ -1,5 +1,6 @@
 let tdid;
 
+
 class UpdateButton {
     btn;
     parent;
@@ -149,7 +150,7 @@ class TestCase {
         this.result.onchange = function() { this.update.disabled = false; }.bind(this);
 
         this.info.onclick = function() { 
-            location.href = "/info_test_case?test_case_id=" + this.id.innerHTML + "&test_dialplan_id=" + tdid; 
+            location.href = "/info_test_case?test_case_id=" + this.id.innerHTML + "&active=" + this.select.checked + "&test_dialplan_id=" + tdid; 
         }.bind(this);
     }
 

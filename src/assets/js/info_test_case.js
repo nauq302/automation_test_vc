@@ -1,4 +1,6 @@
 
+let active;
+
 class Action {
     row;
 
@@ -37,6 +39,7 @@ class Widget {
     div;
 
     // Getter
+    get id() { return this.div.getElementsByClassName('id')[0]; }
     get phone() { return this.div.getElementsByClassName('phone')[0]; }
     get scriptTypes() { return this.div.getElementsByClassName('script-type'); }
     get status() { return this.div.getElementsByClassName('status')[0]; }
@@ -53,10 +56,10 @@ class Widget {
         this.div.classList.add('row');
         this.setHTML();
 
-        // Set temp name for srciptType
-        for (let i = 0; i < this.scriptTypes.length; ++i) {
-            this.scriptTypes[i].name = "t" + parent.s;
-        }
+        this.expectedState.disabled = !active;
+        this.realState.disabled = !active;
+        this.expectedCallee.disabled = !active;
+        this.realCallee.disabled = !active;
     }
 
     // Add action into action list
@@ -66,10 +69,19 @@ class Widget {
         this.tBody.appendChild(action.row);
     }
 
+    // Set data name for submit
+    setDataName() {
+        this.expectedState.name = 'expectedState_' + this.id.value;
+        this.expectedCallee.name = 'expectedCallee_' + this.id.value;
+        this.realState.name = 'realState_' + this.id.value;
+        this.realCallee.name = 'realCallee_' + this.id.value;
+    }
+
     // Set HTML
     setHTML() {
         this.div.innerHTML = /*html*/`
             <div class="widget">
+                <input type="hidden" class="id">
                 <div class="row">
                     <label class="col-sm-3 control-label">Loại Kịch bản</label>
 
@@ -99,7 +111,7 @@ class Widget {
 
                 <div class="row">
                     <label class="col-sm-2 control-label">Kết quả dự kiến</label>
-                    <div class="col-sm-5"><input type="text" class="expected-state form-control" disabled></div>
+                    <div class="col-sm-5"><input type="text" class="expected-state form-control"></div>
                 </div>
                 <div class="hr-line-dashed"></div>
 
@@ -112,7 +124,7 @@ class Widget {
                 <div class="row">
                     <label class="col-sm-2 control-label">Máy nghe dự kiến</label>
                     <div class="col-sm-5">
-                        <input type="text" class="expected-callee form-control" disabled>
+                        <input type="text" class="expected-callee form-control">
                         <small>Mỗi máy cách nhau bởi dấu ,</small>
                     </div>
                 </div>
@@ -167,6 +179,12 @@ class WidgetList {
         let widget = new Widget(this);
         this.widgets.push(widget);
         this.div.appendChild(widget.div);
+    }
+
+    setDataName() {
+        for (let i in this.widgets) {
+            this.widgets[i].setDataName();
+        }
     }
 }
 

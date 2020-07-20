@@ -438,6 +438,7 @@ def remove_dependent_test_case():
             }
         )
 
+
         return "true"
 
     except Exception as e:
@@ -451,7 +452,7 @@ def run_test_case():
 
     testDialplanId = request.form.get('test_dialplan_id')
 
-    with open('fak_run_test_case_data.json') as jsonFile:
+    with open('fake_run_test_case_data.json') as jsonFile:
         data = loads(jsonFile.read())
         response = requests.post("http://103.69.195.70/test_case", json=data)
 
@@ -464,6 +465,8 @@ def run_test_case():
 @login_required
 def info_test_case():
     try:
+
+        active = request.args["active"] == "true"
         testDialplanId = request.args["test_dialplan_id"]
 
         campaignName = db.getCampaignNameOfDialplan(testDialplanId)
@@ -471,7 +474,10 @@ def info_test_case():
         # Get ID of Test Case
         testCaseId = request.args["test_case_id"]
 
-        testDialplanName = db.getTestDialplanName(testDialplanId)
+        testDialplan = {
+            "id": testDialplanId,
+            "name": db.getTestDialplanName(testDialplanId)
+        }
         
         # Get Test Case and its dependent call/listen dialplans
         testCase = db.getTestCase(testCaseId)
@@ -479,8 +485,15 @@ def info_test_case():
 
         # Get actions for each dialplan
         callListenScripts = []
+
         for i in range(callListenScriptsList.count()):
             result = db.getCallListenResult(callListenScriptsList[i]["id"], testDialplanId)
+            if not result:
+                result = {
+                    "expected_state": callListenScriptsList[i]["default_state"],
+                    "expected_callee": callListenScriptsList[i]["default_callee"],
+                }
+
             actions = db.getActionsOfCallListenScript(callListenScriptsList[i]["id"])
             callListenScripts.append((callListenScriptsList[i], actions, result))
 
@@ -491,10 +504,43 @@ def info_test_case():
             test_case = testCase,
             call_listen_scripts = callListenScripts,
             campaignName = campaignName,
-            testDialplanName = testDialplanName
+            testDialplan = testDialplan,
+            active = active
         )
 
         return make_response(res)
+
+    except Exception as e:
+        print(e)
+        return redirect("/")
+
+
+@app.route("/update_info", methods = ["POST"])
+@login_required
+def update_info():
+    
+    try:
+        testDialplanId = request.form["test_dialplan_id"]
+        testCaseId = request.form["test_case_id"]
+
+        callListenIds = db.getCallListenScriptIdsOfTestCase(testCaseId)
+        
+        callListenResults = []
+
+        for cl in callListenIds:
+            callListenResults.append({
+                "id_test_dialplan": testDialplanId,
+                "id_test_case": testCaseId,
+                "id_call_listen": cl["id"],
+                "expected_state": request.form["expectedState_%s" % cl["id"]],
+                "real_state": request.form["realState_%s" % cl["id"]],
+                "expected_callee": request.form["expectedCallee_%s" % cl["id"]].split(","),
+                "real_callee": request.form["realCallee_%s" % cl["id"]],
+            })
+
+        db.updateCallListenResult(callListenResults)
+
+        return redirect("/dependent_test_cases?test_dialplan_id=" + testDialplanId)
 
     except Exception as e:
         print(e)
@@ -725,7 +771,7 @@ def edit_post():
         id = request.form["id"]
 
         # Delete Test Case and its dependents
-        db.deleteTestCaseDependInfo(id)
+        db.deleteTestCaseDepend(id)
 
         # Add new Test Case
         test_case = {
@@ -742,8 +788,6 @@ def edit_post():
 
         size = int(request.form["size"])
 
-        print(size)
-
         for i in range(size):
             
             call_listen_script = {
@@ -757,7 +801,6 @@ def edit_post():
             }
 
             db.addCallListenScript(call_listen_script)
-            print(call_listen_script)
 
             size_ = int(request.form["size_%d" % i])
 
