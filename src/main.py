@@ -398,14 +398,18 @@ def dependent_test_cases():
 @app.route("/add_dependent_test_case", methods = ["POST"])
 @login_required
 def add_dependent_test_case():
-    db.addTestCaseInfoOfDialplan(
-        request.form["test_dialplan_id"],
-        {
-            "id": request.form["id"],
-            "status": request.form["status"],
-            "result": request.form["result"],
-        }
-    )
+
+    testDialplanId = request.form["test_dialplan_id"]
+
+    infoTestCase = {
+        "id": request.form["id"],
+        "status": request.form["status"],
+        "result": request.form["result"],
+    }
+
+    db.addTestCaseInfoOfDialplan(testDialplanId, infoTestCase)
+
+    db.initCallListenResult(infoTestCase["id"], testDialplanId)
 
     return "true"
 
@@ -621,8 +625,8 @@ def create_test_case_post():
                 "type": request.form["scriptType_%d" % i],
                 "machine": request.form["phone_%d" % i],
                 "status": request.form["status_%d" % i],
-                "expected_state": request.form["expectedState_%d" % i],
-                "expected_callee": request.form["expectedCallee_%d" % i].split(","),
+                "default_state": request.form["defaultState_%d" % i],
+                "default_callee": request.form["defaultCallee_%d" % i].split(","),
             }
 
             db.addCallListenScript(callListenScript)
@@ -738,20 +742,22 @@ def edit_post():
 
         size = int(request.form["size"])
 
+        print(size)
+
         for i in range(size):
+            
             call_listen_script = {
                 "id": uuid4().hex,
                 "id_test_case": test_case["id"],
                 "type": request.form["scriptType_%d" % i],
                 "status": request.form["status_%d" % i],
-                "expected_state": request.form["expectedState_%d" % i],
-                "expected_callee": request.form["expectedCallee_%d" % i].split(","),
+                "default_state": request.form["defaultState_%d" % i],
+                "default_callee": request.form["defaultCallee_%d" % i].split(","),
                 "machine": request.form["phone_%d" % i]
             }
 
-
-
             db.addCallListenScript(call_listen_script)
+            print(call_listen_script)
 
             size_ = int(request.form["size_%d" % i])
 

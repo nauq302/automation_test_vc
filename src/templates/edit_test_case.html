@@ -38,7 +38,7 @@
                                 <div class="col-lg-4">
                                     <select name="campaign_id" class="form-control">
                                         {% for c in campaigns %}
-                                            <option value="{{c["id"]}}" {{selected if c["id"] == test_case['id_campaign']}}>{{c["name"]}}</option>
+                                            <option value="{{c['id']}}" {{'selected' if c['id'] == test_case['id_campaign']}}>{{c['name']}}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -100,8 +100,8 @@
                 item = widgetList.widgets[last]
                 item.phone.value = "{{cld[0]['machine']}}";
                 item.status.value = "{{cld[0]['status']}}";
-                item.expectedState.value = "{{cld[0]['expected_state']}}";
-                item.expectedCallee.value = "{{''.join(cld[0]['expected_callee'])}}";
+                item.defaultState.value = "{{cld[0]['default_state']}}";
+                item.defaultCallee.value = "{{','.join(cld[0]['default_callee'])}}";
                 item.scriptTypes[{{0 if cld[0]['type'] == 'call' else 1}}].checked = true;
                 item.scriptTypes[{{1 if cld[0]['type'] == 'call' else 0}}].checked = false;
                 
@@ -118,10 +118,8 @@
                 widgetList.setDataName();
                 
                 if (confirm("Bạn có chắc mình muốn chỉnh sửa Test Case đáng yêu này? Hành động này sẽ không thể quay lại")) {
-                    console.log("sad");
                     return document.forms['form'].submit();
-                }
-                
+                }  
             }
         </script>
 

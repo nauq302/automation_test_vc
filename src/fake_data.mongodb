@@ -59,17 +59,19 @@ for (let i = 0; i < 100; ++i) {
         type: i % 2 ? "call" : "listen",
         machine: "name " + i,
         status: Math.random() * 2 > 0.5,
-        expected_callee: [],
-        expected_state: (Math.random() * 2 > 0.5) ? "miss" : "success",
-        
+        default_callee: [],
+        default_state: (Math.random() * 2 > 0.5) ? "miss" : "success",
     };
+
+    
+
 
     db.tbl_call_listen_script.insert(cls);
 }
 
 
-//        real_state: (Math.random() * 2 > 0.5) ? "miss" : "success",
-//          real_callee: null
+
+    
 
 for (let i = 0; i < 10; ++i) {
     db.tbl_call_listen_action.insert({
@@ -80,4 +82,6 @@ for (let i = 0; i < 10; ++i) {
         note: "Nothing"
     });
 }
+
+
 

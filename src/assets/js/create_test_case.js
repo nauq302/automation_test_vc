@@ -78,8 +78,8 @@ class Widget {
     get phone() { return this.div.getElementsByClassName('phone')[0]; }
     get scriptTypes() { return this.div.getElementsByClassName('script-type'); }
     get status() { return this.div.getElementsByClassName('status')[0]; }
-    get expectedState() { return this.div.getElementsByClassName('expected-state')[0]; }
-    get expectedCallee() { return this.div.getElementsByClassName('expected-callee')[0]; }
+    get defaultState() { return this.div.getElementsByClassName('default-state')[0]; }
+    get defaultCallee() { return this.div.getElementsByClassName('default-callee')[0]; }
     get tBody() { return this.div.getElementsByTagName('tbody')[0]; }
     get addButton() { return this.div.getElementsByClassName('add-button')[0]; }
     get deleteWidgetButton() { return this.div.getElementsByClassName('delete-widget')[0]; }
@@ -161,14 +161,14 @@ class Widget {
 
                 <div class="row">
                     <label class="col-sm-2 control-label">Kết quả dự kiến</label>
-                    <div class="col-sm-5"><input type="text" class="expected-state form-control"></div>
+                    <div class="col-sm-5"><input type="text" class="default-state form-control"></div>
                 </div>
                 <div class="hr-line-dashed"></div>
 
                 <div class="row">
                     <label class="col-sm-2 control-label">Máy nghe dự kiến</label>
                     <div class="col-sm-5">
-                        <input type="text" class="expected-callee form-control">
+                        <input type="text" class="default-callee form-control">
                         <small>Mỗi máy cách nhau bởi dấu ,</small>
                     </div>
                 </div>
@@ -208,8 +208,8 @@ class Widget {
 
         this.phone.name = 'phone_' + count;
         this.status.name = 'status_' + count;
-        this.expectedState.name = 'expectedState_' + count;
-        this.expectedCallee.name = 'expectedCallee_' + count;
+        this.defaultState.name = 'defaultState_' + count;
+        this.defaultCallee.name = 'defaultCallee_' + count;
 
         for (let i in this.actionList) {
             this.actionList[i].setDataName(count, i);

@@ -206,16 +206,30 @@ def deleteTestCase(id):
     deleteTestCaseDependInfo(id)
 
 def getCallListenScript(id):
-    return db.call_listen_script.find({ "id": id })
+    return db.tbl_call_listen_script.find({ "id": id })
 
 def getCallListenScriptsOfTestCase(test_case_id):
-    return db.call_listen_script.find({ "id_test_case": test_case_id })
+    return db.tbl_call_listen_script.find({ "id_test_case": test_case_id })
 
 def getCallListenResult(call_listen_id, test_dialplan_id):
-    return db.call_listen_result.find_one({ "id_call_listen": call_listen_id, "id_test_dialplan": test_dialplan_id })
+    return db.tbl_call_listen_result.find_one({ "id_call_listen": call_listen_id, "id_test_dialplan": test_dialplan_id })
+
+def initCallListenResult(test_case_id, test_dialplan_id):
+    callListenScripts = db.tbl_call_listen_script.find({ "id_test_case": test_case_id }, { "id": 1, "default_callee": 1, "default_state": 1})
+
+    for cl in callListenScripts:
+        db.tbl_call_listen_result.insert_one({
+            "id_test_dialplan": test_dialplan_id,
+            "id_test_case": test_case_id,
+            "id_call_listen": cl["id"],
+            "expected_callee": cl["default_callee"],
+            "expected_state": cl["default_state"]
+        })
+
+        print(cl["default_callee"], cl["default_state"])
 
 def addCallListenScript(call_listen_script):
-    db.tbl_call_listen_script.insert(call_listen_script)
+    print(db.tbl_call_listen_script.insert(call_listen_script))
 
 def getActionsOfCallListenScript(call_listen_script_id):
     return db.tbl_action_dialplan.find({ "id_call_listen": call_listen_script_id })
@@ -224,11 +238,11 @@ def addActionDialplan(action_dialplan):
     db.tbl_action_dialplan.insert(action_dialplan)
 
 def deleteTestCaseDependInfo(id):
-    call_listen_script_id_list = db.call_listen_script.find({ "id_test_case": id }, { "id": 1 })
+    call_listen_script_id_list = db.tbl_call_listen_script.find({ "id_test_case": id }, { "id": 1 })
     for cldi in call_listen_script_id_list:
         db.tbl_action_dialplan.delete_many({ "id_call_listen": cldi["id"] })
 
-    db.call_listen_script.delete_many({ "id_test_case": id })
+    db.tbl_call_listen_script.delete_many({ "id_test_case": id })
 
     db.tbl_test_dialplan.update_many(
         {},
