@@ -710,6 +710,7 @@ def delete():
 
         # Delete
         db.deleteTestCase(id)
+        db.deleteTestCaseDependInfo(id)
 
     except Exception as e:
         print(e)
@@ -771,7 +772,7 @@ def edit_post():
         id = request.form["id"]
 
         # Delete Test Case and its dependents
-        db.deleteTestCaseDepend(id)
+        # db.deleteTestCaseDepend(id)
 
         # Add new Test Case
         test_case = {
@@ -788,10 +789,13 @@ def edit_post():
 
         size = int(request.form["size"])
 
+        callListenScripts = []
+        actionDialplans = []
+
         for i in range(size):
             
             call_listen_script = {
-                "id": uuid4().hex,
+                "id": request.form["id_%d" % i],
                 "id_test_case": test_case["id"],
                 "type": request.form["scriptType_%d" % i],
                 "status": request.form["status_%d" % i],
@@ -800,20 +804,53 @@ def edit_post():
                 "machine": request.form["phone_%d" % i]
             }
 
-            db.addCallListenScript(call_listen_script)
+            
+
+            if call_listen_script["id"] == "":
+                call_listen_script["id"] = uuid4().hex
+                db.addCallListenScript(call_listen_script)
+            
+            callListenScripts.append(call_listen_script)
 
             size_ = int(request.form["size_%d" % i])
 
+            print(size_)
+
             for j in range(size_):
-                db.addActionDialplan({
-                    "id": uuid4().hex,
+                action = {
+                    "id": request.form["id_%d_%d" % (i,j)],
                     "id_call_listen": call_listen_script["id"],
                     "name": request.form["action_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
-                })
+                }
+                
+                if action["id"] == "":
+                    action["id"] = uuid4().hex
+                
+                actionDialplans.append(action)
+
+        callListenIds = db.getCallListenIdsOfTestCase(id)
+        
+        for cl in callListenIds:
+            cls = next((cls for cls in callListenScripts if cls["id"] == cl["id"]), None)
+            
+            if cls == None:
+                db.deleteCallListenScript(cl["id"])
+                
+            else:
+                db.updateCallListenScript(cls)
+
+            db.deleteActionOfCallListen(cl["id"])
+        
+        
+        db.addActionDialplans(actionDialplans)
+        # insert
+
+
     except Exception as e:
         print(e)
+        return redirect("/")
 
     finally:
         return redirect("/test_case")

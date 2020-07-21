@@ -87,6 +87,14 @@
                     </div>
                 </div>
             </div>
+
+            <script>
+                function editTestCase(id) {
+                    if (confirm("Chỉnh sửa thông tin gốc của Test Case có thể ảnh hưởng đến các kết quả đẫ chạy, bạn có chắc muốn chỉnh sửa?")) {
+                        location.href = "edit_test_case?id=" + id;
+                    }     
+                }
+            </script>
         </div>
     </div>
     

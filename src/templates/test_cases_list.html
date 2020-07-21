@@ -6,7 +6,9 @@
         <td>{{tc['name']}}</td>
 
         <td>{{tc['create_date'].date()}}</td>
-        <td><a href="/edit_test_case?id={{tc['id']}}">Edit</a></td>
+        <td>
+            <button onclick="editTestCase(`{{tc['id']}}`)">Edit</button>
+        </td>
 
         <td>{{tc['desc']}}</td>
         
