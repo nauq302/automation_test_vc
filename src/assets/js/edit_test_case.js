@@ -81,7 +81,6 @@ class Widget {
     get id() { return this.div.getElementsByClassName('id')[0]; }
     get phone() { return this.div.getElementsByClassName('phone')[0]; }
     get scriptTypes() { return this.div.getElementsByClassName('script-type'); }
-    get status() { return this.div.getElementsByClassName('status')[0]; }
     get defaultState() { return this.div.getElementsByClassName('default-state')[0]; }
     get defaultCallee() { return this.div.getElementsByClassName('default-callee')[0]; }
     get tBody() { return this.div.getElementsByTagName('tbody')[0]; }
@@ -160,11 +159,6 @@ class Widget {
                 </div>
                 <div class="hr-line-dashed"></div>
 
-                <div class="row">
-                    <label class="col-sm-2 control-label">Trạng thái</label>
-                    <div class="col-sm-5"><input type="text" class="status form-control"></div>
-                </div>
-                <div class="hr-line-dashed"></div>
 
                 <div class="row">
                     <label class="col-sm-2 control-label">Kết quả dự kiến</label>
@@ -215,7 +209,6 @@ class Widget {
 
         this.id.name = 'id_' + count;
         this.phone.name = 'phone_' + count;
-        this.status.name = 'status_' + count;
         this.defaultState.name = 'defaultState_' + count;
         this.defaultCallee.name = 'defaultCallee_' + count;
 

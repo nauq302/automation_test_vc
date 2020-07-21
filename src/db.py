@@ -261,7 +261,6 @@ def updateCallListenScript(callListenScript):
         "$set": {
             "id_test_case": callListenScript["id_test_case"],
             "type": callListenScript["type"],
-            "status": callListenScript["status"],
             "machine": callListenScript["machine"],
             "default_state": callListenScript["default_state"],
             "default_callee": callListenScript["default_callee"]
@@ -279,13 +278,19 @@ def initCallListenResult(test_case_id, test_dialplan_id):
     })
 
     for cl in callListenScripts:
-        db.tbl_call_listen_result.insert_one({
+        db.tbl_call_listen_result.update({
             "id_test_dialplan": test_dialplan_id,
             "id_test_case": test_case_id,
-            "id_call_listen": cl["id"],
-            "expected_callee": cl["default_callee"],
-            "expected_state": cl["default_state"]
-        })
+            
+        }, {
+            "$set": {
+                "id_call_listen": cl["id"],
+                "expected_callee": cl["default_callee"],
+                "expected_state": cl["default_state"]
+            }
+        },
+            True
+        )
 
 
 def addCallListenScript(call_listen_script):
@@ -328,7 +333,8 @@ def updateCallListenResult(callListenResults):
             "id_call_listen": clr["id_call_listen"],
         },
         {
-            "$setOnInsert": {
+            "$set": {
+                "status": clr["status"],
                 "expected_state": clr["expected_state"],
                 "real_state": clr["real_state"],
                 "expected_callee": clr["expected_callee"],

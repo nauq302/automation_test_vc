@@ -56,6 +56,7 @@ class Widget {
         this.div.classList.add('row');
         this.setHTML();
 
+        this.status.disabled = !active;
         this.expectedState.disabled = !active;
         this.realState.disabled = !active;
         this.expectedCallee.disabled = !active;
@@ -71,6 +72,7 @@ class Widget {
 
     // Set data name for submit
     setDataName() {
+        this.status.name = 'status_' + this.id.value;
         this.expectedState.name = 'expectedState_' + this.id.value;
         this.expectedCallee.name = 'expectedCallee_' + this.id.value;
         this.realState.name = 'realState_' + this.id.value;
@@ -105,7 +107,7 @@ class Widget {
 
                 <div class="row">
                     <label class="col-sm-2 control-label">Trạng thái</label>
-                    <div class="col-sm-5"><input type="text" class="status form-control" disabled></div>
+                    <div class="col-sm-5"><input type="text" class="status form-control"></div>
                 </div>
                 <div class="hr-line-dashed"></div>
 

@@ -98,7 +98,6 @@
                 item = widgetList.widgets[last];
                 item.id.value = "{{cld[0]['id']}}";
                 item.phone.value = "{{cld[0]['machine']}}";
-                item.status.value = "{{cld[0]['status']}}";
                 item.defaultState.value = "{{cld[0]['default_state']}}";
                 item.defaultCallee.value = "{{','.join(cld[0]['default_callee'])}}";
                 item.scriptTypes[{{0 if cld[0]['type'] == 'call' else 1}}].checked = true;

@@ -97,7 +97,7 @@
                 item = widgetList.widgets[last];
                 item.id.value = "{{cld[0]['id']}}";
                 item.phone.value = "{{cld[0]['machine']}}";
-                item.status.value = "{{cld[0]['status']}}";
+                item.status.value = "{{cld[2]['status']}}";
                 item.expectedState.value = "{{cld[2]['expected_state']}}";
                 item.expectedCallee.value = "{{','.join(cld[2]['expected_callee'])}}";
                 item.realState.value = "{{cld[2]['real_state']}}";

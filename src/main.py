@@ -409,7 +409,7 @@ def add_dependent_test_case():
 
     db.addTestCaseInfoOfDialplan(testDialplanId, infoTestCase)
 
-    db.initCallListenResult(infoTestCase["id"], testDialplanId)
+    # db.initCallListenResult(infoTestCase["id"], testDialplanId)
 
     return "true"
 
@@ -532,6 +532,7 @@ def update_info():
                 "id_test_dialplan": testDialplanId,
                 "id_test_case": testCaseId,
                 "id_call_listen": cl["id"],
+                "status": request.form["status_%s" % cl["id"]],
                 "expected_state": request.form["expectedState_%s" % cl["id"]],
                 "real_state": request.form["realState_%s" % cl["id"]],
                 "expected_callee": request.form["expectedCallee_%s" % cl["id"]].split(","),
@@ -655,7 +656,6 @@ def create_test_case_post():
             "desc": request.form["description"],
             "require": bool(request.form.get("require")),
             "create_date": datetime.datetime.today(),
-            "status": False
         }
         
         db.addTestCase(testCase)
@@ -670,7 +670,6 @@ def create_test_case_post():
                 "id_test_case": testCase["id"],
                 "type": request.form["scriptType_%d" % i],
                 "machine": request.form["phone_%d" % i],
-                "status": request.form["status_%d" % i],
                 "default_state": request.form["defaultState_%d" % i],
                 "default_callee": request.form["defaultCallee_%d" % i].split(","),
             }
@@ -682,13 +681,13 @@ def create_test_case_post():
 
             # Insert actions
             for j in range(size_):
-                db.addActionDialplan({
+                db.addActionDialplans([{
                     "id": uuid4().hex,
                     "id_call_listen": callListenScript["id"],
                     "name": request.form["action_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
-                })
+                }])
     except Exception as e:
         print(e)
 
@@ -798,7 +797,6 @@ def edit_post():
                 "id": request.form["id_%d" % i],
                 "id_test_case": test_case["id"],
                 "type": request.form["scriptType_%d" % i],
-                "status": request.form["status_%d" % i],
                 "default_state": request.form["defaultState_%d" % i],
                 "default_callee": request.form["defaultCallee_%d" % i].split(","),
                 "machine": request.form["phone_%d" % i]
