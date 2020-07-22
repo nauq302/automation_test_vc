@@ -216,7 +216,7 @@ function runTestCase(test_dialplan_id) {
         if (this.readyState == 4 && this.status == 200) {
             alert("Success");
         } else {
-            alert("Failed");
+            console.log(this.readyState + " " + this.status);
         }
     };
     xhttp.open("GET", "run_test_case", true);

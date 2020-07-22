@@ -438,25 +438,26 @@ def remove_dependent_test_case():
             }
         )
 
-
         return "true"
 
     except Exception as e:
         print(e)
         return "false"
 
+import json
 
-@app.route("/run_test_case", methods = ["POST"])
+@app.route("/run_test_case", methods = ["GET"])
 @login_required
 def run_test_case():
 
     testDialplanId = request.form.get('test_dialplan_id')
 
     with open('fake_run_test_case_data.json') as jsonFile:
-        data = loads(jsonFile.read())
+        data = json.loads(jsonFile.read())
         response = requests.post("http://103.69.195.70/test_case", json=data)
 
-    return response
+    print(response)
+    return ""
 
 #################################################################
 

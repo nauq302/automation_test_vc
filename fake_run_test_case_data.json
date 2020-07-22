@@ -1,0 +1,73 @@
+{
+	"id": "214ffe07-0783-41aa-bfa5-345931cc8750",
+	"ip_server": "103.69.195.64",
+	"hotline_number": "02473090666",
+	"caller_list": [
+    	{
+        	"caller_number": "0123456789",
+        	"timeout": 30,
+        	"script": [
+            	{
+                	"play": {
+                    	"url": "http://callcenter.mediacdn.vn/callcenter/sound_intro/8667b05b-1774-4c28-87ba-61a4183f4438.mp3",
+                    	"md5_sum": "ef1d4de5b0e4ccc3d1667001f7e10f17"
+                	}
+            	}, {
+                	"wait": 20
+            	}
+        	]
+    	},
+    	{
+        	"caller_number": "0987654321",
+        	"timeout": 30,
+        	"script": [
+            	{
+                	"play": {
+                    	"url": "http://callcenter.mediacdn.vn/callcenter/sound_intro/bb4c6119-f835-45b2-9d11-34176bb9bf4f.mp3",
+                    	"md5_sum": "f4950fe5f3f8c64fa0e2ea5d727de89b"
+                	}
+            	}, {
+                	"wait": 10
+            	}
+        	]
+    	}
+	],
+	"callee_list": [
+    	{
+        	"extension_account": "02473090666_666",
+        	"extension_password": "Aq3me0fm",
+        	"ring_time": 0,
+        	"script": {
+            	"play": {
+                	"url": "http://callcenter.mediacdn.vn/callcenter/sound_intro/d997d405-6d4b-4919-aaa3-354e38caea9a.mp3",
+                	"md5_sum": "08b243ce1507f3af563c4df807df1265"
+            	},
+            	"wait": 10
+        	}
+    	},
+    	{
+        	"extension_account": "02473090666_888",
+        	"extension_password": "vXae9TMR",
+        	"ring_time": 0,
+        	"script": {
+            	"play": {
+                	"url": "http://callcenter.mediacdn.vn/callcenter/sound_intro/0ff52a70-189b-4149-8544-415f61a1621d.mp3",
+                	"md5_sum": "9f25c453a2df0e75949c767878fc34b0"
+            	},
+            	"wait": 15
+        	}
+    	},
+    	{
+        	"extension_account": "02473090666_9876",
+        	"extension_password": "QMjoD9Uj",
+        	"ring_time": 0,
+        	"script": {
+            	"play": {
+                	"url": "http://callcenter.mediacdn.vn/callcenter/sound_intro/0b631ef2-2c63-4474-af5d-ed247bbd9a65.mp3",
+                	"md5_sum": "6754559b411c3a4f96c8039e2b3a7361"
+            	},
+            	"wait": 20
+        	}
+    	}
+	]
+}
