@@ -81,15 +81,93 @@ def searchOptions(searchString):
 
 
 
-# class CampaignModel:
-#     @staticmethod
-#     def getAllIdAndName():
-#         return CampaignModel.col.find({}, { "id": 1, "name": 1 })
+class CampaignDAO:
+    @staticmethod
+    def getAllIdAndName():
+        return CampaignDAO.col.find({}, { "id": 1, "name": 1 })
 
-# CampaignModel.col = db.tbl_campaign
+CampaignDAO.col = db.tbl_campaign
+
+
+class TestDialplanDAO:
+    @staticmethod
+    def get(id):
+        return TestDialplanDAO.col.find_one({ "id" : id })
+
+    @staticmethod
+    def getCampaignName(id):
+        campaignID = TestDialplanDAO.col.find_one({ "id": id }, { "id_campaign": 1 })["id_campaign"]
+        return CampaignDAO.col.find_one({ "id": campaignID }, { "name": 1 })["name"]
+
+    @staticmethod
+    def getHotlineNumber(id):
+        return TestDialplanDAO.col.find_one({ "id": id }, { "hotline_number": 1 })["hotline_number"]
+
+    @staticmethod
+    def getName(id):
+        return TestDialplanDAO.col.find_one({ "id": id }, { "name": 1 })["name"]
+
+    @staticmethod
+    def search(searchString, pageIndex, pageSize):
+        search_from = (pageIndex - 1) * pageSize
+
+        return TestDialplanDAO.col.find({ 
+            "name": searchOptions(searchString) 
+        }).skip(search_from).limit(pageSize)
+
+    @staticmethod
+    def searchCount(searchString):
+        return TestDialplanDAO.col.find({ "name": searchOptions(searchString) }).count(True)
+
+    @staticmethod
+    def getAllIdAndName():
+        return TestDialplanDAO.col.find({}, { "id": 1, "name": 1 }) 
+
+    @staticmethod
+    def getIdAndName(id):
+        return TestDialplanDAO.col.find_one({ "id": id }, { "id": 1, "name": 1 }) 
+
+    @staticmethod
+    def getTestCaseInfo(id):
+        return TestDialplanDAO.col.find_one({ "id": id }, { "info_test_case": 1 })["info_test_case"]
+
+
+TestDialplanDAO.col = db.tbl_test_dialplan
 
 #######################################################################
-def getCapaignsIdAndName():
+
+class HotlineDAO:
+    @staticmethod
+    def getServerIP(hotlineNumber):
+        return HotlineDAO.col.find_one({ "hotline_number": hotlineNumber }, { "server_ip": 1 })["server_ip"]
+        
+HotlineDAO.col = db.tbl_hotline
+
+#######################################################################
+
+class TestCaseDAO:
+    @staticmethod
+    def get(id):
+        return TestCaseDAO.col.find_one({ "id": id })
+
+TestCaseDAO.col = db.tbl_test_case
+
+#######################################################################
+
+class CallListenScriptDAO:
+    @staticmethod
+    def getOfTestCase(testCaseId):
+        return CallListenScriptDAO.col.find({ "id_test_case": testCaseId })
+
+CallListenScriptDAO.col = db.tbl_call_listen_script
+
+    
+
+
+
+
+#######################################################################
+def getCapaignsIdAndName():#
     return db.tbl_campaign.find({}, { "id": 1, "name": 1 }) 
 
 def getCampaignNameOfDialplan(dialplan_id):
@@ -97,28 +175,28 @@ def getCampaignNameOfDialplan(dialplan_id):
     return db.tbl_campaign.find_one({ "id": campaignID }, { "name": 1 })["name"]
 
 #######################################################################
-def getTestDialplan(id):
+def getTestDialplan(id):#
     return db.tbl_test_dialplan.find_one({ "id" : id })
 
-def getTestDialplanName(id):
+def getTestDialplanName(id):#
     return db.tbl_test_dialplan.find_one({ "id" : id }, { "name":1 })["name"]
 
-def getTestDialplans(searchString, pageIndex, pageSize):
+def getTestDialplans(searchString, pageIndex, pageSize): #
     search_from = (pageIndex - 1) * pageSize
     test_dialplans = db.tbl_test_dialplan.find({ "name": searchOptions(searchString) }) \
         .skip(search_from)  \
         .limit(pageSize)
     return test_dialplans
 
-def getTestDialplansIdAndName():
+def getTestDialplansIdAndName(): #
     return db.tbl_test_dialplan.find({}, { "id": 1, "name": 1 }) 
 
-def getTestDialplanIdAndName(id):
+def getTestDialplanIdAndName(id): #
     return db.tbl_test_dialplan.find_one({ "id": id }, { "id": 1, "name": 1 }) 
 
 #######################################################################
 
-def getTestCaseInfoOfDialplan(id):
+def getTestCaseInfoOfDialplan(id): #
     return db.tbl_test_dialplan.find_one({ "id": id }, { "info_test_case": 1 }) 
 
 def addTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):

@@ -88,7 +88,7 @@
                         </div>
 
                         <script>
-                            let tcl = new TestCaseList(document.getElementById('dependent-test-cases-list'));
+                            tcl = new TestCaseList(document.getElementById('dependent-test-cases-list'));
                             {% for tc in testCaseList %}
                                 tcl.addTestCase("{{tc['id']}}", "{{tc['name']}}", "{{tc['status']}}", {{"true" if tc['checked'] else "false"}}, "{{tc['result']}}");    
                             {% endfor %}

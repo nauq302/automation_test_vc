@@ -29,13 +29,55 @@ for (let i = 0; i < 28; ++i) {
         name: "name " + i,
         create_date: new Date("2020-06-" + i),
         test_account: "Account " + i,
-        hotline_number: "0123456789",
+        hotline_number: "02473090666",
         state: "",
         info_test_case: []
     }
 
     db.tbl_test_dialplan.insert(td);
 }
+
+
+db.tbl_hotline.insert({
+    'api_key': 'Lsx!uWuY$brtk#SA7js6WhLTesUnUAsc',
+    'audio': true,
+    'audio_time': '12',
+    'bucketid': '7b231cdd-4c8b-422b-b72b-30be07b68c46',
+    'call_in': true,
+    'call_out': true,
+    'domain_pbx': 'test1.cc.bizflycloud.vn',
+    'exchange': 'Staging',
+    'hotline_number': '02473090666',
+    'hotline_staging': '02473000570',
+    'id': '7b231cdd-4c8b-422b-b72b-30be07b68c46',
+    'id_addon': [
+        '3f20906a-f0e7-4a52-8d0c-9948bfdd4a79',
+        '9c580e5f-d8d9-45b9-94d6-710ff3ec10f4'
+    ],
+    'id_package': 'c4b0bed0-7fe9-4c71-b148-618c7ca41388',
+    'ip_backup': '103.69.194.67',
+    'namespace_webhook': 'test_webhook_param_2',
+    'note': 'xc',
+    'owner': '5b67bf015ce86832f0c0062a',
+    'payment_limit': '500000000',
+    'provider': 'FPT',
+    'push_resource': true,
+    'quantity': '30',
+    'raw_diaplan': '[default]\nexten => 02473090666,1,Set(ARRAY(hotline_id,callcenter_hotline_id,owner,direct)=02473090666,7b231cdd-4c8b-422b-b72b-30be07b68c46,5b67bf015ce86832f0c0062a,in)\n same => n,Verbose(0,caller:${CALLERID(num)} direct:${direct} caller_channel:${CHANNEL} hotline_id:${callcenter_hotline_id} hotline_number:${hotline_id})\n same => n,Goto(route,02473090666,1)\n\n[route]\nexten => 02473090666,1,Gosub(ghiam,s,1(in))\n ;same => n,Dial(${PJSIP_DIAL_CONTACTS(02473090666_666)},60,t)\n same => n,Queue(test)\n same => n,Verbose(0,voice_mail:1)\n same => n,Answer()\n same => n,Wait(200)\n same => n,Goto(timing,in_time,1)\n\n[timing]\nexten => in_time,1,Hangup()\n\n[local]\nexten => 02473090666_888,1,NoOp(888 is ${DEVICE_STATE(PJSIP/02473090666_888)})\n same => n,ExecIf($["${DEVICE_STATE(PJSIP/02473090666_888)}"!="NOT_INUSE"]?Hangup())\n same => n,Dial(PJSIP/02473090666_888,10,t)\n same => n,NoOp(HELLO IT\'S ME!)\n\nexten => 02473090666_666,1,Dial(${PJSIP_DIAL_CONTACTS(02473090666_666)},10,t)\n same => n,NoOp(HELLO IT\'S ME!)\n\nexten => aaa,1,Dial(PJSIP/0934569616@02473090666)\n same => n,Dial(PJSIP/02473090666_888)',
+    'raw_queues': '[test]\nstrategy = fewestcalls\nringinuse = no\ntimeout = 20\nmusiconhold = c267df87-7815-4a22-9e68-8cd014ee6295\nmember => PJSIP/02473090666_666\nmember => PJSIP/02473090666_888\nmember => PJSIP/02473090666_9876',
+    'record_in': true,
+    'record_internal': false,
+    'record_out': true,
+    'server_ip': '103.69.194.67',
+    'service_provider_ip': '118.69.114.182',
+    'stagging': true,
+    'stagging_ip': '103.69.195.64',
+    'status': 'active',
+    'tag': 'vccorp dev',
+    'token': '',
+    'type': 'CSKH',
+    'url_webhook': ''
+})
 
 
 for (let i = 0; i < 100; ++i) {

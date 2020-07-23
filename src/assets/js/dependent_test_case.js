@@ -1,5 +1,5 @@
 let tdid;
-
+let tcl;
 
 class UpdateButton {
     btn;
@@ -19,16 +19,19 @@ class UpdateButton {
     set disabled(value) { this.btn.disabled = value; }
 
     sendRequestUpdateTestCase() {
-        let xhttp = new XMLHttpRequest();
-
-        let form = new FormData();
-        form.append("test_dialplan_id", tdid);
-        form.append("id", this.parent.id.innerHTML);
-        form.append("status", this.parent.status.value);
-        form.append("result", this.parent.result.value);
-        
-        xhttp.open("POST", "update_dependent_test_case", true);
-        xhttp.send(form);
+        $.ajax({
+            type: "POST",
+            url: "update_dependent_test_case",
+            datatype: "json",
+            data: { 
+                test_dialplan_id: tdid,
+                id: this.parent.id.innerHTML,
+                status: this.parent.status.value,
+                result: this.parent.result.value
+            },
+            success: function(response) { alert("Cập nhật thành công"); },
+            failure: function(response) { alert("Cập nhật thất bại"); },
+        });
     }
 }
 
@@ -210,15 +213,18 @@ class TestCaseList {
     }
 }
 
-function runTestCase(test_dialplan_id) {
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            alert("Success");
-        } else {
-            console.log(this.readyState + " " + this.status);
-        }
-    };
-    xhttp.open("GET", "run_test_case", true);
-    xhttp.send("test_dialplan_id=" + test_dialplan_id);
+function runTestCase() {
+
+    for (let i = 0; i < tcl.testCaseList.length; ++i) {
+
+        $.ajax({
+            type: "POST",
+            url: "run_test_case",
+            datatype: "json",
+            data: { test_dialplan_id: tdid, test_case_id: tcl.testCaseList[i].id.innerHTML },
+            success: function(response) { alert("1"); },
+            failure: function(response) { alert("2"); },
+        });
+    }
+    
 }

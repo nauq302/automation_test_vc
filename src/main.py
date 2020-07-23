@@ -256,23 +256,22 @@ def index():
         searchString = ""
 
     # Get dialplans
-    testDialplanList = db.getTestDialplans(searchString, 1, index.pageSize)
+    testDialplanList = db.TestDialplanDAO.search(searchString, 1, index.pageSize)
 
     # Calculate page count
-    count = db.getTestDialplanCount(searchString)
+    count = db.TestDialplanDAO.searchCount(searchString)
     pageCount = count // index.pageSize + (0 if count % index.pageSize == 0 else 1)
 
     # Count passed and total test cases
     # And then push all data into a list
     testDialplans = []
-    count = testDialplanList.count(True)
-    for i in range(count):
+    for i in range(testDialplanList.count(True)):
         # Get passed and total test cases
-        info_test_case = testDialplanList[i].get("info_test_case")
+        infoTestCase = testDialplanList[i].get("info_test_case")
 
-        if info_test_case != None:
-            passed = len([x for x in info_test_case if x["status"] == "passed"])
-            total = len(info_test_case)
+        if infoTestCase != None:
+            passed = len([x for x in infoTestCase if x["status"] == "passed"])
+            total = len(infoTestCase)
         else:
             passed = 0
             total = 0
@@ -302,23 +301,22 @@ def test_dialplans_list():
     searchString = request.form["search"]
 
     # Get dialplans
-    testDialplanList = db.getTestDialplans(searchString, page, index.pageSize)
+    testDialplanList = db.TestDialplanDAO.search(searchString, page, index.pageSize)
 
     # Calculate page count
-    count = db.getTestDialplanCount(searchString)
+    count = db.TestDialplanDAO.searchCount(searchString)
     pageCount = count // index.pageSize + (0 if count % index.pageSize == 0 else 1)
 
     # Count passed and total test cases
     # And then push all data into a list
     testDialplans = []
-    count = testDialplanList.count(True)
-    for i in range(count):
+    for i in range(testDialplanList.count(True)):
         # Get passed and totoal test cases
-        info_test_case = testDialplanList[i].get("info_test_case")
+        infoTestCase = testDialplanList[i].get("info_test_case")
 
-        if info_test_case != None:
-            passed = len([x for x in info_test_case if x["status"] == "passed"])
-            total = len(info_test_case)
+        if infoTestCase != None:
+            passed = len([x for x in infoTestCase if x["status"] == "passed"])
+            total = len(infoTestCase)
         else:
             passed = 0
             total = 0
@@ -344,12 +342,12 @@ def dependent_test_cases():
 
     # Get Test dialplan ID from request
     testDialplanID = request.args.get("test_dialplan_id")
-    testDialplan = db.getTestDialplan(testDialplanID)
+    testDialplan = db.TestDialplanDAO.get(testDialplanID)
 
-    campaignName = db.getCampaignNameOfDialplan(testDialplanID)
+    campaignName = db.TestDialplanDAO.getCampaignName(testDialplanID)
 
     # Get list of ID and Name of Test dialplan
-    testDialplanList = db.getTestDialplansIdAndName()
+    testDialplanList = db.TestDialplanDAO.getAllIdAndName()
 
     # If not found Test dialplan ID from request then set it as the first of list
     if testDialplanID == None:
@@ -446,17 +444,61 @@ def remove_dependent_test_case():
 
 import json
 
-@app.route("/run_test_case", methods = ["GET"])
+@app.route("/run_test_case", methods = ["POST"])
 @login_required
 def run_test_case():
 
-    testDialplanId = request.form.get('test_dialplan_id')
+    testDialplanId = request.form['test_dialplan_id']
+    testCaseId = request.form['test_case_id']
 
-    with open('fake_run_test_case_data.json') as jsonFile:
-        data = json.loads(jsonFile.read())
-        response = requests.post("http://103.69.195.70/test_case", json=data)
+    hotlineNumber = db.TestDialplanDAO.getHotlineNumber(testDialplanId)
+    serverIP = db.HotlineDAO.getServerIP(hotlineNumber)
+
+    data = {
+        "id": testCaseId,
+        "test_dialplan_id": testDialplanId,
+        "ip_server": serverIP,
+        "hotline_number": hotlineNumber,
+        "caller_list": [],
+        "callee_list": []
+    }
+
+    callListenScripts = db.CallListenScriptDAO.getOfTestCase(testCaseId)
+
+    for cl in callListenScripts:
+        if cl["type"] == "call":
+            data["callee_list"].append({
+                "id": cl["id"],
+                "caller_number": cl["machine"],
+                "script": [{
+                    "play": {
+                        "url": "huhu",
+                        "md5_sum": "hehe"
+                    },
+                    "wait": 0
+                }]
+            })
+        else:
+            data["callee_list"].append({
+                "id": cl["id"],
+                "extension_account": "emanresu",
+                "extension_password": "drowssap",
+                "script": [{
+                    "play": {
+                        "url": "huhu",
+                        "md5_sum": "hehe"
+                    },
+                    "wait": 0
+                }]
+            })
+
+    print(data)
+
+
+    response = requests.post("http://103.69.195.70/test_case", json=data)
 
     print(response)
+
     return ""
 
 #################################################################
@@ -803,8 +845,6 @@ def edit_post():
                 "machine": request.form["phone_%d" % i]
             }
 
-            
-
             if call_listen_script["id"] == "":
                 call_listen_script["id"] = uuid4().hex
                 db.addCallListenScript(call_listen_script)
@@ -812,8 +852,6 @@ def edit_post():
             callListenScripts.append(call_listen_script)
 
             size_ = int(request.form["size_%d" % i])
-
-            print(size_)
 
             for j in range(size_):
                 action = {
@@ -836,7 +874,6 @@ def edit_post():
             
             if cls == None:
                 db.deleteCallListenScript(cl["id"])
-                
             else:
                 db.updateCallListenScript(cls)
 
@@ -844,8 +881,6 @@ def edit_post():
         
         
         db.addActionDialplans(actionDialplans)
-        # insert
-
 
     except Exception as e:
         print(e)
