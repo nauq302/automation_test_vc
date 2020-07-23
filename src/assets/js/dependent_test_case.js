@@ -9,10 +9,10 @@ class UpdateButton {
         this.btn = btn;
         this.parent = parent;
 
-        btn.onclick = function() {
+        btn.onclick = (() => {
             this.disabled = true;
             this.sendRequestUpdateTestCase();
-        }.bind(this);
+        }).bind(this);
     }
 
     get disabled() { return this.btn.disabled; }
@@ -29,8 +29,8 @@ class UpdateButton {
                 status: this.parent.status.value,
                 result: this.parent.result.value
             },
-            success: function(response) { alert("Cập nhật thành công"); },
-            failure: function(response) { alert("Cập nhật thất bại"); },
+            success: (response) => { alert("Cập nhật thành công"); },
+            failure: (response) => { alert("Cập nhật thất bại"); },
         });
     }
 }
@@ -44,9 +44,7 @@ class SelectCheckbox {
         this.cbx = cbx;
         this.parent = parent;
 
-        this.cbx.onclick = function() {
-            this.changeData();
-        }.bind(this);
+        this.cbx.onclick = (() => { this.changeData(); }).bind(this);
     }
 
     changeData() {
@@ -68,35 +66,33 @@ class SelectCheckbox {
     set checked(checked) { this.cbx.checked = checked; }
 
     sendRequestAddTestCase() {
-        let xhttp = new XMLHttpRequest();
-
-        let form = new FormData();
-        form.append("test_dialplan_id", tdid);
-        form.append("id", this.parent.id.innerHTML);
-        form.append("status", this.parent.status.value);
-        form.append("result", this.parent.result.value);
-        
-        xhttp.open("POST", "add_dependent_test_case", true);
-        xhttp.send(form);
+        $.ajax({
+            type: "POST",
+            url: "add_dependent_test_case",
+            datatype: "json",
+            data: { 
+                test_dialplan_id: tdid, 
+                id: this.parent.id.innerHTML,
+                status: this.parent.status.value,
+                result: this.parent.result.value
+            },
+        });
     }
 
-
     sendRequestRemoveTestCase() {
-        let xhttp = new XMLHttpRequest();
-
-        let form = new FormData();
-        form.append("test_dialplan_id", tdid);
-        form.append("id", this.parent.id.innerHTML);
-        
-        xhttp.open("POST", "remove_dependent_test_case", true);
-        xhttp.send(form);
+        $.ajax({
+            type: "POST",
+            url: "remove_dependent_test_case",
+            datatype: "json",
+            data: { 
+                test_dialplan_id: tdid, 
+                id: this.parent.id.innerHTML,
+            },
+        });
     }
 }
 
 class Status {
-    static get FAILED() { return 0; }
-    static get PASSED() { return 1; }
-
     select;
     parent;
 
@@ -104,10 +100,10 @@ class Status {
         this.select = select;
         this.parent = parent;
 
-        this.select.onchange = function() {
+        this.select.onchange = (() => {
             this.setColor();
             parent.update.disabled = false;
-        }.bind(this);
+        }).bind(this);
     }
 
     get selectedIndex() { return this.select.selectedIndex; }
@@ -123,6 +119,9 @@ class Status {
         this.select.style.color = "";
     }
 }
+
+Status.FAILED = 0;
+Status.PASSED = 1;
 
 Status.dict = {
     "failed": Status.FAILED,
@@ -150,11 +149,11 @@ class TestCase {
         this.select = new SelectCheckbox(this.tr.getElementsByClassName('select')[0], this);
 
         this.status = new Status(this.tr.getElementsByClassName('status')[0], this);
-        this.result.onchange = function() { this.update.disabled = false; }.bind(this);
+        this.result.onchange = (() => { this.update.disabled = false; }).bind(this);
 
-        this.info.onclick = function() { 
+        this.info.onclick = (() => { 
             location.href = "/info_test_case?test_case_id=" + this.id.innerHTML + "&active=" + this.select.checked + "&test_dialplan_id=" + tdid; 
-        }.bind(this);
+        }).bind(this);
     }
 
     setHTML() {
@@ -200,7 +199,6 @@ class TestCaseList {
         if (select) {
             tc.status.setColor();
         }
-        
 
         tc.select.checked = select;
         
@@ -214,19 +212,39 @@ class TestCaseList {
 }
 
 function runTestCase() {
+    const NOT_RUN = 0;
+    const SUSSESS = 1;
+    const FAILED = 2;
 
-    for (let i = 0; i < tcl.testCaseList.length; ++i) {
-        if (tcl.testCaseList[i].select.checked) {
-            $.ajax({
+    let status = [];
+    let requests = [];
+    let len = 0;
+    let count = 0;
+
+    for (const tc of tcl.testCaseList) {
+        if (tc.select.checked) {
+            ++len;
+            requests.push($.ajax({
                 type: "POST",
                 url: "run_test_case",
                 datatype: "json",
-                data: { test_dialplan_id: tdid, test_case_id: tcl.testCaseList[i].id.innerHTML },
-                success: function(response) { alert("Chạy Test Case thành công"); },
-                failure: function(response) { alert("Chạy Test Case thất bại"); },
-            });
+                data: { 
+                    test_dialplan_id: tdid, 
+                    test_case_id: tc.id.innerHTML 
+                },
+                success: (response) => { status.push(SUSSESS); ++count; },
+                failure: (response) => { status.push(FAILED); },
+            }));
+        } else {
+            status.push(NOT_RUN);
         }
-        
     }
-    
+
+    $.when.apply($, requests).done(() => {
+        if (count == len) {
+            alert("Chạy Test Case thành công");
+        } else {
+            alert("Chạy Test Case thất bại");
+        }
+    })
 }
