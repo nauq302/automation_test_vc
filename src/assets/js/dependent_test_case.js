@@ -222,8 +222,8 @@ function runTestCase() {
                 url: "run_test_case",
                 datatype: "json",
                 data: { test_dialplan_id: tdid, test_case_id: tcl.testCaseList[i].id.innerHTML },
-                success: function(response) { alert("1"); },
-                failure: function(response) { alert("2"); },
+                success: function(response) { alert("Chạy Test Case thành công"); },
+                failure: function(response) { alert("Chạy Test Case thất bại"); },
             });
         }
         
