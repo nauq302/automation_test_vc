@@ -216,15 +216,17 @@ class TestCaseList {
 function runTestCase() {
 
     for (let i = 0; i < tcl.testCaseList.length; ++i) {
-
-        $.ajax({
-            type: "POST",
-            url: "run_test_case",
-            datatype: "json",
-            data: { test_dialplan_id: tdid, test_case_id: tcl.testCaseList[i].id.innerHTML },
-            success: function(response) { alert("1"); },
-            failure: function(response) { alert("2"); },
-        });
+        if (tcl.testCaseList[i].select.checked) {
+            $.ajax({
+                type: "POST",
+                url: "run_test_case",
+                datatype: "json",
+                data: { test_dialplan_id: tdid, test_case_id: tcl.testCaseList[i].id.innerHTML },
+                success: function(response) { alert("1"); },
+                failure: function(response) { alert("2"); },
+            });
+        }
+        
     }
     
 }
