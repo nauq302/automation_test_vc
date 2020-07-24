@@ -8,7 +8,8 @@ import time
 import uuid
 from bson import ObjectId
 # connect db
-client = pymongo.MongoClient(config.DB_MONGO)
+client = pymongo.MongoClient(config.MONGODB_SERVERS)
+DB = client.admin.authenticate(config.MONGODB_USER,config.MONGODB_PASSWORD, None)
 db = client.voice_db
 
 

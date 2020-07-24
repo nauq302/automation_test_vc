@@ -16,16 +16,20 @@
 
     <script>
         function pageChange(page) {
-            let xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    document.getElementById('test-dialplans-list').innerHTML = this.responseText;
+            
+            $.ajax({
+                type: "POST",
+                url: "test_dialplans_list",
+                datatype: "json",
+                data: { 
+                    'page': page,
+                    search: '{{searchString}}'
+                },
+                success: (response) => { 
+                    document.getElementById('test-dialplans-list').innerHTML = response;
                 }
-            };
-
-            xhttp.open('POST', 'test_dialplans_list', true);
-            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhttp.send('page=' + page + '&search={{searchString}}');
+                
+            })
 
             let pageButtons = document.getElementsByClassName('page-btn');
             for (let i = 0; i < pageButtons.length; ++i) {

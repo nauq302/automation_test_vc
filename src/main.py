@@ -278,7 +278,14 @@ def index():
             total = 0
 
             # Push data to list
-        testDialplans.append((testDialplanList[i], passed, total, campaignName))
+        testDialplans.append({
+            "data": testDialplanList[i], 
+            "tc": {
+                "passed": passed, 
+                "total": total, 
+            },
+            "campaignName": campaignName
+        })
 
     # Create response
     res = render_template(
@@ -312,8 +319,9 @@ def test_dialplans_list():
     # And then push all data into a list
     testDialplans = []
     for i in range(testDialplanList.count(True)):
-        # Get passed and totoal test cases
+        # Get passed and total test cases
         infoTestCase = testDialplanList[i].get("info_test_case")
+        campaignName = db.TestDialplanDAO.getCampaignName(testDialplanList[i]["id"])
 
         if infoTestCase != None:
             passed = len([x for x in infoTestCase if x["status"] == "passed"])
@@ -322,8 +330,15 @@ def test_dialplans_list():
             passed = 0
             total = 0
 
-        # Push data to list
-        testDialplans.append((testDialplanList[i], passed, total))
+            # Push data to list
+        testDialplans.append({
+            "data": testDialplanList[i], 
+            "tc": {
+                "passed": passed, 
+                "total": total, 
+            },
+            "campaignName": campaignName
+        })
 
     # Create response
     res = render_template(
