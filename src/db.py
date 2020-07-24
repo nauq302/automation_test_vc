@@ -114,7 +114,7 @@ class TestDialplanDAO:
 
         return TestDialplanDAO.col.find({ 
             "name": searchOptions(searchString) 
-        }).skip(search_from).limit(pageSize)
+        }).sort([("create_date", -1)]).skip(search_from).limit(pageSize)
 
     @staticmethod
     def searchCount(searchString):
