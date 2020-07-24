@@ -268,6 +268,7 @@ def index():
     for i in range(testDialplanList.count(True)):
         # Get passed and total test cases
         infoTestCase = testDialplanList[i].get("info_test_case")
+        campaignName = db.TestDialplanDAO.getCampaignName(testDialplanList[i]["id"])
 
         if infoTestCase != None:
             passed = len([x for x in infoTestCase if x["status"] == "passed"])
@@ -277,7 +278,7 @@ def index():
             total = 0
 
             # Push data to list
-        testDialplans.append((testDialplanList[i], passed, total))
+        testDialplans.append((testDialplanList[i], passed, total, campaignName))
 
     # Create response
     res = render_template(
@@ -493,7 +494,6 @@ def run_test_case():
             })
 
     print(data)
-
 
     response = requests.post("http://103.69.195.70/test_case", json=data)
 

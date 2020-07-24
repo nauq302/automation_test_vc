@@ -161,11 +161,6 @@ class CallListenScriptDAO:
 
 CallListenScriptDAO.col = db.tbl_call_listen_script
 
-    
-
-
-
-
 #######################################################################
 def getCapaignsIdAndName():#
     return db.tbl_campaign.find({}, { "id": 1, "name": 1 }) 

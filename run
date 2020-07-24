@@ -1,0 +1,3 @@
+sudo su
+expect "[sudo] password for nauq302: "
+send "keoDuaChuH0@ng\r"

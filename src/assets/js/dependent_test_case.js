@@ -29,7 +29,7 @@ class UpdateButton {
                 status: this.parent.status.value,
                 result: this.parent.result.value
             },
-            success: (response) => { alert("Cập nhật thành công"); },
+            success: (response) => { alert("Cập nhật thành công"); console.log(response) },
             failure: (response) => { alert("Cập nhật thất bại"); },
         });
     }
@@ -108,7 +108,7 @@ class Status {
 
     get selectedIndex() { return this.select.selectedIndex; }
     set selectedIndex(index) { this.select.selectedIndex = index; }
-    set disabled(disabled) { this.select.disabled = disabled; }
+    set disabled(disable) { this.select.disabled = disable; }
     get value() { return this.select.value; }
 
     setColor() {
@@ -157,7 +157,7 @@ class TestCase {
     }
 
     setHTML() {
-        let html = /*html*/`
+        this.tr.innerHTML = /*html*/`
             <td>
                 <input type="checkbox" class="select">
                 <label>Select</label>
@@ -174,8 +174,6 @@ class TestCase {
             <td><button type="button" class="update btn btn-primary">Update</button></td>
             <td><button type="button" class="info btn btn-primary">Xem</button></td>
         `;
-
-        this.tr.innerHTML = html;
     }
 }
 

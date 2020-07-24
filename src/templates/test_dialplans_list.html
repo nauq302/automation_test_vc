@@ -4,6 +4,8 @@
         {% set id = td['id'] %}
         <td>{{td['name']}}</td>
 
+        <td>{{p[3]}}</td>
+
         <td>{{td['create_date'].date()}}</td>
 
         <td>{{td['test_account']}}</td>
@@ -21,5 +23,6 @@
                 <i class="fa fa-minus"></i>
             </button>
         </td>
+
     </tr>
 {% endfor %}
