@@ -162,6 +162,17 @@ class CallListenScriptDAO:
 
 CallListenScriptDAO.col = db.tbl_call_listen_script
 
+
+#######################################################################
+
+class ExtentionDAO:
+    @staticmethod
+    def getAllIdAndNumber():
+        return ExtentionDAO.col.find({}, { "id": 1, "extension_number": 1 })
+
+ExtentionDAO.col = db.tbl_extension
+
+
 #######################################################################
 def getCapaignsIdAndName():#
     return db.tbl_campaign.find({}, { "id": 1, "name": 1 }) 

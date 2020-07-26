@@ -687,11 +687,13 @@ def test_cases_list():
 def create_test_case_get():
 
     campaigns = db.getCapaignsIdAndName()
+    numbers = db.ExtentionDAO.getAllIdAndNumber()
 
     res = render_template(
-        "create_test_case.html",
+        "create_test_case.html.j2",
         info_user = g.user,
-        campaigns = campaigns
+        campaigns = campaigns,
+        numbers = numbers
     )
 
     return make_response(res)
@@ -742,7 +744,7 @@ def create_test_case_post():
                 db.addActionDialplans([{
                     "id": uuid4().hex,
                     "id_call_listen": callListenScript["id"],
-                    "name": request.form["action_%d_%d" % (i,j)],
+                    "name": request.form["name_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
                 }])
@@ -787,6 +789,7 @@ def delete():
 def edit_get():
     try:
         campaigns = db.getCapaignsIdAndName()
+        numbers = db.ExtentionDAO.getAllIdAndNumber()
 
         # Get ID of Test Case
         id = request.args["id"]
@@ -803,11 +806,12 @@ def edit_get():
 
         # Create response
         res = render_template(
-            "edit_test_case.html",
+            "edit_test_case.html.j2",
             info_user = g.user,
             test_case = testCase,
             call_listen_scripts = callListenScripts,
-            campaigns = campaigns
+            campaigns = campaigns,
+            numbers = numbers
         )
         
         return make_response(res)
@@ -872,7 +876,7 @@ def edit_post():
                 action = {
                     "id": request.form["id_%d_%d" % (i,j)],
                     "id_call_listen": call_listen_script["id"],
-                    "name": request.form["action_%d_%d" % (i,j)],
+                    "name": request.form["name_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
                 }

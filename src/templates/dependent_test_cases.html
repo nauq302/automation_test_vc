@@ -87,6 +87,8 @@
                             </div>
                         </div>
 
+
+                        
                         <script>
                             tcl = new TestCaseList(document.getElementById('dependent-test-cases-list'));
                             {% for tc in testCaseList %}
@@ -96,8 +98,7 @@
                             function redirect(url) {
                                 location.href = url;
                             }
-                
-                            
+        
                             function toggle(source) {
                                 let testCaseList = tcl.testCaseList;
 
