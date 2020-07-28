@@ -58,14 +58,14 @@
 
                             <div class="row">
                                 <div class="col-lg-3 col-lg-offset-3">
-                                    <button type="button" onclick="widgetList.addCallListen()" class="btn btn-primary">
+                                    <button type="button" onclick="scriptList.addScript()" class="btn btn-primary">
                                         <i class="fa fa-save"></i> Thêm Kịch bản Nghe/Gọi
                                     </button>
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
 
-                            <div id="widget-list"></div>
+                            <div id="script-list"></div>
 
                             <div class="row">
                                 <div class="col-lg-3 col-lg-offset-3">
@@ -84,12 +84,12 @@
         <script src="assets/js/edit_test_case.js"></script>
         <script>
 
-            var widgetList = new CallListenScriptList(document.getElementById('widget-list'));
+            var scriptList = new CallListenScriptList(document.getElementById('script-list'));
 
             {% for n in numbers %}
                 callees.push({
-                    id: `{{n['id']}}`,
-                    number: `{{n['extension_number']}}`
+                    id: "{{n['id']}}",
+                    number: "{{n['extension_number']}}"
                 });
             {% endfor %}
 
@@ -98,9 +98,9 @@
             let back;
 
             {% for cld in call_listen_scripts %}
-                widgetList.addCallListen();
-                last = widgetList.widgets.length - 1;
-                item = widgetList.widgets[last];
+                scriptList.addScript();
+                last = scriptList.scripts.length - 1;
+                item = scriptList.scripts[last];
                 item.id.value = "{{cld[0]['id']}}";
                 item.types.radios[{{0 if cld[0]['type'] == 'call' else 1}}].checked = true;
                 item.types.radios[{{1 if cld[0]['type'] == 'call' else 0}}].checked = false;
@@ -120,7 +120,7 @@
             {% endfor %}
 
             function sm() {
-                widgetList.setDataName();
+                scriptList.setDataName();
                 
                 if (confirm("Bạn có chắc mình muốn chỉnh sửa Test Case đáng yêu này? Hành động này sẽ không thể quay lại")) {
                     return document.forms['form'].submit();

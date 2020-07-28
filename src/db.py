@@ -132,6 +132,71 @@ class TestDialplanDAO:
     def getTestCaseInfo(id):
         return TestDialplanDAO.col.find_one({ "id": id }, { "info_test_case": 1 })["info_test_case"]
 
+    @staticmethod
+    def delete(id):
+        TestDialplanDAO.col.remove({ "id": id })
+
+    @staticmethod
+    def getPassedAndTotalTestCase(id):
+        td_list =  TestDialplanDAO.getTestCaseInfo(id)
+        return td_list.find({ "status": "passed" }).count(True) , td_list.count(True)
+
+    @staticmethod
+    def updateTestCaseInfo(id, testCaseInfo):
+        TestDialplanDAO.col.find_one_and_update(
+            { 
+                "id": id,
+                "info_test_case.id": testCaseInfo["id"]
+            }, { 
+                "$set": {
+                    "info_test_case.$.status": testCaseInfo["status"],
+                    "info_test_case.$.result": testCaseInfo["result"],
+                }   
+            }
+        )
+
+    @staticmethod
+    def removeTestCaseInfo(id, testCaseInfo):
+        TestDialplanDAO.col.find_one_and_update(
+            { 
+                "id": id
+            }, { 
+                "$pull": {
+                    "info_test_case": {
+                        "id": testCaseInfo["id"]
+                    }
+                } 
+            }
+        )
+
+        db.tbl_call_listen_result.remove({
+            "id_test_dialplan": id,
+            "id_test_case": testCaseInfo["id"]
+        })
+
+
+    @staticmethod
+    def addTestCaseInfo(id, testCaseInfo):
+        if TestDialplanDAO.getTestCaseInfo(id).get("info_test_case") == None:
+            TestDialplanDAO.col.find_one_and_update(
+                { "id": id },
+                { 
+                    "$set" : {
+                        "info_test_case": []
+                    }
+                }
+            )
+
+            TestDialplanDAO.col.find_one_and_update(
+                { "id": id },
+                { 
+                    "$addToSet" : {
+                        "info_test_case": testCaseInfo
+                    }
+                    
+                }
+            )
+
 
 TestDialplanDAO.col = db.tbl_test_dialplan
 
@@ -151,6 +216,23 @@ class TestCaseDAO:
     def get(id):
         return TestCaseDAO.col.find_one({ "id": id })
 
+    @staticmethod
+    def getOfTestDialplan(dialplan):
+        return TestCaseDAO.col.find({ "id_campaign": dialplan["id_campaign"] }, { "id": 1, "name": 1 })
+
+    @staticmethod
+    def add(testCase):
+        TestCaseDAO.col.insert(testCase)
+
+    @staticmethod
+    def getOfCampaign(campaignId, pageIndex, pageSize):
+        filter = { "id_campaign": campaignId } if campaignId != "" else {}
+        search_from = (pageIndex - 1) * pageSize
+        test_cases = db.tbl_test_case.find(filter) \
+            .skip(search_from)  \
+            .limit(pageSize)
+        return test_cases
+
 TestCaseDAO.col = db.tbl_test_case
 
 #######################################################################
@@ -160,9 +242,20 @@ class CallListenScriptDAO:
     def getOfTestCase(testCaseId):
         return CallListenScriptDAO.col.find({ "id_test_case": testCaseId })
 
+    @staticmethod
+    def getIdsOfTestCase(testCaseId):
+        return CallListenScriptDAO.col.find({ "id_test_case": testCaseId }, { "id": 1 })
+
 CallListenScriptDAO.col = db.tbl_call_listen_script
 
+#######################################################################
 
+class ActionDAO:
+    @staticmethod
+    def getOfCallListenScript(callListenScriptId):
+        return ActionDAO.col.find({ "id_call_listen": callListenScriptId })
+        
+ActionDAO.col = db.tbl_call_listen_action
 #######################################################################
 
 class ExtentionDAO:
@@ -170,97 +263,20 @@ class ExtentionDAO:
     def getAllIdAndNumber():
         return ExtentionDAO.col.find({}, { "id": 1, "extension_number": 1 })
 
+
+    @staticmethod
+    def getByNumber(number):
+        return ExtentionDAO.col.find_one({ "extension_number": number })
+
 ExtentionDAO.col = db.tbl_extension
 
 
 #######################################################################
-def getCapaignsIdAndName():#
-    return db.tbl_campaign.find({}, { "id": 1, "name": 1 }) 
-
-def getCampaignNameOfDialplan(dialplan_id):
-    campaignID = db.tbl_test_dialplan.find_one({ "id": dialplan_id }, { "id_campaign": 1 })["id_campaign"]
-    return db.tbl_campaign.find_one({ "id": campaignID }, { "name": 1 })["name"]
-
-#######################################################################
-def getTestDialplan(id):#
-    return db.tbl_test_dialplan.find_one({ "id" : id })
-
-def getTestDialplanName(id):#
-    return db.tbl_test_dialplan.find_one({ "id" : id }, { "name":1 })["name"]
-
-def getTestDialplans(searchString, pageIndex, pageSize): #
-    search_from = (pageIndex - 1) * pageSize
-    test_dialplans = db.tbl_test_dialplan.find({ "name": searchOptions(searchString) }) \
-        .skip(search_from)  \
-        .limit(pageSize)
-    return test_dialplans
-
-def getTestDialplansIdAndName(): #
-    return db.tbl_test_dialplan.find({}, { "id": 1, "name": 1 }) 
-
-def getTestDialplanIdAndName(id): #
-    return db.tbl_test_dialplan.find_one({ "id": id }, { "id": 1, "name": 1 }) 
 
 #######################################################################
 
-def getTestCaseInfoOfDialplan(id): #
-    return db.tbl_test_dialplan.find_one({ "id": id }, { "info_test_case": 1 }) 
 
-def addTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
-    if getTestCaseInfoOfDialplan(testDialplanId).get("info_test_case") == None:
-        db.tbl_test_dialplan.find_one_and_update(
-            { "id": testDialplanId },
-            { 
-                "$set" : {
-                    "info_test_case": []
-                }
-            }
-        )
-
-    db.tbl_test_dialplan.find_one_and_update(
-        { "id": testDialplanId },
-        { 
-            "$addToSet" : {
-                "info_test_case": testCaseInfo
-            }
-            
-        }
-    )
-
-def updateTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
-    db.tbl_test_dialplan.find_one_and_update(
-        { 
-            "id": testDialplanId,
-            "info_test_case.id": testCaseInfo["id"]
-        },
-        { 
-            "$set": {
-                "info_test_case.$.status": testCaseInfo["status"],
-                "info_test_case.$.result": testCaseInfo["result"],
-            }
-            
-        }
-    )
-
-def removeTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
-    db.tbl_test_dialplan.find_one_and_update(
-        { 
-            "id": testDialplanId
-        },
-        { 
-            "$pull": {
-                "info_test_case": {
-                    "id": testCaseInfo["id"]
-                }
-            }
-            
-        }
-    )
-
-    db.tbl_call_listen_result.remove({
-        "id_test_dialplan": testDialplanId,
-        "id_test_case": testCaseInfo["id"]
-    })
+#######################################################################
 
 
 #######################################################################
@@ -268,47 +284,6 @@ def removeTestCaseInfoOfDialplan(testDialplanId, testCaseInfo):
 
 
 
-def getPassedAndTotalTestCase(id):
-    td_list =  getTestCaseInfoOfDialplan(id)
-    return td_list.find({ "status": "passed" }).count(True) , td_list.count(True)
-
-def deleteTestDialplan(id):
-    db.tbl_test_dialplan.remove({ "id": id })
-
-def getTestDialplanCount(searchString):
-    return db.tbl_test_dialplan.find({ "name": searchOptions(searchString) }).count(True)
-
-def getTestCase(id):
-    return db.tbl_test_case.find_one({ "id": id })
-
-def getTestCasesOfCampaign(campaign, pageIndex, pageSize):
-    filter = { "id_campaign": campaign["id"] } if campaign["id"] != "" else {}
-    search_from = (pageIndex - 1) * pageSize
-    test_cases = db.tbl_test_case.find(filter) \
-        .skip(search_from)  \
-        .limit(pageSize)
-    return test_cases
-
-def getTestCaseOfDialpan(dialplan):
-    testCasesIdAndName = db.tbl_test_case.find({ "id_campaign": dialplan["id_campaign"] }, { "id": 1, "name": 1 })
-    return testCasesIdAndName
-
-def addTestCase(testCase):
-    db.tbl_test_case.insert(testCase)
-
-def updateTestCase(testCase):
-    db.tbl_test_case.update_one(
-        { "id": testCase["id"] },
-        {
-            "$set": {
-                "name": testCase["name"],
-                "id_campaign": testCase["id_campaign"],
-                "require": testCase["require"], 
-                "create_date": testCase["create_date"],
-                "desc": testCase["desc"]
-            }
-        }
-    )
 
 def deleteTestCase(id):
     db.tbl_test_case.remove({ "id": id })

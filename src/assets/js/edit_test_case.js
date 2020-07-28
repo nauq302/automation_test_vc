@@ -191,7 +191,7 @@ class ListenScriptData extends BaseData {
         this.id.name = 'id_' + count;
         this.data.setDataName(count);
 
-        for (let i in this.actions) {
+        for (let i = 0; i < this.actions.length; ++i) {
             this.actions[i].setDataName(count, i);
         }
 
@@ -214,7 +214,7 @@ class ListenScriptData extends BaseData {
  * 
  */
 class CallListenScriptList {
-    widgets = [];
+    scripts = [];
     div;
     s = 0;
 
@@ -224,23 +224,23 @@ class CallListenScriptList {
     }
 
     // Add a widget
-    addCallListen() {
-        let widget = new CallListenScript(this);
-        this.widgets.push(widget);
-        this.div.appendChild(widget.div);
+    addScript() {
+        let script = new CallListenScript(this);
+        this.scripts.push(script);
+        this.div.appendChild(script.div);
         ++this.s;
     }
 
     // 
-    removeCallListen(widget) {
-        this.widgets.splice(this.widgets.indexOf(widget), 1);
-        this.div.removeChild(widget.div);
+    removeCallListen(script) {
+        this.scripts.splice(this.scripts.indexOf(script), 1);
+        this.div.removeChild(script.div);
         --this.s;
     }
 
     setDataName() {
-        for (let i = 0; i < this.widgets.length; ++i) {
-            this.widgets[i].setDataName(i);
+        for (let i = 0; i < this.scripts.length; ++i) {
+            this.scripts[i].setDataName(i);
         }
 
         this.addSize();
@@ -250,7 +250,7 @@ class CallListenScriptList {
         let input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'size';
-        input.value = this.widgets.length;
+        input.value = this.scripts.length;
         this.div.appendChild(input);
     }
 }

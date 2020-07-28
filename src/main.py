@@ -369,10 +369,8 @@ def dependent_test_cases():
     if testDialplanID == None:
         testDialplanID = testDialplanList[0]["id"]
 
-    testCaseOfDialplan = db.getTestCaseOfDialpan(testDialplan)
-
     testCaseList = []
-    for tc in testCaseOfDialplan:
+    for tc in db.TestCaseDAO.getOfTestDialplan(testDialplan):
 
         i = None
         if testDialplan.get('info_test_case') != None: 
@@ -421,7 +419,7 @@ def add_dependent_test_case():
         "result": request.form["result"],
     }
 
-    db.addTestCaseInfoOfDialplan(testDialplanId, infoTestCase)
+    db.TestDialplanDAO.addTestCaseInfo(testDialplanId, infoTestCase)
 
     # db.initCallListenResult(infoTestCase["id"], testDialplanId)
 
@@ -430,7 +428,7 @@ def add_dependent_test_case():
 @app.route("/update_dependent_test_case", methods = ["POST"])
 @login_required
 def update_dependent_test_case():
-    db.updateTestCaseInfoOfDialplan(
+    db.TestDialplanDAO.updateTestCaseInfo(
         request.form["test_dialplan_id"],
         {
             "id": request.form["id"],
@@ -445,7 +443,7 @@ def update_dependent_test_case():
 @login_required
 def remove_dependent_test_case():
     try:
-        db.removeTestCaseInfoOfDialplan(
+        db.TestDialplanDAO.removeTestCaseInfo(
             request.form["test_dialplan_id"],
             {
                 "id": request.form["id"]
@@ -479,36 +477,35 @@ def run_test_case():
         "callee_list": []
     }
 
-    callListenScripts = db.CallListenScriptDAO.getOfTestCase(testCaseId)
-
-    for cl in callListenScripts:
+    for cl in db.CallListenScriptDAO.getOfTestCase(testCaseId):
         if cl["type"] == "call":
-            data["callee_list"].append({
+            caller = {
                 "id": cl["id"],
                 "caller_number": cl["machine"],
-                "script": [{
-                    "play": {
-                        "url": "huhu",
-                        "md5_sum": "hehe"
-                    },
-                    "wait": 0
-                }]
-            })
-        else:
-            data["callee_list"].append({
-                "id": cl["id"],
-                "extension_account": "emanresu",
-                "extension_password": "drowssap",
-                "script": [{
-                    "play": {
-                        "url": "huhu",
-                        "md5_sum": "hehe"
-                    },
-                    "wait": 0
-                }]
-            })
+                "script": []
+            }
 
-    print(data)
+            for a in db.ActionDAO.getOfCallListenScript(cl["id"]):
+                caller["script"].append({ a["name"]: a["value"] })
+
+            data["callee_list"].append(caller)
+
+        else:
+            extension = db.ExtentionDAO.getByNumber(cl["machine"])
+
+            callee = {
+                "id": cl["id"],
+                "extension_account": extension["extension_account"],
+                "extension_password": extension["extension_password"],
+                "ring_time": None,
+                "script": []
+            }
+
+            for a in db.ActionDAO.getOfCallListenScript(cl["id"]):
+                callee["script"].append({ a["name"]: a["value"] })
+
+            data["callee_list"].append(callee)
+
 
     response = requests.post("http://103.69.195.70/test_case", json=data)
 
@@ -523,22 +520,21 @@ def run_test_case():
 @login_required
 def info_test_case():
     try:
-
-        active = request.args["active"] == "true"
+        active = (request.args["active"] == "true")
         testDialplanId = request.args["test_dialplan_id"]
 
-        campaignName = db.getCampaignNameOfDialplan(testDialplanId)
+        campaignName = db.TestDialplanDAO.getCampaignName(testDialplanId)
 
         # Get ID of Test Case
         testCaseId = request.args["test_case_id"]
 
         testDialplan = {
             "id": testDialplanId,
-            "name": db.getTestDialplanName(testDialplanId)
+            "name": db.TestDialplanDAO.getName(testDialplanId)
         }
         
         # Get Test Case and its dependent call/listen dialplans
-        testCase = db.getTestCase(testCaseId)
+        testCase = db.TestCaseDAO.get(testCaseId)
         callListenScriptsList = db.getCallListenScriptsOfTestCase(testCaseId)
 
         # Get actions for each dialplan
@@ -553,11 +549,15 @@ def info_test_case():
                 }
 
             actions = db.getActionsOfCallListenScript(callListenScriptsList[i]["id"])
-            callListenScripts.append((callListenScriptsList[i], actions, result))
+            callListenScripts.append({
+                "data": callListenScriptsList[i],
+                "result": result,
+                "actions": actions
+            })
 
         # Create response
         res = render_template(
-            "info_test_case.html",
+            "info_test_case.html.j2",
             info_user = g.user,
             test_case = testCase,
             call_listen_scripts = callListenScripts,
@@ -580,21 +580,20 @@ def update_info():
     try:
         testDialplanId = request.form["test_dialplan_id"]
         testCaseId = request.form["test_case_id"]
-
-        callListenIds = db.getCallListenScriptIdsOfTestCase(testCaseId)
         
         callListenResults = []
 
-        for cl in callListenIds:
+        for cl in db.CallListenScriptDAO.getIdsOfTestCase(testCaseId):
+            clid = cl["id"]
             callListenResults.append({
                 "id_test_dialplan": testDialplanId,
                 "id_test_case": testCaseId,
                 "id_call_listen": cl["id"],
-                "status": request.form["status_%s" % cl["id"]],
-                "expected_state": request.form["expectedState_%s" % cl["id"]],
-                "real_state": request.form["realState_%s" % cl["id"]],
-                "expected_callee": request.form["expectedCallee_%s" % cl["id"]].split(","),
-                "real_callee": request.form["realCallee_%s" % cl["id"]],
+                "status": request.form["status_%s" % clid],
+                "expected_state": request.form["expectedState_%s" % clid],
+                "real_state": request.form["realState_%s" % clid],
+                "expected_callee": request.form["expectedCallee_%s" % clid].split(","),
+                "real_callee": request.form["realCallee_%s" % clid],
             })
 
         db.updateCallListenResult(callListenResults)
@@ -614,7 +613,7 @@ def update_info():
 @login_required
 def delete_test_dialplan():
     testDialplanID = request.args.get("id")
-    db.deleteTestDialplan(testDialplanID)
+    db.TestDialplanDAO.delete(testDialplanID)
     return redirect("/")
 
 
@@ -635,10 +634,10 @@ def test_case():
         campaignID = ""
 
     # Get list of ID and Name of Test dialplan
-    campaignList = db.getCapaignsIdAndName()
+    campaigns = db.CampaignDAO.getAllIdAndName()
 
     # Get all Test case of specific Test dialplan
-    testCaseList = db.getTestCasesOfCampaign({"id": campaignID}, 1,test_case.pageSize)
+    testCaseList = db.TestCaseDAO.getOfCampaign(campaignID, 1, test_case.pageSize)
     
     count = testCaseList.count()
     page_count = count // test_case.pageSize + (0 if count % test_case.pageSize == 0 else 1)
@@ -649,7 +648,7 @@ def test_case():
         info_user = g.user,
         test_case_list = testCaseList,
         campaign_id = campaignID,
-        campaigns = campaignList,
+        campaigns = campaigns,
         page_count = page_count
     )
 
@@ -667,7 +666,7 @@ def test_cases_list():
     page = int(request.form["page"])
 
     # Get all Test case
-    testCaseList = db.getTestCasesOfCampaign({"id": campaignID}, page, test_case.pageSize)
+    testCaseList = db.TestCaseDAO.getOfCampaign(campaignID, page, test_case.pageSize)
 
     # Create response
     res = render_template(
@@ -686,7 +685,7 @@ def test_cases_list():
 
 def create_test_case_get():
 
-    campaigns = db.getCapaignsIdAndName()
+    campaigns = db.CampaignDAO.getAllIdAndName()
     numbers = db.ExtentionDAO.getAllIdAndNumber()
 
     res = render_template(
@@ -718,7 +717,7 @@ def create_test_case_post():
             "create_date": datetime.datetime.today(),
         }
         
-        db.addTestCase(testCase)
+        db.TestCaseDAO.add(testCase)
         
         # Get number of call/listen dialplans depend on test case
         size = int(request.form["size"])
@@ -788,15 +787,15 @@ def delete():
 
 def edit_get():
     try:
-        campaigns = db.getCapaignsIdAndName()
+        campaigns = db.CampaignDAO.getAllIdAndName()
         numbers = db.ExtentionDAO.getAllIdAndNumber()
 
         # Get ID of Test Case
         id = request.args["id"]
         
         # Get Test Case and its dependent call/listen dialplans
-        testCase = db.getTestCase(id)
-        callListenScriptsList = db.getCallListenScriptsOfTestCase(id)
+        testCase = db.TestCaseDAO.get(id)
+        callListenScriptsList = db.CallListenScriptDAO.getOfTestCase(id)
 
         # Get actions for each dialplan
         callListenScripts = []

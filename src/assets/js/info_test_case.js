@@ -34,14 +34,14 @@ Action.typeDict = {
 /**
  * Widget
  */
-class Widget {
-    actionList = [];
+class CallListenScript {
+    actions = [];
     div;
 
     // Getter
     get id() { return this.div.getElementsByClassName('id')[0]; }
     get phone() { return this.div.getElementsByClassName('phone')[0]; }
-    get scriptTypes() { return this.div.getElementsByClassName('script-type'); }
+    get types() { return this.div.getElementsByClassName('type'); }
     get status() { return this.div.getElementsByClassName('status')[0]; }
     get expectedState() { return this.div.getElementsByClassName('expected-state')[0]; }
     get expectedCallee() { return this.div.getElementsByClassName('expected-callee')[0]; }
@@ -51,7 +51,7 @@ class Widget {
     get addButton() { return this.div.getElementsByClassName('add-button')[0]; }
 
     // Constructor
-    constructor(parent) {
+    constructor() {
         this.div = document.createElement('div');
         this.div.classList.add('row');
         this.setHTML();
@@ -65,8 +65,8 @@ class Widget {
 
     // Add action into action list
     addAction() {
-        let action = new Action(this.tBody);
-        this.actionList.push(action);
+        let action = new Action();
+        this.actions.push(action);
         this.tBody.appendChild(action.row);
     }
 
@@ -88,12 +88,12 @@ class Widget {
                     <label class="col-sm-3 control-label">Loại Kịch bản</label>
 
                     <label class="col-sm-3 control-label">
-                        <input type="radio" value="call" class="script-type" disabled/>
+                        <input type="radio" value="call" class="type" disabled/>
                         Kịch bản Gọi
                     </label>
 
                     <label class="col-sm-3 control-label">
-                        <input type="radio" value="listen" class="script-type" disabled/>
+                        <input type="radio" value="listen" class="type" disabled/>
                         Kịch bản Nghe
                     </label>
                 </div>
@@ -167,8 +167,8 @@ class Widget {
 /**
  * 
  */
-class WidgetList {
-    widgets = [];
+class CallListenScriptList {
+    scripts = [];
     div;
 
     // Create widget list
@@ -177,15 +177,15 @@ class WidgetList {
     }
 
     // Add a widget
-    addWidget() {
-        let widget = new Widget(this);
-        this.widgets.push(widget);
-        this.div.appendChild(widget.div);
+    addScript() {
+        let script = new CallListenScript();
+        this.scripts.push(script);
+        this.div.appendChild(script.div);
     }
 
     setDataName() {
-        for (let i in this.widgets) {
-            this.widgets[i].setDataName();
+        for (let s of this.scripts) {
+            s.setDataName();
         }
     }
 }

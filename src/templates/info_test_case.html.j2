@@ -20,7 +20,7 @@
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <h2>Thông tin Test Case</h2>
-                        <button onclick="editTestCase(`{{test_case['id']}}`)"><i class="fa fa-pencil"></i></button>
+                        <button onclick="editTestCase(`{{test_case['id']}}`)"><i class="fa fa-pencil"> Chỉnh sửa thông tin gốc</i></button>
                     </div>
 
                     <div class="ibox-content">
@@ -63,7 +63,7 @@
                             </div>
                             <div class="hr-line-dashed"></div>
 
-                            <div id="widget-list"></div>
+                            <div id="script-list"></div>
 
                             {% if active %}
                                 <div class="row">
@@ -86,28 +86,28 @@
 
         <script>
             active = {{'true' if active else 'false'}};
-            var widgetList = new WidgetList(document.getElementById('widget-list'));
+            var scriptList = new CallListenScriptList(document.getElementById('script-list'));
 
             let last;
             let item;
             let back;
             {% for cld in call_listen_scripts %}
-                widgetList.addWidget();
-                last = widgetList.widgets.length - 1;
-                item = widgetList.widgets[last];
-                item.id.value = "{{cld[0]['id']}}";
-                item.phone.value = "{{cld[0]['machine']}}";
-                item.status.value = "{{cld[2]['status']}}";
-                item.expectedState.value = "{{cld[2]['expected_state']}}";
-                item.expectedCallee.value = "{{','.join(cld[2]['expected_callee'])}}";
-                item.realState.value = "{{cld[2]['real_state']}}";
-                item.realCallee.value = "{{cld[2]['real_callee']}}";
-                item.scriptTypes[{{0 if cld[0]['type'] == 'call' else 1}}].checked = true;
-                item.scriptTypes[{{1 if cld[0]['type'] == 'call' else 0}}].checked = false;
+                scriptList.addScript();
+                last = scriptList.scripts.length - 1;
+                item = scriptList.scripts[last];
+                item.id.value = "{{cld['data']['id']}}";
+                item.phone.value = "{{cld['data']['machine']}}";
+                item.status.value = "{{cld['result']['status']}}";
+                item.expectedState.value = "{{cld['result']['expected_state']}}";
+                item.expectedCallee.value = "{{','.join(cld['result']['expected_callee'])}}";
+                item.realState.value = "{{cld['result']['real_state']}}";
+                item.realCallee.value = "{{cld['result']['real_callee']}}";
+                item.types[{{0 if cld['data']['type'] == 'call' else 1}}].checked = true;
+                item.types[{{1 if cld['data']['type'] == 'call' else 0}}].checked = false;
                 
-                {% for a in cld[1] %}
+                {% for a in cld['actions'] %}
                     item.addAction();
-                    back = item.actionList[item.actionList.length - 1];
+                    back = item.actions[item.actions.length - 1];
                     back.action.value = Action.typeDict["{{a['name']}}"];
                     back.value.value = "{{a['value']}}";
                     back.note.value = "{{a['note']}}";
@@ -122,8 +122,7 @@
 
             function sm() {
                 if (confirm("Bạn có chắc muốn cập nhật thông tin cho test case không?")) {
-                    widgetList.setDataName();
-
+                    scriptList.setDataName();
                     document.forms['form'].submit();
                 }
             }
