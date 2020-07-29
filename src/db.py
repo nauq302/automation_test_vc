@@ -83,14 +83,16 @@ def searchOptions(searchString):
 
 
 class CampaignDAO:
+    col = db.tbl_campaign
+
     @staticmethod
     def getAllIdAndName():
         return CampaignDAO.col.find({}, { "id": 1, "name": 1 })
 
-CampaignDAO.col = db.tbl_campaign
-
 
 class TestDialplanDAO:
+    col = db.tbl_test_dialplan
+
     @staticmethod
     def get(id):
         return TestDialplanDAO.col.find_one({ "id" : id })
@@ -103,6 +105,11 @@ class TestDialplanDAO:
     @staticmethod
     def getHotlineNumber(id):
         return TestDialplanDAO.col.find_one({ "id": id }, { "hotline_number": 1 })["hotline_number"]
+
+    @staticmethod
+    def getAllHotlineOfCampaign(campaignId):
+        return TestDialplanDAO.col.distinct("hotline_number", { "id_campaign": campaignId })
+        #return TestDialplanDAO.col.find( { "id_campaign": campaignId }, {"hotline_number": 1})
 
     @staticmethod
     def getName(id):
@@ -130,10 +137,10 @@ class TestDialplanDAO:
 
     @staticmethod
     def getTestCaseInfo(id):
-        return TestDialplanDAO.col.find_one({ "id": id }, { "info_test_case": 1 })["info_test_case"]
+        return TestDialplanDAO.col.find_one({ "id": id }, { "info_test_case": 1 }).get("info_test_case")
 
     @staticmethod
-    def delete(id):
+    def remove(id):
         TestDialplanDAO.col.remove({ "id": id })
 
     @staticmethod
@@ -169,15 +176,32 @@ class TestDialplanDAO:
             }
         )
 
-        db.tbl_call_listen_result.remove({
+        CallListenResultDAO.col.remove({
             "id_test_dialplan": id,
             "id_test_case": testCaseInfo["id"]
+        })
+
+    @staticmethod
+    def removeTestCaseDependInfo(testCaseId):
+        TestDialplanDAO.col.update_many(
+            {},
+            { 
+                "$pull": {
+                    "info_test_case": {
+                        "id": testCaseId
+                    }
+                } 
+            }
+        )
+
+        CallListenResultDAO.col.remove({
+            "id_test_case": testCaseId
         })
 
 
     @staticmethod
     def addTestCaseInfo(id, testCaseInfo):
-        if TestDialplanDAO.getTestCaseInfo(id).get("info_test_case") == None:
+        if TestDialplanDAO.getTestCaseInfo(id) == None:
             TestDialplanDAO.col.find_one_and_update(
                 { "id": id },
                 { 
@@ -187,31 +211,30 @@ class TestDialplanDAO:
                 }
             )
 
-            TestDialplanDAO.col.find_one_and_update(
-                { "id": id },
-                { 
-                    "$addToSet" : {
-                        "info_test_case": testCaseInfo
-                    }
-                    
+        TestDialplanDAO.col.find_one_and_update(
+            { "id": id },
+            { 
+                "$addToSet" : {
+                    "info_test_case": testCaseInfo
                 }
-            )
-
-
-TestDialplanDAO.col = db.tbl_test_dialplan
+                
+            }
+        )
 
 #######################################################################
 
 class HotlineDAO:
+    col = db.tbl_hotline
+
     @staticmethod
     def getServerIP(hotlineNumber):
-        return HotlineDAO.col.find_one({ "hotline_number": hotlineNumber }, { "server_ip": 1 })["server_ip"]
-        
-HotlineDAO.col = db.tbl_hotline
+        return HotlineDAO.col.find_one({ "hotline_number": hotlineNumber }, { "server_ip": 1 }).get("server_ip")
 
 #######################################################################
 
 class TestCaseDAO:
+    col = db.tbl_test_case
+
     @staticmethod
     def get(id):
         return TestCaseDAO.col.find_one({ "id": id })
@@ -233,11 +256,30 @@ class TestCaseDAO:
             .limit(pageSize)
         return test_cases
 
-TestCaseDAO.col = db.tbl_test_case
+    @staticmethod
+    def update(testCase):
+        TestCaseDAO.col.update_one(
+            { "id": testCase["id"] },
+            {
+                "$set": {
+                    "name": testCase["name"],
+                    "id_campaign": testCase["id_campaign"],
+                    "require": testCase["require"], 
+                    "create_date": testCase["create_date"],
+                    "desc": testCase["desc"]
+                }
+            }
+        )
+
+    @staticmethod
+    def remove(id):
+        TestCaseDAO.col.remove({ "id": id })
 
 #######################################################################
 
 class CallListenScriptDAO:
+    col = db.tbl_call_listen_script
+
     @staticmethod
     def getOfTestCase(testCaseId):
         return CallListenScriptDAO.col.find({ "id_test_case": testCaseId })
@@ -246,21 +288,50 @@ class CallListenScriptDAO:
     def getIdsOfTestCase(testCaseId):
         return CallListenScriptDAO.col.find({ "id_test_case": testCaseId }, { "id": 1 })
 
-CallListenScriptDAO.col = db.tbl_call_listen_script
+    @staticmethod
+    def add(callListenScript):
+        CallListenScriptDAO.col.insert(callListenScript)
+
+    @staticmethod
+    def remove(id):
+        CallListenScriptDAO.col.remove({ "id": id })
+
+    @staticmethod
+    def update(callListenScript):
+        db.tbl_call_listen_script.update({ "id": callListenScript["id"] }, { "$set": callListenScript })
 
 #######################################################################
 
 class ActionDAO:
+    col = db.tbl_call_listen_action
+
     @staticmethod
     def getOfCallListenScript(callListenScriptId):
         return ActionDAO.col.find({ "id_call_listen": callListenScriptId })
-        
-ActionDAO.col = db.tbl_call_listen_action
+
+    @staticmethod
+    def add(action):
+        ActionDAO.col.insert(action)
+
+    @staticmethod
+    def addMany(actions):
+        ActionDAO.col.insert_many(actions)
+
+    @staticmethod
+    def removeOfCallListenScript(callListenScriptId):
+        ActionDAO.col.remove({ "id_call_listen": callListenScriptId })
+
 #######################################################################
 
 class ExtentionDAO:
+    col = db.tbl_extension
+
     @staticmethod
     def getAllIdAndNumber():
+        return ExtentionDAO.col.find({}, { "id": 1, "extension_number": 1 })
+
+    @staticmethod
+    def getIdAndNumberOfHotline(hotline):
         return ExtentionDAO.col.find({}, { "id": 1, "extension_number": 1 })
 
 
@@ -268,147 +339,53 @@ class ExtentionDAO:
     def getByNumber(number):
         return ExtentionDAO.col.find_one({ "extension_number": number })
 
-ExtentionDAO.col = db.tbl_extension
-
-
 #######################################################################
 
-#######################################################################
+class CallListenResultDAO:
+    col = db.tbl_call_listen_result
 
+    @staticmethod
+    def get(callListenScriptID, testDialplanId):
+        return CallListenResultDAO.col.find_one({ 
+            "id_call_listen": callListenScriptID, 
+            "id_test_dialplan": testDialplanId 
+        })
 
-#######################################################################
-
-
-#######################################################################
+    @staticmethod
+    def removeOfCallListenScript(callListenScriptID):
+        CallListenResultDAO.col.remove({ "id_call_listen": callListenScriptID })
     
+    @staticmethod
+    def updateMany(callListenResults):
+        for clr in callListenResults:
+            CallListenResultDAO.col.update(
+                {
+                    "id_test_dialplan": clr["id_test_dialplan"],
+                    "id_call_listen": clr["id_call_listen"],
+                    "id_test_case": clr["id_test_case"],
+                }, {
+                    "$set": {
+                        "status": clr["status"],
+                        "expected_state": clr["expected_state"],
+                        "real_state": clr["real_state"],
+                        "expected_callee": clr["expected_callee"],
+                        "real_callee": clr["real_callee"],
+                    }
+                }, upsert=True
+            )
+
+#######################################################################
+
+#######################################################################
+
+
+#######################################################################
+
+
+#######################################################################
 
 
 
-
-def deleteTestCase(id):
-    db.tbl_test_case.remove({ "id": id })
-    deleteTestCaseDependInfo(id)
-
-def getCallListenScript(id):
-    return db.tbl_call_listen_script.find({ "id": id })
-
-
-def getCallListenScriptsOfTestCase(test_case_id):
-    return db.tbl_call_listen_script.find({ "id_test_case": test_case_id })
-
-
-
-def getCallListenScriptIdsOfTestCase(test_case_id):
-    return db.tbl_call_listen_script.find({ "id_test_case": test_case_id }, { "id": 1 })
-
-def deleteCallListenScript(id):
-    db.tbl_call_listen_script.remove({ "id": id })
-
-def deleteActionOfCallListen(callListenScriptID):
-    db.tbl_action_dialplan.remove({ "id_call_listen": callListenScriptID })
-
-def deleteCallListenResult(callListenScriptID):
-    db.tbl_call_listen_result.remove({ "id_call_listen": callListenScriptID })
-
-def getCallListenResult(call_listen_id, test_dialplan_id):
-    return db.tbl_call_listen_result.find_one({ "id_call_listen": call_listen_id, "id_test_dialplan": test_dialplan_id })
-
-def updateCallListenScript(callListenScript):
-    db.tbl_call_listen_script.update({
-        "id": callListenScript["id"]
-    },
-    {
-        "$set": {
-            "id_test_case": callListenScript["id_test_case"],
-            "type": callListenScript["type"],
-            "machine": callListenScript["machine"],
-            "default_state": callListenScript["default_state"],
-            "default_callee": callListenScript["default_callee"]
-        }
-    })
-
-
-def initCallListenResult(test_case_id, test_dialplan_id):
-    callListenScripts = db.tbl_call_listen_script.find({ 
-            "id_test_case": test_case_id 
-        }, {
-            "id": 1, 
-            "default_callee": 1, 
-            "default_state": 1
-    })
-
-    for cl in callListenScripts:
-        db.tbl_call_listen_result.update({
-            "id_test_dialplan": test_dialplan_id,
-            "id_test_case": test_case_id,
-            
-        }, {
-            "$set": {
-                "id_call_listen": cl["id"],
-                "expected_callee": cl["default_callee"],
-                "expected_state": cl["default_state"]
-            }
-        },
-            True
-        )
-
-
-def addCallListenScript(call_listen_script):
-    db.tbl_call_listen_script.insert(call_listen_script)
-
-
-def getActionsOfCallListenScript(call_listen_script_id):
-    return db.tbl_action_dialplan.find({ "id_call_listen": call_listen_script_id })
-
-def addActionDialplans(action_dialplans):
-    db.tbl_action_dialplan.insert_many(action_dialplans)
-
-def deleteTestCaseDepend(id):
-    call_listen_script_id_list = db.tbl_call_listen_script.find({ "id_test_case": id }, { "id": 1 })
-    for cldi in call_listen_script_id_list:
-        db.tbl_action_dialplan.delete_many({ "id_call_listen": cldi["id"] })
-
-    db.tbl_call_listen_script.delete_many({ "id_test_case": id })
-
-def deleteTestCaseDependInfo(id):
-    db.tbl_test_dialplan.update_many(
-        {},
-        { 
-            "$pull": {
-                "info_test_case": {
-                    "id": id
-                }
-            } 
-        }
-    )
-
-    db.tbl_call_listen_result.remove({
-        "id_test_case": id
-    })
-
-def updateCallListenResult(callListenResults):
-    for clr in callListenResults:
-        db.tbl_call_listen_result.update({
-            "id_test_dialplan": clr["id_test_dialplan"],
-            "id_call_listen": clr["id_call_listen"],
-        },
-        {
-            "$set": {
-                "status": clr["status"],
-                "expected_state": clr["expected_state"],
-                "real_state": clr["real_state"],
-                "expected_callee": clr["expected_callee"],
-                "real_callee": clr["real_callee"],
-            }
-        },
-            True
-        )
-
-def getCallListenIds():
-    db.tbl_call_listen_script.find({}, { "id": 1 })
-
-def getCallListenIdsOfTestCase(test_case_id):
-    return db.tbl_call_listen_script.find({ "id_test_case": test_case_id }, { "id": 1 })
 
 # find all documents
 

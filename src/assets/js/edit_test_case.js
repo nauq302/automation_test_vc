@@ -64,7 +64,7 @@ class ListenScriptData extends BaseData {
 
 
             <div class="row">
-                <label class="col-sm-2 control-label">Thời gian rung chuông</label>
+                <label class="col-sm-2 control-label">Thời gian rung chuông (giây)</label>
                 <div class="col-sm-5"><input type="number" class="ring-time form-control"></div>
             </div>
             <div class="hr-line-dashed"></div>
@@ -76,6 +76,11 @@ class ListenScriptData extends BaseData {
             option.text = c['number'];
             this.phone.add(option);
         }
+    }
+
+    setDataName(count) {
+        this.phone.name = 'phone_' + count;
+        this.ringTime.name = 'ringTime_' + count;
     }
 }  
 
@@ -90,7 +95,6 @@ class ListenScriptData extends BaseData {
 
     // Getter
     get id() { return this.div.getElementsByClassName('id')[0]; }
-    
     get types() { return this.div.getElementsByClassName('type'); }
     get tBody() { return this.div.getElementsByTagName('tbody')[0]; }
     get addButton() { return this.div.getElementsByClassName('add-button')[0]; }
@@ -111,6 +115,14 @@ class ListenScriptData extends BaseData {
 
         // Set delete button action 
         this.deleteWidgetButton.onclick = (() => { parent.removeWidget(this); }).bind(this);
+    }
+
+    setCallScript() {
+        this.data = new CallScriptData(this, this.div.getElementsByClassName('data')[0]);
+    }
+
+    setListenScript() {
+        this.data = new ListenScriptData(this, this.div.getElementsByClassName('data')[0]);
     }
 
     // Add action into action list

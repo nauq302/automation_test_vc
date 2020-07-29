@@ -71,11 +71,11 @@ class Action {
         `;
     }
 
-    setDataName(widgetCount, actionCount) {
-        this.id.name = 'id_' + widgetCount + '_' + actionCount;
-        this.name.name = 'name_' + widgetCount + '_' + actionCount;
-        this.value.name = 'value_' + widgetCount + '_' + actionCount;
-        this.note.name = 'note_' + widgetCount + '_' + actionCount;
+    setDataName(scriptCount, actionCount) {
+        this.id.name = 'id_' + scriptCount + '_' + actionCount;
+        this.name.name = 'name_' + scriptCount + '_' + actionCount;
+        this.value.name = 'value_' + scriptCount + '_' + actionCount;
+        this.note.name = 'note_' + scriptCount + '_' + actionCount;
     }
 }
 
@@ -97,12 +97,12 @@ class ScriptTypeRadios {
             r.name = 't' + tempName;
         }
 
-        this.radios[0].onchange = () => {
-            parent.data = new CallScriptData(parent, parent.div.getElementsByClassName('data')[0]);
+        this.radios[ScriptTypeRadios.CALL].onchange = () => {
+            parent.setCallScript();
         };
 
-        this.radios[1].onchange = () => {
-            parent.data = new ListenScriptData(parent, parent.div.getElementsByClassName('data')[0]);
+        this.radios[ScriptTypeRadios.LISTEN].onchange = () => {
+            parent.setListenScript();
         };
     }
 
@@ -124,13 +124,13 @@ class ScriptTypeRadios {
 
     setDataName(count) {
         for (let r of this.radios) {
-            r.name = 'scriptType_' + count;
+            r.name = 'type_' + count;
         }
     }
 }
 
 ScriptTypeRadios.CALL = 0;
-ScriptTypeRadios.LISTEN = 0;
+ScriptTypeRadios.LISTEN = 1;
 
 
 let callees = [];

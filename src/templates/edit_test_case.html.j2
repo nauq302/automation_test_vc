@@ -88,8 +88,7 @@
 
             {% for n in numbers %}
                 callees.push({
-                    id: "{{n['id']}}",
-                    number: "{{n['extension_number']}}"
+                    number: "{{n}}"
                 });
             {% endfor %}
 
@@ -101,15 +100,28 @@
                 scriptList.addScript();
                 last = scriptList.scripts.length - 1;
                 item = scriptList.scripts[last];
-                item.id.value = "{{cld[0]['id']}}";
-                item.types.radios[{{0 if cld[0]['type'] == 'call' else 1}}].checked = true;
-                item.types.radios[{{1 if cld[0]['type'] == 'call' else 0}}].checked = false;
+                item.id.value = "{{cld['data']['id']}}";
+                item.data.phone.value = "{{cld['data']['machine']}}";
 
-                item.data.phone.value = "{{cld[0]['machine']}}";
-                item.data.defaultState.value = "{{cld[0]['default_state']}}";
-                item.data.defaultCallee.value = "{{','.join(cld[0]['default_callee'])}}";
+                {% if cld['data']['type'] == 'call' %}
+                    item.types.radios[ScriptTypeRadios.CALL].checked = true;
+                    item.types.radios[ScriptTypeRadios.LISTEN].checked = false;
+
+                    item.data.defaultState.value = "{{cld['data']['default_state']}}";
+                    item.data.defaultCallee.value = "{{','.join(cld['data']['default_callee'])}}";
+
+                {% else %}
+                    item.types.radios[ScriptTypeRadios.CALL].checked = false;
+                    item.types.radios[ScriptTypeRadios.LISTEN].checked = true;
+
+                    item.setListenScript();
+                    item.data.ringTime.value = "{{cld['data']['ring_time']}}";
+                {% endif %}
+
                 
-                {% for a in cld[1] %}
+                
+                
+                {% for a in cld['actions'] %}
                     item.addAction();
                     back = item.actions[item.actions.length - 1];
                     back.id.value = "{{a['id']}}";

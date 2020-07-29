@@ -535,20 +535,20 @@ def info_test_case():
         
         # Get Test Case and its dependent call/listen dialplans
         testCase = db.TestCaseDAO.get(testCaseId)
-        callListenScriptsList = db.getCallListenScriptsOfTestCase(testCaseId)
+        callListenScriptsList = db.CallListenScriptDAO.getOfTestCase(testCaseId)
 
         # Get actions for each dialplan
         callListenScripts = []
 
         for i in range(callListenScriptsList.count()):
-            result = db.getCallListenResult(callListenScriptsList[i]["id"], testDialplanId)
+            result = db.CallListenResultDAO.get(callListenScriptsList[i]["id"], testDialplanId)
             if not result:
                 result = {
                     "expected_state": callListenScriptsList[i]["default_state"],
                     "expected_callee": callListenScriptsList[i]["default_callee"],
                 }
 
-            actions = db.getActionsOfCallListenScript(callListenScriptsList[i]["id"])
+            actions = db.ActionDAO.getOfCallListenScript(callListenScriptsList[i]["id"])
             callListenScripts.append({
                 "data": callListenScriptsList[i],
                 "result": result,
@@ -596,7 +596,7 @@ def update_info():
                 "real_callee": request.form["realCallee_%s" % clid],
             })
 
-        db.updateCallListenResult(callListenResults)
+        db.CallListenResultDAO.updateMany(callListenResults)
 
         return redirect("/dependent_test_cases?test_dialplan_id=" + testDialplanId)
 
@@ -613,7 +613,7 @@ def update_info():
 @login_required
 def delete_test_dialplan():
     testDialplanID = request.args.get("id")
-    db.TestDialplanDAO.delete(testDialplanID)
+    db.TestDialplanDAO.remove(testDialplanID)
     return redirect("/")
 
 
@@ -718,35 +718,33 @@ def create_test_case_post():
         }
         
         db.TestCaseDAO.add(testCase)
-        
-        # Get number of call/listen dialplans depend on test case
-        size = int(request.form["size"])
 
         # Insert call/listen dialplans
-        for i in range(size):
+        for i in range(int(request.form["size"])):
             callListenScript = {
                 "id": uuid4().hex,
                 "id_test_case": testCase["id"],
-                "type": request.form["scriptType_%d" % i],
-                "machine": request.form["phone_%d" % i],
-                "default_state": request.form["defaultState_%d" % i],
-                "default_callee": request.form["defaultCallee_%d" % i].split(","),
+                "type": request.form["type_%d" % i],
+                "machine": request.form["phone_%d" % i]
             }
 
-            db.addCallListenScript(callListenScript)
+            if callListenScript["type"] == "call":
+                callListenScript["default_state"] = request.form["defaultState_%d" % i]
+                callListenScript["default_callee"] = request.form["defaultCallee_%d" % i].split(",")
+            else:
+                callListenScript["ring_time"] = request.form["ringTime_%d" % i]
 
-            # Get number of action in each call/listen dialplan
-            size_ = int(request.form["size_%d" % i])
+            db.CallListenScriptDAO.add(callListenScript)
 
             # Insert actions
-            for j in range(size_):
-                db.addActionDialplans([{
+            for j in range(int(request.form["size_%d" % i])):
+                db.ActionDAO.add({
                     "id": uuid4().hex,
                     "id_call_listen": callListenScript["id"],
                     "name": request.form["name_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
-                }])
+                })
     except Exception as e:
         print(e)
 
@@ -767,8 +765,8 @@ def delete():
         id = request.args["id"]
 
         # Delete
-        db.deleteTestCase(id)
-        db.deleteTestCaseDependInfo(id)
+        db.TestCaseDAO.remove(id)
+        db.TestDialplanDAO.removeTestCaseDependInfo(id)
 
     except Exception as e:
         print(e)
@@ -788,8 +786,9 @@ def delete():
 def edit_get():
     try:
         campaigns = db.CampaignDAO.getAllIdAndName()
-        numbers = db.ExtentionDAO.getAllIdAndNumber()
 
+
+        
         # Get ID of Test Case
         id = request.args["id"]
         
@@ -797,11 +796,23 @@ def edit_get():
         testCase = db.TestCaseDAO.get(id)
         callListenScriptsList = db.CallListenScriptDAO.getOfTestCase(id)
 
+        if False:
+            numbers = db.ExtentionDAO.getAllIdAndNumber()
+        else:
+            if campaigns.count() > 0:  
+                numbers = db.TestDialplanDAO.getAllHotlineOfCampaign(testCase["id_campaign"])
+            else:
+                numbers = []
+
+
         # Get actions for each dialplan
         callListenScripts = []
         for i in range(callListenScriptsList.count()):
-            actions = db.getActionsOfCallListenScript(callListenScriptsList[i]["id"])
-            callListenScripts.append((callListenScriptsList[i], actions))
+            actions = db.ActionDAO.getOfCallListenScript(callListenScriptsList[i]["id"])
+            callListenScripts.append({
+                "data": callListenScriptsList[i],
+                "actions": actions
+            })
 
         # Create response
         res = render_template(
@@ -831,9 +842,6 @@ def edit_post():
     try:
         id = request.form["id"]
 
-        # Delete Test Case and its dependents
-        # db.deleteTestCaseDepend(id)
-
         # Add new Test Case
         test_case = {
             "id": id,
@@ -845,36 +853,37 @@ def edit_post():
             "status": False
         }
 
-        db.updateTestCase(test_case)
-
-        size = int(request.form["size"])
+        db.TestCaseDAO.update(test_case)
 
         callListenScripts = []
         actionDialplans = []
 
-        for i in range(size):
+        for i in range(int(request.form["size"])):
             
-            call_listen_script = {
+            callListenScript = {
                 "id": request.form["id_%d" % i],
                 "id_test_case": test_case["id"],
-                "type": request.form["scriptType_%d" % i],
-                "default_state": request.form["defaultState_%d" % i],
-                "default_callee": request.form["defaultCallee_%d" % i].split(","),
+                "type": request.form["type_%d" % i],
+                
                 "machine": request.form["phone_%d" % i]
             }
 
-            if call_listen_script["id"] == "":
-                call_listen_script["id"] = uuid4().hex
-                db.addCallListenScript(call_listen_script)
+            if callListenScript["type"] == "call":
+                callListenScript["default_state"] = request.form["defaultState_%d" % i]
+                callListenScript["default_callee"] = request.form["defaultCallee_%d" % i].split(",")
+            else:
+                callListenScript["ring_time"] = request.form["ringTime_%d" % i]
+
+            if callListenScript["id"] == "":
+                callListenScript["id"] = uuid4().hex
+                db.CallListenScriptDAO.add(callListenScript)
             
-            callListenScripts.append(call_listen_script)
+            callListenScripts.append(callListenScript)
 
-            size_ = int(request.form["size_%d" % i])
-
-            for j in range(size_):
+            for j in range(int(request.form["size_%d" % i])):
                 action = {
                     "id": request.form["id_%d_%d" % (i,j)],
-                    "id_call_listen": call_listen_script["id"],
+                    "id_call_listen": callListenScript["id"],
                     "name": request.form["name_%d_%d" % (i,j)],
                     "value": request.form["value_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
@@ -885,24 +894,20 @@ def edit_post():
                 
                 actionDialplans.append(action)
 
-        callListenIds = db.getCallListenIdsOfTestCase(id)
-        
-        for cl in callListenIds:
+        for cl in db.CallListenScriptDAO.getIdsOfTestCase(id):
             cls = next((cls for cls in callListenScripts if cls["id"] == cl["id"]), None)
             
             if cls == None:
-                db.deleteCallListenScript(cl["id"])
+                db.CallListenScriptDAO.remove(cl["id"])
             else:
-                db.updateCallListenScript(cls)
+                db.CallListenScriptDAO.update(cls)
 
-            db.deleteActionOfCallListen(cl["id"])
+            db.ActionDAO.removeOfCallListenScript(cl["id"])
         
-        
-        db.addActionDialplans(actionDialplans)
+        db.ActionDAO.addMany(actionDialplans)
 
     except Exception as e:
         print(e)
-        return redirect("/")
 
     finally:
         return redirect("/test_case")
