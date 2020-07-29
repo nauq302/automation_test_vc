@@ -17,7 +17,7 @@
             <div class="col-lg-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h2>Thêm Test Case</h2>
+                        <h2>Chỉnh sửa Test Case</h2>
                     </div>
 
                     <div class="ibox-content">
@@ -34,11 +34,12 @@
                             <div class="row">
                                 <label class="col-lg-2 control-label">Tổng đài</label>
                                 <div class="col-lg-4">
-                                    <select name="campaign_id" class="form-control">
+                                    <select name="campaign_id" onchange="changCampaign(this.value)" class="form-control">
                                         {% for c in campaigns %}
                                             <option value="{{c['id']}}" {{'selected' if c['id'] == test_case['id_campaign']}}>{{c['name']}}</option>
                                         {% endfor %}
                                     </select>
+                                    <small>Thay đổi Tổng đài có thể ảnh hưởng đến thông tin bên dưới</small>
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
@@ -87,9 +88,7 @@
             var scriptList = new CallListenScriptList(document.getElementById('script-list'));
 
             {% for n in numbers %}
-                callees.push({
-                    number: "{{n}}"
-                });
+                callees.push("{{n}}");
             {% endfor %}
 
             let last;
@@ -100,8 +99,7 @@
                 scriptList.addScript();
                 last = scriptList.scripts.length - 1;
                 item = scriptList.scripts[last];
-                item.id.value = "{{cld['data']['id']}}";
-                item.data.phone.value = "{{cld['data']['machine']}}";
+                item.id.value = "{{cld['data']['id']}}";         
 
                 {% if cld['data']['type'] == 'call' %}
                     item.types.radios[ScriptTypeRadios.CALL].checked = true;
@@ -118,8 +116,7 @@
                     item.data.ringTime.value = "{{cld['data']['ring_time']}}";
                 {% endif %}
 
-                
-                
+                item.data.phone.value = "{{cld['data']['machine']}}";
                 
                 {% for a in cld['actions'] %}
                     item.addAction();
@@ -138,10 +135,27 @@
                     return document.forms['form'].submit();
                 }  
             }
-        </script>
 
-        <script >
-            
+            function changCampaign(campaignId) {
+                $.ajax({
+                    type: "POST",
+                    url: "campaign_hotline",
+                    datatype: "json",
+                    data: { 
+                        campaign_id: campaignId
+                    },
+                    success: (response) => { 
+                        callees = response.split('\n');
+                        
+                        for (let s of scriptList.scripts) {
+                            if (s.types.radios[ScriptTypeRadios.LISTEN].checked == true) {
+                                s.data.refreshPhone();
+                            }
+                        }
+                    }
+                    
+                });
+            }
         </script>
 
     </div>

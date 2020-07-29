@@ -86,7 +86,6 @@ class ScriptTypeRadios {
 
     get radios() { return this.div.getElementsByClassName('type'); }
 
-
     constructor(parent, div, tempName) {
         this.parent = parent;
         this.div = div;
@@ -97,13 +96,8 @@ class ScriptTypeRadios {
             r.name = 't' + tempName;
         }
 
-        this.radios[ScriptTypeRadios.CALL].onchange = () => {
-            parent.setCallScript();
-        };
-
-        this.radios[ScriptTypeRadios.LISTEN].onchange = () => {
-            parent.setListenScript();
-        };
+        this.radios[ScriptTypeRadios.CALL].onchange = () => { parent.setCallScript(); };
+        this.radios[ScriptTypeRadios.LISTEN].onchange = () => { parent.setListenScript(); };
     }
 
     setHTML() {
@@ -131,6 +125,5 @@ class ScriptTypeRadios {
 
 ScriptTypeRadios.CALL = 0;
 ScriptTypeRadios.LISTEN = 1;
-
 
 let callees = [];

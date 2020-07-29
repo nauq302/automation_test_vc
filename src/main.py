@@ -912,6 +912,18 @@ def edit_post():
     finally:
         return redirect("/test_case")
 
+@app.route("/campaign_hotline", methods=["POST"])
+@login_required
+def campaign_hotline():
+    campaignId = request.form["campaign_id"]
+    numbers = db.TestDialplanDAO.getAllHotlineOfCampaign(campaignId)
+
+    numberString = ""
+    for n in numbers:
+        numberString += n + '\n'
+
+    return numberString
+
 
 ###################################################################
 
