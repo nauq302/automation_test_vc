@@ -686,7 +686,7 @@ def test_cases_list():
 def create_test_case_get():
 
     campaigns = db.CampaignDAO.getAllIdAndName()
-    numbers = db.ExtentionDAO.getAllIdAndNumber()
+    numbers = db.test(campaigns[0]["id"])
 
     res = render_template(
         "create_test_case.html.j2",
@@ -800,7 +800,7 @@ def edit_get():
             numbers = db.ExtentionDAO.getAllIdAndNumber()
         else:
             if campaigns.count() > 0:  
-                numbers = db.TestDialplanDAO.getAllHotlineOfCampaign(testCase["id_campaign"])
+                numbers = db.test(testCase["id_campaign"])
             else:
                 numbers = []
 
@@ -916,7 +916,8 @@ def edit_post():
 @login_required
 def campaign_hotline():
     campaignId = request.form["campaign_id"]
-    numbers = db.TestDialplanDAO.getAllHotlineOfCampaign(campaignId)
+    # numbers = db.TestDialplanDAO.getAllHotlineOfCampaign(campaignId)
+    numbers = db.test(campaignId)
 
     numberString = ""
     for n in numbers:

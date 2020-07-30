@@ -89,6 +89,10 @@ class CampaignDAO:
     def getAllIdAndName():
         return CampaignDAO.col.find({}, { "id": 1, "name": 1 })
 
+    @staticmethod
+    def getName(id):
+        return CampaignDAO.col.find_one({ "id": id }, { "name": 1 })["name"]
+
 
 class TestDialplanDAO:
     col = db.tbl_test_dialplan
@@ -381,6 +385,29 @@ class CallListenResultDAO:
 
 #######################################################################
 
+def test(campaignID):
+    campaignName = CampaignDAO.getName(campaignID)
+
+    print(campaignName)
+    hotlineIds = HotlineDAO.col.distinct("id", { "exchange": campaignName })
+
+    print(hotlineIds)
+    extensionIds = db.tbl_map_all.distinct(
+        "extension_id", { 
+            "hotline_id": {
+                "$in": hotlineIds
+            } 
+        }
+    )
+
+    print(extensionIds)
+    return ExtentionDAO.col.distinct(
+        "extension_number", {
+            "id": {
+                "$in": extensionIds
+            }
+        }
+    )
 
 #######################################################################
 

@@ -100,6 +100,9 @@ class ScriptTypeRadios {
         this.radios[ScriptTypeRadios.LISTEN].onchange = () => { parent.setListenScript(); };
     }
 
+
+
+
     setHTML() {
         this.div.innerHTML = /*html*/`
             <label class="col-sm-3 control-label">Chọn loại Kịch bản</label>
@@ -127,3 +130,5 @@ ScriptTypeRadios.CALL = 0;
 ScriptTypeRadios.LISTEN = 1;
 
 let callees = [];
+
+
