@@ -89,10 +89,7 @@
 
 
             {% for n in numbers %}
-                callees.push({
-                    id: "{{n['eid']}}",
-                    number: "{{n['extension_number']}}"
-                });
+                callees.push("{{n}}");
             {% endfor %}
 
             function sm() {
