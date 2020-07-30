@@ -593,11 +593,11 @@ def update_info():
                 "id_test_dialplan": testDialplanId,
                 "id_test_case": testCaseId,
                 "id_call_listen": cl["id"],
-                "status": request.form["status_%s" % clid],
-                "expected_state": request.form["expectedState_%s" % clid],
-                "real_state": request.form["realState_%s" % clid],
-                "expected_callee": request.form["expectedCallee_%s" % clid].split(","),
-                "real_callee": request.form["realCallee_%s" % clid],
+                "status": request.form.get("status_%s" % clid),
+                "expected_state": request.form.get("expectedState_%s" % clid),
+                "real_state": request.form.get("realState_%s" % clid),
+                "expected_callee": request.form["expectedCallee_%s" % clid].split(",") if request.form.get("expectedCallee_%s" % clid) != None else None,
+                "real_callee": request.form.get("realCallee_%s" % clid),
             })
 
         db.CallListenResultDAO.updateMany(callListenResults)

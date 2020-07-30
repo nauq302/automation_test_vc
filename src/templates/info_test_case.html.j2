@@ -92,7 +92,7 @@
             let item;
             let back;
             {% for cld in call_listen_scripts %}
-                scriptList.addScript();
+                scriptList.addScript("{{cld['data']['type']}}");
                 last = scriptList.scripts.length - 1;
                 item = scriptList.scripts[last];
                 item.id.value = "{{cld['data']['id']}}";
@@ -100,18 +100,14 @@
                 
 
                 {% if cld['data']['type'] == 'call' %}
-                    item.status.value = "{{cld['result']['status']}}";
-                    item.expectedState.value = "{{cld['result']['expected_state']}}";
-                    item.expectedCallee.value = "{{','.join(cld['result']['expected_callee'])}}";
-                    item.realState.value = "{{cld['result']['real_state']}}";
-                    item.realCallee.value = "{{cld['result']['real_callee']}}";
+                    item.data.status.value = "{{cld['result']['status']}}";
+                    item.data.expectedState.value = "{{cld['result']['expected_state']}}";
+                    item.data.expectedCallee.value = "{{','.join(cld['result']['expected_callee'])}}";
+                    item.data.realState.value = "{{cld['result']['real_state']}}";
+                    item.data.realCallee.value = "{{cld['result']['real_callee']}}";
 
                 {% else %}
-                    item.status.disabled = true;
-                    item.expectedState.disabled = true;
-                    item.expectedCallee.disabled = true;
-                    item.realState.disabled = true;
-                    item.realCallee.disabled = true;
+                    item.data.ringTime.value = "{{cld['data']['ring_time']}}";
                 {% endif %}
                 
                 item.types[{{0 if cld['data']['type'] == 'call' else 1}}].checked = true;

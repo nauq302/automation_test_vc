@@ -31,36 +31,117 @@ Action.typeDict = {
     "delay": "Delay (Thời gian chờ trước khi thực hiện cuộc gọi)",
 }
 
+
+
+class CallScriptData {
+    div;
+
+    get status() { return this.div.getElementsByClassName('status')[0]; }
+    get expectedState() { return this.div.getElementsByClassName('expected-state')[0]; }
+    get expectedCallee() { return this.div.getElementsByClassName('expected-callee')[0]; }
+    get realState() { return this.div.getElementsByClassName('real-state')[0]; }
+    get realCallee() { return this.div.getElementsByClassName('real-callee')[0]; }
+
+    constructor(div) {
+        this.div = div;
+        this.setHTML();
+    }
+
+    setHTML() {
+        this.div.innerHTML = /*html*/`
+            <div class="row">
+                <label class="col-sm-2 control-label">Trạng thái</label>
+                <div class="col-sm-5"><input type="text" class="status form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="row">
+                <label class="col-sm-2 control-label">Kết quả dự kiến</label>
+                <div class="col-sm-5"><input type="text" class="expected-state form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="row">
+                <label class="col-sm-2 control-label">Kết quả thực tế</label>
+                <div class="col-sm-5"><input type="text" class="real-state form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="row">
+                <label class="col-sm-2 control-label">Máy nghe dự kiến</label>
+                <div class="col-sm-5">
+                    <input type="text" class="expected-callee form-control">
+                    <small>Mỗi máy cách nhau bởi dấu ,</small>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="row">
+                <label class="col-sm-2 control-label">Máy nghe thực tế</label>
+                <div class="col-sm-5">
+                    <input type="text" class="real-callee form-control">
+                </div>
+            </div>
+        `;
+    }
+}
+
+class ListenScriptData {
+    div;
+
+    get ringTime() { return this.div.getElementsByClassName('ring-time')[0]; }
+    constructor(div) {
+        this.div = div;
+        this.setHTML();
+    }
+
+    setHTML() {
+        this.div.innerHTML = /*html*/`
+            <div class="row">
+                <label class="col-sm-2 control-label">Thời gian rung chuông (giây)</label>
+                <div class="col-sm-5"><input type="text" class="ring-time form-control"></div>
+            </div>
+        `;
+    }
+}
 /**
  * Widget
  */
 class CallListenScript {
     actions = [];
     div;
+    data;
 
     // Getter
     get id() { return this.div.getElementsByClassName('id')[0]; }
     get phone() { return this.div.getElementsByClassName('phone')[0]; }
     get types() { return this.div.getElementsByClassName('type'); }
-    get status() { return this.div.getElementsByClassName('status')[0]; }
-    get expectedState() { return this.div.getElementsByClassName('expected-state')[0]; }
-    get expectedCallee() { return this.div.getElementsByClassName('expected-callee')[0]; }
-    get realState() { return this.div.getElementsByClassName('real-state')[0]; }
-    get realCallee() { return this.div.getElementsByClassName('real-callee')[0]; }
     get tBody() { return this.div.getElementsByTagName('tbody')[0]; }
-    get addButton() { return this.div.getElementsByClassName('add-button')[0]; }
+
+    type;
 
     // Constructor
-    constructor() {
+    constructor(type) {
         this.div = document.createElement('div');
         this.div.classList.add('row');
         this.setHTML();
 
-        this.status.disabled = !active;
-        this.expectedState.disabled = !active;
-        this.realState.disabled = !active;
-        this.expectedCallee.disabled = !active;
-        this.realCallee.disabled = !active;
+        this.type = type;
+
+        if (type == 'call') {
+
+            this.data = new CallScriptData(this.div.getElementsByClassName('data')[0]);
+
+            this.data.status.disabled = !active;
+            this.data.expectedState.disabled = !active;
+            this.data.realState.disabled = !active;
+            this.data.expectedCallee.disabled = !active;
+            this.data.realCallee.disabled = !active;
+
+        } else {
+            this.data = new ListenScriptData(this.div.getElementsByClassName('data')[0]);
+            this.data.ringTime.disabled = true;
+        }
     }
 
     // Add action into action list
@@ -72,11 +153,13 @@ class CallListenScript {
 
     // Set data name for submit
     setDataName() {
-        this.status.name = 'status_' + this.id.value;
-        this.expectedState.name = 'expectedState_' + this.id.value;
-        this.expectedCallee.name = 'expectedCallee_' + this.id.value;
-        this.realState.name = 'realState_' + this.id.value;
-        this.realCallee.name = 'realCallee_' + this.id.value;
+        if (this.type == 'call') {
+            this.data.status.name = 'status_' + this.id.value;
+            this.data.expectedState.name = 'expectedState_' + this.id.value;
+            this.data.expectedCallee.name = 'expectedCallee_' + this.id.value;
+            this.data.realState.name = 'realState_' + this.id.value;
+            this.data.realCallee.name = 'realCallee_' + this.id.value;
+        }
     }
 
     // Set HTML
@@ -105,38 +188,12 @@ class CallListenScript {
                 </div>
                 <div class="hr-line-dashed"></div>
 
-                <div class="row">
-                    <label class="col-sm-2 control-label">Trạng thái</label>
-                    <div class="col-sm-5"><input type="text" class="status form-control"></div>
-                </div>
-                <div class="hr-line-dashed"></div>
+                
 
-                <div class="row">
-                    <label class="col-sm-2 control-label">Kết quả dự kiến</label>
-                    <div class="col-sm-5"><input type="text" class="expected-state form-control"></div>
+                <div class="data">
+                    
                 </div>
-                <div class="hr-line-dashed"></div>
-
-                <div class="row">
-                    <label class="col-sm-2 control-label">Kết quả thực tế</label>
-                    <div class="col-sm-5"><input type="text" class="real-state form-control"></div>
-                </div>
-                <div class="hr-line-dashed"></div>
-
-                <div class="row">
-                    <label class="col-sm-2 control-label">Máy nghe dự kiến</label>
-                    <div class="col-sm-5">
-                        <input type="text" class="expected-callee form-control">
-                        <small>Mỗi máy cách nhau bởi dấu ,</small>
-                    </div>
-                </div>
-                <div class="hr-line-dashed"></div>
-                <div class="row">
-                    <label class="col-sm-2 control-label">Máy nghe thực tế</label>
-                    <div class="col-sm-5">
-                        <input type="text" class="real-callee form-control">
-                    </div>
-                </div>
+                
                 <div class="hr-line-dashed"></div>
 
 
@@ -177,8 +234,8 @@ class CallListenScriptList {
     }
 
     // Add a widget
-    addScript() {
-        let script = new CallListenScript();
+    addScript(type) {
+        let script = new CallListenScript(type);
         this.scripts.push(script);
         this.div.appendChild(script.div);
     }
