@@ -548,8 +548,8 @@ def info_test_case():
             result = db.CallListenResultDAO.get(callListenScriptsList[i]["id"], testDialplanId)
             if not result:
                 result = {
-                    "expected_state": callListenScriptsList[i]["default_state"],
-                    "expected_callee": callListenScriptsList[i]["default_callee"],
+                    "expected_state": callListenScriptsList[i].get("default_state"),
+                    "expected_callee": callListenScriptsList[i].get("default_callee"),
                 }
 
             actions = db.ActionDAO.getOfCallListenScript(callListenScriptsList[i]["id"])

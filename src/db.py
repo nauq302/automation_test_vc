@@ -198,6 +198,17 @@ class TestDialplanDAO:
             }
         )
 
+        TestDialplanDAO.col.update_many(
+            {},
+            { 
+                "$pull": {
+                    "info_test_case": {
+                        "id": testCaseId
+                    }
+                } 
+            }
+        )
+
         CallListenResultDAO.col.remove({
             "id_test_case": testCaseId
         })
@@ -388,12 +399,8 @@ class CallListenResultDAO:
 def test(campaignID):
     campaignName = CampaignDAO.getName(campaignID)
 
-    print(campaignName)
-    print("\n")
     hotlineIds = HotlineDAO.col.distinct("id", { "exchange": campaignName })
 
-    print(hotlineIds)
-    print("\n")
     extensionIds = db.tbl_map_all.distinct(
         "extension_id", { 
             "hotline_id": {
@@ -402,8 +409,6 @@ def test(campaignID):
         }
     )
 
-    print(extensionIds)
-    print("\n")
     return ExtentionDAO.col.distinct(
         "extension_number", {
             "id": {

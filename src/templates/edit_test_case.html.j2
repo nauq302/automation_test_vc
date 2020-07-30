@@ -81,6 +81,9 @@
             </div>
         </div>
 
+        <link href="css/plugins/select2/select2.min.css" rel="stylesheet">
+        <link href="css/plugins/select2/select2-bootstrap4.min.css" rel="stylesheet">
+        <script src="assets/js/plugins/select2/select2.full.min.js"></script>
         <script src="assets/js/change_test_case.js"></script>
         <script src="assets/js/edit_test_case.js"></script>
         <script>
@@ -136,28 +139,10 @@
                 }  
             }
 
-            function changCampaign(campaignId) {
-                $.ajax({
-                    type: "POST",
-                    url: "campaign_hotline",
-                    datatype: "json",
-                    data: { 
-                        campaign_id: campaignId
-                    },
-                    success: (response) => { 
-                        callees = response.split('\n');
-                        
-                        for (let s of scriptList.scripts) {
-                            if (s.types.radios[ScriptTypeRadios.LISTEN].checked == true) {
-                                s.data.refreshPhone();
-                            }
-                        }
-                    }
-                    
-                });
-            }
+            
         </script>
-
+            
     </div>
+
 
 {% endblock %}

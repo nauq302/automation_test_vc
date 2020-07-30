@@ -57,7 +57,7 @@ class ListenScriptData extends BaseData {
             <div class="row">
                 <label class="col-sm-2 control-label">Chọn máy nghe</label>
                 <div class="col-sm-5">
-                    <select class="phone form-control"></select>
+                    <select class="phone form-control select2_demo_1"></select>
                 </div>
             </div>
             <div class="hr-line-dashed"></div>
@@ -87,6 +87,10 @@ class ListenScriptData extends BaseData {
         this.ringTime.name = 'ringTime_' + count;
     }
 }  
+
+$(".select2_demo_1").select2({
+    theme: 'bootstrap4',
+});
 
 /**
  * CallListenScript

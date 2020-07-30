@@ -97,11 +97,23 @@
                 item = scriptList.scripts[last];
                 item.id.value = "{{cld['data']['id']}}";
                 item.phone.value = "{{cld['data']['machine']}}";
-                item.status.value = "{{cld['result']['status']}}";
-                item.expectedState.value = "{{cld['result']['expected_state']}}";
-                item.expectedCallee.value = "{{','.join(cld['result']['expected_callee'])}}";
-                item.realState.value = "{{cld['result']['real_state']}}";
-                item.realCallee.value = "{{cld['result']['real_callee']}}";
+                
+
+                {% if cld['data']['type'] == 'call' %}
+                    item.status.value = "{{cld['result']['status']}}";
+                    item.expectedState.value = "{{cld['result']['expected_state']}}";
+                    item.expectedCallee.value = "{{','.join(cld['result']['expected_callee'])}}";
+                    item.realState.value = "{{cld['result']['real_state']}}";
+                    item.realCallee.value = "{{cld['result']['real_callee']}}";
+
+                {% else %}
+                    item.status.disabled = true;
+                    item.expectedState.disabled = true;
+                    item.expectedCallee.disabled = true;
+                    item.realState.disabled = true;
+                    item.realCallee.disabled = true;
+                {% endif %}
+                
                 item.types[{{0 if cld['data']['type'] == 'call' else 1}}].checked = true;
                 item.types[{{1 if cld['data']['type'] == 'call' else 0}}].checked = false;
                 
