@@ -488,7 +488,7 @@ def run_test_case():
             for a in db.ActionDAO.getOfCallListenScript(cl["id"]):
                 caller["script"].append({ a["name"]: a["value"] })
 
-            data["callee_list"].append(caller)
+            data["caller_list"].append(caller)
 
         else:
             extension = db.ExtentionDAO.getByNumber(cl["machine"])
@@ -497,7 +497,7 @@ def run_test_case():
                 "id": cl["id"],
                 "extension_account": extension["extension_account"],
                 "extension_password": extension["extension_password"],
-                "ring_time": None,
+                "ring_time": cl["ring_time"],
                 "script": []
             }
 
@@ -506,8 +506,10 @@ def run_test_case():
 
             data["callee_list"].append(callee)
 
+    api = "http://103.69.195.70/test_case"
+    headers = {"Authorization": "4U*kkraLh+AsabuhskuKkpb3YterDjS(", "Content-Type": "application/json"}
 
-    response = requests.post("http://103.69.195.70/test_case", json=data)
+    response = requests.post(api, headers, json=data)
 
     print(response)
 
@@ -787,8 +789,6 @@ def edit_get():
     try:
         campaigns = db.CampaignDAO.getAllIdAndName()
 
-
-        
         # Get ID of Test Case
         id = request.args["id"]
         
