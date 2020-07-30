@@ -506,8 +506,10 @@ def run_test_case():
 
             data["callee_list"].append(callee)
 
+    print(data)
+
     api = "http://103.69.195.70/test_case"
-    headers = {"Authorization": "4U*kkraLh+AsabuhskuKkpb3YterDjS(", "Content-Type": "application/json"}
+    headers = { "Authorization": "4U*kkraLh+AsabuhskuKkpb3YterDjS(", "Content-Type": "application/json" }
 
     response = requests.post(api, headers, json=data)
 

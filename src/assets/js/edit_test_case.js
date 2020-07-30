@@ -371,3 +371,24 @@ function autocomplete(inp, arr) {
     /*execute a function when someone clicks in the document:*/
     document.addEventListener("click", e => { closeAllLists(e.target); });
 }
+
+function changCampaign(campaignId) {
+    $.ajax({
+        type: "POST",
+        url: "campaign_hotline",
+        datatype: "json",
+        data: { 
+            campaign_id: campaignId
+        },
+        success: (response) => { 
+            callees = response.split('\n');
+            
+            for (let s of scriptList.scripts) {
+                if (s.types.radios[ScriptTypeRadios.LISTEN].checked == true) {
+                    s.data.refreshPhone();
+                }
+            }
+        }
+        
+    });
+}

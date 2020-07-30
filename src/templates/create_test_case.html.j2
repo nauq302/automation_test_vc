@@ -32,7 +32,7 @@
                             <div class="row">
                                 <label class="col-lg-2 control-label">Tổng đài</label>
                                 <div class="col-lg-4">
-                                    <select name="campaign_id" class="form-control">
+                                    <select name="campaign_id" onchange="changCampaign(this.value)" class="form-control">
                                         {% for c in campaigns %}
                                             <option value="{{c['id']}}">{{c['name']}}</option>
                                         {% endfor %}
@@ -89,10 +89,7 @@
 
 
             {% for n in numbers %}
-                callees.push({
-                    id: "{{n['eid']}}",
-                    number: "{{n['extension_number']}}"
-                });
+                callees.push("{{n}}");
             {% endfor %}
 
             function sm() {
