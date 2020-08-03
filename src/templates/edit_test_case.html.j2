@@ -59,7 +59,7 @@
 
                             <div class="row">
                                 <div class="col-lg-3 col-lg-offset-3">
-                                    <button type="button" onclick="scriptList.addScript()" class="btn btn-primary">
+                                    <button type="button" id="add" class="btn btn-primary">
                                         <i class="fa fa-save"></i> Thêm Kịch bản Nghe/Gọi
                                     </button>
                                 </div>
@@ -131,6 +131,10 @@
                 if (confirm('Bạn có chắc mình muốn chỉnh sửa Test Case đáng yêu này? Hành động này sẽ không thể quay lại')) {
                     document.forms['form'].submit();
                 }  
+            }
+
+            document.getElementById('add').onclick = () => {
+                scriptList.addScript();
             }
         </script>
             

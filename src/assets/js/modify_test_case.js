@@ -1,4 +1,5 @@
 import { BaseData, Action, ScriptTypeRadios, callees } from './change_test_case.js'
+export { ScriptTypeRadios, callees };
 
 class CallScriptData extends BaseData {
 
@@ -272,4 +273,4 @@ export class CallListenScriptList {
     }
 }
 
-export { ScriptTypeRadios, callees };
+
