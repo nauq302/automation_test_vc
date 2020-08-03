@@ -1,4 +1,4 @@
-class BaseData {
+export class BaseData {
     div;
     parent;
 
@@ -11,27 +11,25 @@ class BaseData {
 }
 
 
-class Action {
+export class Action {
     row;
 
     get id() { return this.row.getElementsByClassName('aid')[0]; }
     get name() { return this.row.getElementsByClassName('name')[0]; }
     get value() { return this.row.getElementsByClassName('value')[0]; }
-    
     get note() { return this.row.getElementsByClassName('note')[0]; }
-    get delete() { return this.row.getElementsByClassName('delete')[0]; }
+    get remove() { return this.row.getElementsByClassName('remove')[0]; }
 
     constructor(parent) {
         this.row = document.createElement('tr');
         this.setHTML();
 
-        
         this.name.onclick = (() => { 
             let opt = this.name.options[this.name.selectedIndex];
             this.changeActionType(opt.value); 
         }).bind(this);
 
-        this.delete.onclick = (() => { parent.removeAction(this); }).bind(this);
+        this.remove.onclick = (() => { parent.removeAction(this); }).bind(this);
     }
 
     changeActionType(type) {
@@ -45,14 +43,14 @@ class Action {
             case 'play':
                 this.value.type = 'file';
                 this.value.value = '';
-            break;
+                break;
         }
     }
 
 
     setHTML() {
         this.row.innerHTML = /*html*/`
-        <input type="hidden" class="aid"/>
+            <input type="hidden" class="aid"/>
             <td class="col-sm-2">
                 <select class="name form-control">
                     <option value="press" selected>Press (Phím bấm sẽ thực hiện)</option>
@@ -64,7 +62,7 @@ class Action {
             <td class="col-sm-2"><input type="text" class="value form-control"/></td>
             <td class="col-sm-3"><textarea class="note form-control"></textarea></td>
             <td class="col-sm-1">
-                <button type="button" class="delete form-control">
+                <button type="button" class="remove form-control">
                     <i class="fa fa-minus"></i>
                 </button>
             </td>
@@ -80,7 +78,7 @@ class Action {
 }
 
 
-class ScriptTypeRadios {
+export class ScriptTypeRadios {
     parent;
     div;
 
@@ -126,6 +124,6 @@ class ScriptTypeRadios {
 ScriptTypeRadios.CALL = 0;
 ScriptTypeRadios.LISTEN = 1;
 
-let callees = [];
+export let callees = [];
 
 

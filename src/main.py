@@ -289,7 +289,7 @@ def index():
 
     # Create response
     res = render_template(
-        "index.html", 
+        "index.html.j2", 
         info_user = g.user, 
         test_dialplans = testDialplans, 
         page = 1, 
@@ -342,7 +342,7 @@ def test_dialplans_list():
 
     # Create response
     res = render_template(
-        "test_dialplans_list.html", 
+        "test_dialplans_list.html.j2", 
         test_dialplans = testDialplans, 
         page = page, 
         page_count = pageCount,
@@ -397,7 +397,7 @@ def dependent_test_cases():
 
     # Create response
     res = render_template(
-        "dependent_test_cases.html", 
+        "dependent_test_cases.html.j2", 
         info_user = g.user,
         testDialplanList = testDialplanList,
         testDialplanID = testDialplanID,
@@ -506,10 +506,13 @@ def run_test_case():
 
             data["callee_list"].append(callee)
 
-    print(data)
-
     api = "http://103.69.195.70/test_case"
-    headers = { "Authorization": "4U*kkraLh+AsabuhskuKkpb3YterDjS(", "Content-Type": "application/json" }
+    headers = { 
+        "Authorization": "4U*kkraLh+AsabuhskuKkpb3YterDjS(", 
+        "Content-Type": "application/json" 
+    }
+
+    db.TestDialplanDAO.setState(testDialplanId, "pending")
 
     response = requests.post(api, headers, json=data)
 
@@ -648,7 +651,7 @@ def test_case():
 
     # Create response
     res = render_template(
-        "test_case.html",
+        "test_case.html.j2",
         info_user = g.user,
         test_case_list = testCaseList,
         campaign_id = campaignID,
@@ -674,7 +677,7 @@ def test_cases_list():
 
     # Create response
     res = render_template(
-        "test_cases_list.html",
+        "test_cases_list.html.j2",
         test_case_list = testCaseList
     )
 
@@ -796,23 +799,16 @@ def edit_get():
         
         # Get Test Case and its dependent call/listen dialplans
         testCase = db.TestCaseDAO.get(id)
-        callListenScriptsList = db.CallListenScriptDAO.getOfTestCase(id)
+        clsList = db.CallListenScriptDAO.getOfTestCase(id)
 
-        if False:
-            numbers = db.ExtentionDAO.getAllIdAndNumber()
-        else:
-            if campaigns.count() > 0:  
-                numbers = db.test(testCase["id_campaign"])
-            else:
-                numbers = []
-
+        numbers = db.test(testCase["id_campaign"]) if campaigns.count() > 0 else []
 
         # Get actions for each dialplan
         callListenScripts = []
-        for i in range(callListenScriptsList.count()):
-            actions = db.ActionDAO.getOfCallListenScript(callListenScriptsList[i]["id"])
+        for i in range(clsList.count()):
+            actions = db.ActionDAO.getOfCallListenScript(clsList[i]["id"])
             callListenScripts.append({
-                "data": callListenScriptsList[i],
+                "data": clsList[i],
                 "actions": actions
             })
 
@@ -820,7 +816,7 @@ def edit_get():
         res = render_template(
             "edit_test_case.html.j2",
             info_user = g.user,
-            test_case = testCase,
+            testCase = testCase,
             call_listen_scripts = callListenScripts,
             campaigns = campaigns,
             numbers = numbers

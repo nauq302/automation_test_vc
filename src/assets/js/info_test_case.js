@@ -190,9 +190,7 @@ class CallListenScript {
 
                 
 
-                <div class="data">
-                    
-                </div>
+                <div class="data"></div>
                 
                 <div class="hr-line-dashed"></div>
 

@@ -235,6 +235,10 @@ class TestDialplanDAO:
                 
             }
         )
+    
+    @staticmethod
+    def setState(id, state):
+        TestDialplanDAO.col.update_one({ "id": id }, { "$set": { "state": state } })
 
 #######################################################################
 
@@ -353,6 +357,28 @@ class ExtentionDAO:
     @staticmethod
     def getByNumber(number):
         return ExtentionDAO.col.find_one({ "extension_number": number })
+
+    @staticmethod
+    def getAllNumberOfCampaign(campaignID):
+        campaignName = CampaignDAO.getName(campaignID)
+
+        hotlineIds = HotlineDAO.col.distinct("id", { "exchange": campaignName })
+
+        extensionIds = db.tbl_map_all.distinct(
+            "extension_id", { 
+                "hotline_id": {
+                    "$in": hotlineIds
+                } 
+            }
+        )
+
+        return ExtentionDAO.col.distinct(
+            "extension_number", {
+                "id": {
+                    "$in": extensionIds
+                }
+            }
+        )
 
 #######################################################################
 

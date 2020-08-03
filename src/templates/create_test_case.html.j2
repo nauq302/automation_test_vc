@@ -67,7 +67,7 @@
 
                             <div class="row">
                                 <div class="col-lg-3 col-lg-offset-3">
-                                    <button type="button" onclick="sm()" class="btn btn-primary">
+                                    <button type="button" id="sm" class="btn btn-primary">
                                         <i class="fa fa-save"></i> Lưu và tiếp tục
                                     </button>
                                 </div>
@@ -79,26 +79,23 @@
             </div>
         </div>
 
-        <script src="assets/js/change_test_case.js" type="text/javascript"></script>
-        <script src="assets/js/edit_test_case.js" type="text/javascript"></script>
+        <script type="module">
+            import { CallListenScriptList, callees } from './assets/js/modify_test_case.js';
 
-        <script>
             var scriptList = new CallListenScriptList(document.getElementById('script-list'));
             scriptList.addScript();
             scriptList.scripts[0].addAction();
 
-
             {% for n in numbers %}
-                callees.push("{{n}}");
+                callees.push('{{n}}');
             {% endfor %}
 
-            function sm() {
+            document.getElementById('sm').onclick = () => {
                 scriptList.setDataName();
                 
-                if (confirm("Bạn có chắc mình muốn tạo 1 Test Case đáng yêu như vậy? Hành động này sẽ không thể quay lại")) {
+                if (confirm('Bạn có chắc mình muốn tạo 1 Test Case đáng yêu như vậy? Hành động này sẽ không thể quay lại')) {
                     return document.forms['form'].submit();
-                }
-                
+                }    
             }
         </script>
 

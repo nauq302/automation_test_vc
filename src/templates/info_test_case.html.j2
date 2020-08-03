@@ -80,10 +80,7 @@
                 </div>
             </div>
         </div>
-
-
         
-
         <script>
             active = {{'true' if active else 'false'}};
             var scriptList = new CallListenScriptList(document.getElementById('script-list'));
@@ -100,6 +97,8 @@
                 
 
                 {% if cld['data']['type'] == 'call' %}
+                    item.types.radios[ScriptTypeRadios.CALL].checked = true;
+
                     item.data.status.value = "{{cld['result']['status']}}";
                     item.data.expectedState.value = "{{cld['result']['expected_state']}}";
                     item.data.expectedCallee.value = "{{','.join(cld['result']['expected_callee'])}}";
@@ -107,11 +106,10 @@
                     item.data.realCallee.value = "{{cld['result']['real_callee']}}";
 
                 {% else %}
+                    item.types.radios[ScriptTypeRadios.LISTEN].checked = true;
+                    
                     item.data.ringTime.value = "{{cld['data']['ring_time']}}";
                 {% endif %}
-                
-                item.types[{{0 if cld['data']['type'] == 'call' else 1}}].checked = true;
-                item.types[{{1 if cld['data']['type'] == 'call' else 0}}].checked = false;
                 
                 {% for a in cld['actions'] %}
                     item.addAction();

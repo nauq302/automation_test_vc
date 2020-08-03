@@ -22,12 +22,12 @@
 
                     <div class="ibox-content">
                         <form action="edit_test_case" id="form" method="POST">
-                            <input type="hidden" name="id" value="{{test_case['id']}}" />
+                            <input type="hidden" name="id" value="{{testCase['id']}}" />
                             
 
                             <div class="row">
                                 <label class="col-sm-2 control-label">Tên Test Case</label>
-                                <div class="col-sm-5"><input type="text" name="name" value="{{test_case['name']}}" class="form-control" required></div>
+                                <div class="col-sm-5"><input type="text" name="name" value="{{testCase['name']}}" class="form-control" required></div>
                             </div>
                             <div class="hr-line-dashed"></div>
 
@@ -36,7 +36,7 @@
                                 <div class="col-lg-4">
                                     <select name="campaign_id" onchange="changCampaign(this.value)" class="form-control">
                                         {% for c in campaigns %}
-                                            <option value="{{c['id']}}" {{'selected' if c['id'] == test_case['id_campaign']}}>{{c['name']}}</option>
+                                            <option value="{{c['id']}}" {{'selected' if c['id'] == testCase['id_campaign']}}>{{c['name']}}</option>
                                         {% endfor %}
                                     </select>
                                     <small>Thay đổi Tổng đài có thể ảnh hưởng đến thông tin bên dưới</small>
@@ -46,13 +46,13 @@
 
                             <div class="row">
                                 <label class="col-lg-2 control-label">Mô tả</label>
-                                <div class="col-lg-4"><textarea name="description" class="form-control">{{test_case['desc']}}</textarea></div>
+                                <div class="col-lg-4"><textarea name="description" class="form-control">{{testCase['desc']}}</textarea></div>
                             </div>
                             <div class="hr-line-dashed"></div>
 
                             <div class="row">
                                 <label class="col-sm-2 control-label">Bắt buộc</label>
-                                <div class="col-sm-5"><input type="checkbox" name="require" value="1" class="form-control" {{'checked' if test_case['require']}}/></div>
+                                <div class="col-sm-5"><input type="checkbox" name="require" value="1" class="form-control" {{'checked' if testCase['require']}}/></div>
                                 
                             </div>
                             <div class="hr-line-dashed"></div>
@@ -70,7 +70,7 @@
 
                             <div class="row">
                                 <div class="col-lg-3 col-lg-offset-3">
-                                    <button type="button" onclick="sm()" class="btn btn-primary">
+                                    <button id="sm" type="button" class="btn btn-primary">
                                         <i class="fa fa-save"></i> Lưu và tiếp tục
                                     </button>
                                 </div>
@@ -81,17 +81,13 @@
             </div>
         </div>
 
-        <link href="css/plugins/select2/select2.min.css" rel="stylesheet">
-        <link href="css/plugins/select2/select2-bootstrap4.min.css" rel="stylesheet">
-        <script src="assets/js/plugins/select2/select2.full.min.js"></script>
-        <script src="assets/js/change_test_case.js"></script>
-        <script src="assets/js/edit_test_case.js"></script>
-        <script>
+        <script type="module">
+            import { CallListenScriptList, ScriptTypeRadios, callees } from './assets/js/modify_test_case.js';
 
             var scriptList = new CallListenScriptList(document.getElementById('script-list'));
 
             {% for n in numbers %}
-                callees.push("{{n}}");
+                callees.push('{{n}}');
             {% endfor %}
 
             let last;
@@ -106,13 +102,11 @@
 
                 {% if cld['data']['type'] == 'call' %}
                     item.types.radios[ScriptTypeRadios.CALL].checked = true;
-                    item.types.radios[ScriptTypeRadios.LISTEN].checked = false;
 
                     item.data.defaultState.value = "{{cld['data']['default_state']}}";
                     item.data.defaultCallee.value = "{{','.join(cld['data']['default_callee'])}}";
 
                 {% else %}
-                    item.types.radios[ScriptTypeRadios.CALL].checked = false;
                     item.types.radios[ScriptTypeRadios.LISTEN].checked = true;
 
                     item.setListenScript();
@@ -131,15 +125,13 @@
                 {% endfor %}
             {% endfor %}
 
-            function sm() {
+            document.getElementById('sm').onclick = () => {
                 scriptList.setDataName();
                 
-                if (confirm("Bạn có chắc mình muốn chỉnh sửa Test Case đáng yêu này? Hành động này sẽ không thể quay lại")) {
-                    return document.forms['form'].submit();
+                if (confirm('Bạn có chắc mình muốn chỉnh sửa Test Case đáng yêu này? Hành động này sẽ không thể quay lại')) {
+                    document.forms['form'].submit();
                 }  
             }
-
-            
         </script>
             
     </div>
