@@ -82,12 +82,12 @@
         </div>
 
         <script type="module">
-            import { CallListenScriptList, ScriptTypeRadios, callees } from './assets/js/modify_test_case.js';
+            import { CallListenScriptList, ScriptTypeRadios, callees } from "./assets/js/modify_test_case.js";
 
-            var scriptList = new CallListenScriptList(document.getElementById('script-list'));
+            var scriptList = new CallListenScriptList(document.getElementById("script-list"));
 
             {% for n in numbers %}
-                callees.push('{{n}}');
+                callees.push("{{n}}");
             {% endfor %}
 
             let last;
@@ -125,15 +125,15 @@
                 {% endfor %}
             {% endfor %}
 
-            document.getElementById('sm').onclick = () => {
+            document.getElementById("sm").onclick = () => {
                 scriptList.setDataName();
                 
-                if (confirm('Bạn có chắc mình muốn chỉnh sửa Test Case đáng yêu này? Hành động này sẽ không thể quay lại')) {
-                    document.forms['form'].submit();
+                if (confirm("Bạn có chắc mình muốn chỉnh sửa Test Case đáng yêu này? Hành động này sẽ không thể quay lại")) {
+                    document.forms["form"].submit();
                 }  
             }
 
-            document.getElementById('add').onclick = () => {
+            document.getElementById("add").onclick = () => {
                 scriptList.addScript();
             }
         </script>

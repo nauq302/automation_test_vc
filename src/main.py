@@ -514,7 +514,7 @@ def run_test_case():
 
     db.TestDialplanDAO.setState(testDialplanId, "pending")
 
-    response = requests.post(api, headers, json=data)
+    response = requests.post(api, headers=headers, json=data)
 
     print(response)
 
