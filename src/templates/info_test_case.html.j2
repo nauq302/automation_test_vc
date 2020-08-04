@@ -97,7 +97,7 @@
                 
 
                 {% if cld['data']['type'] == 'call' %}
-                    item.types.radios[ScriptTypeRadios.CALL].checked = true;
+                    item.types[0].checked = true;
 
                     item.data.status.value = "{{cld['result']['status']}}";
                     item.data.expectedState.value = "{{cld['result']['expected_state']}}";
@@ -106,7 +106,7 @@
                     item.data.realCallee.value = "{{cld['result']['real_callee']}}";
 
                 {% else %}
-                    item.types.radios[ScriptTypeRadios.LISTEN].checked = true;
+                    item.types[1].checked = true;
                     
                     item.data.ringTime.value = "{{cld['data']['ring_time']}}";
                 {% endif %}
