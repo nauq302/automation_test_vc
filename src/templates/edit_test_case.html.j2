@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="ibox-content">
-                        <form action="edit_test_case" id="form" method="POST">
+                        <form action="edit_test_case" id="form" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="id" value="{{testCase['id']}}" />
                             
 
@@ -77,7 +77,7 @@
                             </div>
                         </form>
                     </div>
-                </div>
+                </div>`
             </div>
         </div>
 
@@ -120,8 +120,17 @@
                     back = item.actions[item.actions.length - 1];
                     back.id.value = "{{a['id']}}";
                     back.name.value = "{{a['name']}}";
-                    back.value.value = "{{a['value']}}";
                     back.note.value = "{{a['note']}}";
+
+                    back.value.type = "text";
+                    back.value.value = "{{a['value']}}";
+
+                    {% if a['name'] == 'play' %}
+                        back.value.readOnly = true;
+                        back.hint.innerHTML = "Click để thay đổi file âm thanh";
+                    {% endif %}
+
+                    
                 {% endfor %}
             {% endfor %}
 

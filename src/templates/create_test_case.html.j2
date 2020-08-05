@@ -20,9 +20,8 @@
                     </div>
 
                     <div class="ibox-content">
-                        <form action="create_test_case" id="form" method="POST">
-                            
-
+                        <form action="create_test_case" id="form" method="POST" enctype="multipart/form-data">
+                        
                             <div class="row">
                                 <label class="col-sm-2 control-label">Tên Test Case</label>
                                 <div class="col-sm-5"><input type="text" name="name" class="form-control" required/></div>
@@ -78,27 +77,26 @@
                 </div>
             </div>
         </div>
-
         <script type="module">
-            import { CallListenScriptList, callees } from './assets/js/modify_test_case.js';
+            import { CallListenScriptList, callees } from "./assets/js/modify_test_case.js";
 
-            var scriptList = new CallListenScriptList(document.getElementById('script-list'));
+            var scriptList = new CallListenScriptList(document.getElementById("script-list"));
             scriptList.addScript();
             scriptList.scripts[0].addAction();
 
             {% for n in numbers %}
-                callees.push('{{n}}');
+                callees.push("{{n}}");
             {% endfor %}
 
-            document.getElementById('sm').onclick = () => {
+            document.getElementById("sm").onclick = () => {
                 scriptList.setDataName();
                 
-                if (confirm('Bạn có chắc mình muốn tạo 1 Test Case đáng yêu như vậy? Hành động này sẽ không thể quay lại')) {
-                    return document.forms['form'].submit();
+                if (confirm("Bạn có chắc mình muốn tạo 1 Test Case đáng yêu như vậy? Hành động này sẽ không thể quay lại")) {
+                    return document.forms["form"].submit();
                 }    
             }
 
-            document.getElementById('add').onclick = () => {
+            document.getElementById("add").onclick = () => {
                 scriptList.addScript();
             }
         </script>

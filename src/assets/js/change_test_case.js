@@ -19,6 +19,7 @@ export class Action {
     get value() { return this.row.getElementsByClassName('value')[0]; }
     get note() { return this.row.getElementsByClassName('note')[0]; }
     get remove() { return this.row.getElementsByClassName('remove')[0]; }
+    get hint() { return this.row.getElementsByClassName('hint')[0]; }
 
     constructor(parent) {
         this.row = document.createElement('tr');
@@ -30,6 +31,11 @@ export class Action {
         }).bind(this);
 
         this.remove.onclick = (() => { parent.removeAction(this); }).bind(this);
+        this.value.onclick = (() => {
+            if (this.name.value == 'play') {
+                this.value.type = 'file';
+            }
+        }).bind(this);
     }
 
     changeActionType(type) {
@@ -39,10 +45,14 @@ export class Action {
             case 'delay':
                 this.value.type = 'text';
                 this.value.value = '';
+                this.value.readOnly = false;
+                this.hint.innerHTML = "";
                 break;
             case 'play':
                 this.value.type = 'file';
                 this.value.value = '';
+                this.value.accept = "audio/*";
+                this.hint.innerHTML = "Click để thay đổi file âm thanh";
                 break;
         }
     }
@@ -59,7 +69,7 @@ export class Action {
                     <option value="delay">Delay (Thời gian chờ trước khi thực hiện cuộc gọi)</option>
                 </select>
             </td>
-            <td class="col-sm-2"><input type="text" class="value form-control"/></td>
+            <td class="col-sm-2"><input type="text" class="value form-control"/><small class="hint"></small></td>
             <td class="col-sm-3"><textarea class="note form-control"></textarea></td>
             <td class="col-sm-1">
                 <button type="button" class="remove form-control">

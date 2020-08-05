@@ -10,6 +10,7 @@ from uuid import uuid4, UUID
 import random
 from flask import (Flask, request, send_from_directory, Response,
                    render_template, redirect, session, g, make_response)
+import werkzeug
 from werkzeug.datastructures import CallbackDict
 from flask.sessions import SessionInterface, SessionMixin
 from itsdangerous import URLSafeTimedSerializer, BadSignature
@@ -44,6 +45,7 @@ app.jinja_env.autoescape = False
 
 app.config["SECRET_KEY"] = config.SECRET_KEY
 app.config["SESSION_COOKIE_DOMAIN"] = config.SESSION_COOKIE_DOMAIN
+app.config["UPLOAD_FOLDER"] = "src/audio_files"
 sentry = Sentry(app)
 #app.jinja_env.add_extension("jinja2.ext.do")
 
@@ -195,6 +197,13 @@ def login_required(f):
 def public_files(filename):
     src = os.path.dirname(__file__)
     return send_from_directory(os.path.join(src, "assets"), filename)
+
+#################################################################
+
+@app.route("/audio_files/<path:filename>")
+def audio_files(filename):
+    src = os.path.dirname(__file__)
+    return send_from_directory(os.path.join(src, "audio_files"), filename)
 
 #################################################################
 
@@ -747,13 +756,27 @@ def create_test_case_post():
 
             # Insert actions
             for j in range(int(request.form["size_%d" % i])):
-                db.ActionDAO.add({
+                action = {
                     "id": uuid4().hex,
                     "id_call_listen": callListenScript["id"],
                     "name": request.form["name_%d_%d" % (i,j)],
-                    "value": request.form["value_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
-                })
+                }
+
+                if action["name"] == "play":
+                    audio = request.files.get("value_%d_%d" % (i,j))
+                    if audio:
+                        filename = werkzeug.utils.secure_filename(audio.filename)
+                        audio.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+                        action["value"] = filename
+                    else:
+                        action["value"] = request.form.get("value_%d_%d" % (i,j))
+                else:
+                    action["value"] = request.form["value_%d_%d" % (i,j)]
+
+                db.ActionDAO.add(action)
+
+                
     except Exception as e:
         print(e)
 
@@ -882,12 +905,22 @@ def edit_post():
 
             for j in range(int(request.form["size_%d" % i])):
                 action = {
-                    "id": request.form["id_%d_%d" % (i,j)],
+                    "id": uuid4().hex,
                     "id_call_listen": callListenScript["id"],
                     "name": request.form["name_%d_%d" % (i,j)],
-                    "value": request.form["value_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
                 }
+
+                if action["name"] == "play":
+                    audio = request.files.get("value_%d_%d" % (i,j))
+                    if audio:
+                        filename = werkzeug.utils.secure_filename(audio.filename)
+                        audio.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+                        action["value"] = filename
+                    else:
+                        action["value"] = request.form.get("value_%d_%d" % (i,j))
+                else:
+                    action["value"] = request.form["value_%d_%d" % (i,j)]
                 
                 if action["id"] == "":
                     action["id"] = uuid4().hex
@@ -916,7 +949,6 @@ def edit_post():
 @login_required
 def campaign_hotline():
     campaignId = request.form["campaign_id"]
-    # numbers = db.TestDialplanDAO.getAllHotlineOfCampaign(campaignId)
     numbers = db.test(campaignId)
 
     numberString = ""
