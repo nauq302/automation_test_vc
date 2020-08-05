@@ -247,7 +247,7 @@ class HotlineDAO:
 
     @staticmethod
     def getServerIP(hotlineNumber):
-        return HotlineDAO.col.find_one({ "hotline_number": hotlineNumber }, { "server_ip": 1 }).get("server_ip")
+        return HotlineDAO.col.find_one({ "hotline_number": hotlineNumber }, { "stagging_ip": 1 }).get("stagging_ip")
 
 #######################################################################
 

@@ -361,6 +361,7 @@ def dependent_test_cases():
     testDialplan = db.TestDialplanDAO.get(testDialplanID)
 
     campaignName = db.TestDialplanDAO.getCampaignName(testDialplanID)
+    hotlineNumber = db.TestDialplanDAO.getHotlineNumber(testDialplanID)
 
     # Get list of ID and Name of Test dialplan
     testDialplanList = db.TestDialplanDAO.getAllIdAndName()
@@ -402,7 +403,8 @@ def dependent_test_cases():
         testDialplanList = testDialplanList,
         testDialplanID = testDialplanID,
         testCaseList = testCaseList,
-        campaignName = campaignName
+        campaignName = campaignName,
+        hotlineNumber = hotlineNumber
     )
 
     return make_response(res)
