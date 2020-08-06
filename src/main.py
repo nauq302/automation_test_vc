@@ -28,7 +28,7 @@ from raven.contrib.flask import Sentry
 import redis
 from functools import wraps
 import redis
-from hashlib import md5
+import hashlib
 from simplejson import load as loads_json
 from simplejson import dumps as dump_json
 from raven.contrib.flask import Sentry
@@ -217,7 +217,7 @@ def login():
 
     else:
         username = request.form.get("username")
-        password = md5(request.form.get("password")).hexdigest()
+        password = hashlib.md5(request.form.get("password")).hexdigest()
         resp, message = db.login(username, password)
     
 
@@ -469,6 +469,30 @@ def remove_dependent_test_case():
 
 import json
 
+# ----------------------------------------------------------------
+# Purpose: Get bytes of media file
+# Input:
+#   file: File path
+# Output: bytes
+# ----------------------------------------------------------------
+def file_as_bytes(file):
+    with file:
+        return file.read()
+
+
+# ----------------------------------------------------------------
+# Purpose: Gen checksum of media file
+# Input:
+#   file_path: File path
+# Output: md5
+# ----------------------------------------------------------------
+def md5sum(file_path):
+    return hashlib.md5(file_as_bytes(open(file_path, 'rb'))).hexdigest()
+
+# ----------------------------------------------------------------
+# Purpose: 
+# Output: 
+# ----------------------------------------------------------------
 @app.route("/run_test_case", methods = ["POST"])
 @login_required
 def run_test_case():
@@ -513,7 +537,16 @@ def run_test_case():
             }
 
             for a in db.ActionDAO.getOfCallListenScript(cl["id"]):
-                callee["script"].append({ a["name"]: a["value"] })
+                if a["name"] == "play":
+                    url = "automation.bizflycloud.vn/audio_files/" + a["value"]
+                    callee["script"].append({ 
+                        a["name"]: {
+                            "url": url,
+                            "md5_sum": md5sum(url) 
+                        } 
+                    })
+                else:
+                    callee["script"].append({ a["name"]: a["value"] })
 
             data["callee_list"].append(callee)
 
