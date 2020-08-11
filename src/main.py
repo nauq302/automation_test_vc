@@ -538,7 +538,7 @@ def run_test_case():
 
             for a in db.ActionDAO.getOfCallListenScript(cl["id"]):
                 if a["name"] == "play":
-                    url = "automation-callcenter.bizflycloud.vn/audio_files/" + a["value"]
+                    url = os.path.dirname(__file__) + "/audio_files/" + a["value"]
                     callee["script"].append({ 
                         a["name"]: {
                             "url": url,
