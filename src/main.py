@@ -798,9 +798,12 @@ def create_test_case_post():
 
                 if action["name"] == "play":
                     audio = request.files.get("value_%d_%d" % (i,j))
+                    print(audio)
+
                     if audio:
                         filename = werkzeug.utils.secure_filename(audio.filename)
-                        audio.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+                        print(filename)
+                        print(audio.save(os.path.join(app.config["UPLOAD_FOLDER"], filename)))
                         action["value"] = filename
                     else:
                         action["value"] = request.form.get("value_%d_%d" % (i,j))
@@ -809,13 +812,12 @@ def create_test_case_post():
 
                 db.ActionDAO.add(action)
 
+        return redirect("/edit_test_case?id=" + id)
                 
     except Exception as e:
         print(e)
-
-    # Back to test case page
-    finally:
         return redirect("/test_case")
+        
 
 #################################################################
 #
@@ -972,11 +974,12 @@ def edit_post():
         
         db.ActionDAO.addMany(actionDialplans)
 
+        return redirect("/edit_test_case?id=" + id)
+
     except Exception as e:
         print(e)
-
-    finally:
-        return redirect("/test_case")
+        return redirect("test_case") 
+        
 
 @app.route("/campaign_hotline", methods=["POST"])
 @login_required

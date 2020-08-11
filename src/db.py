@@ -103,8 +103,12 @@ class TestDialplanDAO:
 
     @staticmethod
     def getCampaignName(id):
-        campaignID = TestDialplanDAO.col.find_one({ "id": id }, { "id_campaign": 1 })["id_campaign"]
-        return CampaignDAO.col.find_one({ "id": campaignID }, { "name": 1 })["name"]
+        campaignID = TestDialplanDAO.col.find_one({ "id": id }, { "id_campaign": 1 }).get("id_campaign")
+
+        if campaignID:
+            return CampaignDAO.col.find_one({ "id": campaignID }, { "name": 1 })["name"]
+        else:
+            return ""
 
     @staticmethod
     def getHotlineNumber(id):
