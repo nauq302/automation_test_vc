@@ -48,6 +48,7 @@
                         <div class="row">
                             <div class="col-sm-4 col-sm-offset-1">
                                 <button type="button" class="btn btn-primary" onclick="runTestCase('{{testDialplanID}}')"><i class="fa fa-play"></i> Run Test Case</button>
+                                {# <button type="button" onclick="test()"></button> #}
                             </div>
                         </div>
 
@@ -61,6 +62,7 @@
                                                 <input type="checkbox" id="select-all" onclick="toggle(this)">
                                                 <label for="select-all">Select All</label>
                                             </th>
+                                            <th>Ưu tiên<br><small>(Số nhỏ sẽ được ưu tiên chạy trước)</small></th>
                                             <th>ID</th>
                                             <th>Tên Test Case</th>
                                             <th>Trạng thái</th>
@@ -75,6 +77,7 @@
                                     <thead class="form-group">
                                         <tr>
                                             <th></th>
+                                            <th>Ưu tiên</th>
                                             <th>ID</th>
                                             <th>Tên Test Case</th>
                                             <th>Trạng thái</th>
@@ -92,7 +95,7 @@
                         <script>
                             tcl = new TestCaseList(document.getElementById('dependent-test-cases-list'));
                             {% for tc in testCaseList %}
-                                tcl.addTestCase("{{tc['id']}}", "{{tc['name']}}", "{{tc['status']}}", {{"true" if tc['checked'] else "false"}}, "{{tc['result']}}");    
+                                tcl.addTestCase("{{tc['id']}}", "{{tc['name']}}", "{{tc['priority'] if tc.get('priority') != None else 1}}", "{{tc['status']}}", {{"true" if tc['checked'] else "false"}}, "{{tc['result']}}");    
                             {% endfor %}
                             
                             function redirect(url) {

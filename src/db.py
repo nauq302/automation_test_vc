@@ -164,11 +164,14 @@ class TestDialplanDAO:
                 "info_test_case.id": testCaseInfo["id"]
             }, { 
                 "$set": {
+                    "info_test_case.$.priority": testCaseInfo["priority"],
                     "info_test_case.$.status": testCaseInfo["status"],
                     "info_test_case.$.result": testCaseInfo["result"],
                 }   
             }
         )
+        
+        print(id, testCaseInfo["id"])
 
     @staticmethod
     def removeTestCaseInfo(id, testCaseInfo):

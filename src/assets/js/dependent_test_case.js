@@ -26,6 +26,7 @@ class UpdateButton {
             data: { 
                 test_dialplan_id: tdid,
                 id: this.parent.id.innerHTML,
+                priority: this.parent.priority.value,
                 status: this.parent.status.value,
                 result: this.parent.result.value
             },
@@ -52,11 +53,13 @@ class SelectCheckbox {
             this.sendRequestAddTestCase();
             this.parent.status.disabled = false;
             this.parent.result.disabled = false;
+            this.parent.priority.disabled = false;
             this.parent.status.setColor();
         } else {
             this.sendRequestRemoveTestCase();
             this.parent.status.disabled = true;
             this.parent.result.disabled = true;
+            this.parent.priority.disabled = true;
             this.parent.update.disabled = true;
             this.parent.status.removeColor();
         }
@@ -139,6 +142,7 @@ class TestCase {
     get name() { return this.tr.getElementsByClassName('name')[0]; }
     get result() { return this.tr.getElementsByClassName('result')[0]; }
     get info() { return this.tr.getElementsByClassName('info')[0]; }
+    get priority() { return this.tr.getElementsByClassName('priority')[0]; }
 
     constructor() {
         this.tr = document.createElement('tr');
@@ -150,6 +154,7 @@ class TestCase {
 
         this.status = new Status(this.tr.getElementsByClassName('status')[0], this);
         this.result.onchange = (() => { this.update.disabled = false; }).bind(this);
+        this.priority.onchange = (() => { this.update.disabled = false; }).bind(this);
 
         this.info.onclick = (() => { 
             location.href = "/info_test_case?test_case_id=" + this.id.innerHTML + "&active=" + this.select.checked + "&test_dialplan_id=" + tdid; 
@@ -162,6 +167,7 @@ class TestCase {
                 <input type="checkbox" class="select">
                 <label>Select</label>
             </td>
+            <td><input type="number" name="priority" class="priority form-control" min="1" step="1"></td>
             <td><span class="id" name="id"></span></td>
             <td><span class="name"></span></td>
             <td>
@@ -175,6 +181,34 @@ class TestCase {
             <td><button type="button" class="info btn btn-primary">Xem</button></td>
         `;
     }
+
+
+    setNewHTML(html) {
+        html.getElementsByClassName('select')[0].checked = this.select.checked;
+
+        html.getElementsByClassName('priority')[0].value = this.priority.value;
+
+
+        html.getElementsByClassName('status')[0].value = this.status.value;
+        
+
+        html.getElementsByClassName('result')[0].value = this.result.value;
+
+        
+    }
+
+    setNewEvent() {
+        this.update = new UpdateButton(this.tr.getElementsByClassName('update')[0], this);
+        this.select = new SelectCheckbox(this.tr.getElementsByClassName('select')[0], this);
+
+        this.status = new Status(this.tr.getElementsByClassName('status')[0], this);
+        this.result.onchange = (() => { this.update.disabled = false; }).bind(this);
+        this.priority.onchange = (() => { this.update.disabled = false; }).bind(this);
+
+        this.info.onclick = (() => { 
+            location.href = "/info_test_case?test_case_id=" + this.id.innerHTML + "&active=" + this.select.checked + "&test_dialplan_id=" + tdid; 
+        }).bind(this);
+    }
 }
 
 class TestCaseList {
@@ -186,11 +220,14 @@ class TestCaseList {
         this.tbody = tbody;
     }
 
-    addTestCase(id, name, status, select, result) {
+    addTestCase(id, name, priority, status, select, result) {
         let tc = new TestCase(tdid);
 
         tc.id.innerHTML = id;
         tc.name.innerHTML = name;
+
+        tc.priority.value = priority;
+        tc.priority.disabled = !select;
 
         tc.status.selectedIndex = Status.dict[status];
         tc.status.disabled = !select;
@@ -207,6 +244,36 @@ class TestCaseList {
         this.tbody.appendChild(tc.tr);
         this.testCaseList.push(tc);
     }
+
+    sort() {
+        this.testCaseList.sort((lhs, rhs) => {
+            if (!lhs.select.checked) {
+                return 1;
+            } else if (!rhs.select.checked) {  
+                return -1; 
+            } else {
+                return lhs.priority.value - rhs.priority.value;
+            }
+        });
+    }
+
+    refactor() {
+        // for (let tc of this.testCaseList) {
+        //     let newRow = document.createElement('tr');
+
+        //     newRow.innerHTML = tc.tr.innerHTML;
+        //     tc.setNewHTML(newRow);
+        //     // newRow.getElementsByClassName('select')[0].checked = tc.select.checked;
+        //     // newRow.getElementsByClassName('priority')[0].value = tc.priority.value;
+        //     // newRow.getElementsByClassName('status')[0].value = tc.status.value;
+        //     // newRow.getElementsByClassName('result')[0].value = tc.result.value;
+
+        //     this.tbody.appendChild(newRow);
+        //     this.tbody.removeChild(tc.tr);
+        //     tc.tr = newRow;
+        //     tc.setNewEvent();
+        // }
+    }
 }
 
 function runTestCase() {
@@ -218,6 +285,8 @@ function runTestCase() {
     let requests = [];
     let len = 0;
     let count = 0;
+
+    tcl.sort();
 
     for (const tc of tcl.testCaseList) {
         if (tc.select.checked) {
@@ -245,4 +314,12 @@ function runTestCase() {
             alert("Chạy Test Case thất bại");
         }
     })
+
+    
+}
+
+
+function test() {
+    tcl.sort();
+    tcl.refactor();
 }

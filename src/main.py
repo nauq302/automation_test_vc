@@ -390,6 +390,7 @@ def dependent_test_cases():
             testCaseList.append({
                 "id": tc["id"],
                 "name": tc["name"],
+                "priority": i.get("priority"),
                 "status": i["status"],
                 "checked": True,
                 "result": i["result"]
@@ -399,6 +400,7 @@ def dependent_test_cases():
             testCaseList.append({
                 "id": tc["id"],
                 "name": tc["name"],
+                "priority": None,
                 "status": "",
                 "checked": False,
                 "result": ""
@@ -426,6 +428,7 @@ def add_dependent_test_case():
 
     infoTestCase = {
         "id": request.form["id"],
+        "priority": request.form["priority"],
         "status": request.form["status"],
         "result": request.form["result"],
     }
@@ -443,10 +446,13 @@ def update_dependent_test_case():
         request.form["test_dialplan_id"],
         {
             "id": request.form["id"],
+            "priority": request.form["priority"],
             "status": request.form["status"],
             "result": request.form["result"],
         }
     )
+
+    print(request.form["priority"])
 
     return "true"
 
