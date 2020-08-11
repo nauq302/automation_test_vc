@@ -45,7 +45,7 @@ app.jinja_env.autoescape = False
 
 app.config["SECRET_KEY"] = config.SECRET_KEY
 app.config["SESSION_COOKIE_DOMAIN"] = config.SESSION_COOKIE_DOMAIN
-app.config["UPLOAD_FOLDER"] = "src/audio_files"
+app.config["UPLOAD_FOLDER"] = "audio_files"
 sentry = Sentry(app)
 #app.jinja_env.add_extension("jinja2.ext.do")
 
@@ -538,7 +538,7 @@ def run_test_case():
 
             for a in db.ActionDAO.getOfCallListenScript(cl["id"]):
                 if a["name"] == "play":
-                    url = "automation.bizflycloud.vn/audio_files/" + a["value"]
+                    url = "automation-callcenter.bizflycloud.vn/audio_files/" + a["value"]
                     callee["script"].append({ 
                         a["name"]: {
                             "url": url,
@@ -798,12 +798,11 @@ def create_test_case_post():
 
                 if action["name"] == "play":
                     audio = request.files.get("value_%d_%d" % (i,j))
-                    print(audio)
 
                     if audio:
                         filename = werkzeug.utils.secure_filename(audio.filename)
-                        print(filename)
-                        print(audio.save(os.path.join(app.config["UPLOAD_FOLDER"], filename)))
+                        filename
+                        audio.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
                         action["value"] = filename
                     else:
                         action["value"] = request.form.get("value_%d_%d" % (i,j))
