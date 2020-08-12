@@ -299,8 +299,8 @@ function runTestCase() {
                     test_dialplan_id: tdid, 
                     test_case_id: tc.id.innerHTML 
                 },
-                success: (response) => { status.push(SUSSESS); ++count; },
-                failure: (response) => { status.push(FAILED); },
+                success: response => { status.push(SUSSESS); ++count; },
+                failure: response => { status.push(FAILED); },
             }));
         } else {
             status.push(NOT_RUN);

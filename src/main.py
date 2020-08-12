@@ -544,11 +544,12 @@ def run_test_case():
 
             for a in db.ActionDAO.getOfCallListenScript(cl["id"]):
                 if a["name"] == "play":
-                    url = os.path.dirname(__file__) + "/audio_files/" + a["value"]
+                    physicsPath = os.path.dirname(__file__) + "/audio_files/" + a["value"]
+                    url = "http://automation-callcenter.bizflycloud.vn/audio_files/" + a["value"]
                     callee["script"].append({ 
                         a["name"]: {
                             "url": url,
-                            "md5_sum": md5sum(url) 
+                            "md5_sum": md5sum(physicsPath) 
                         } 
                     })
                 else:
