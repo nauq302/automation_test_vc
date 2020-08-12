@@ -34,7 +34,7 @@
                             <div class="row">
                                 <label class="col-lg-2 control-label">Tổng đài</label>
                                 <div class="col-lg-4">
-                                    <select name="campaign_id" onchange="changCampaign(this.value)" class="form-control">
+                                    <select name="campaign_id" onchange="" class="form-control">
                                         {% for c in campaigns %}
                                             <option value="{{c['id']}}" {{'selected' if c['id'] == testCase['id_campaign']}}>{{c['name']}}</option>
                                         {% endfor %}
@@ -82,9 +82,9 @@
         </div>
 
         <script type="module">
-            import { CallListenScriptList, ScriptTypeRadios, callees } from "./assets/js/modify_test_case.js";
+            import { CallListenScriptList, ScriptTypeRadios, callees, changCampaign, scriptList } from "./assets/js/modify_test_case.js";
 
-            var scriptList = new CallListenScriptList(document.getElementById("script-list"));
+            scriptList.init(document.getElementById("script-list"));
 
             {% for n in numbers %}
                 callees.push("{{n}}");
@@ -145,6 +145,9 @@
             document.getElementById("add").onclick = () => {
                 scriptList.addScript();
             }
+
+            let select_cid = document.getElementsByName("campaign_id")[0];
+            select_cid.onchange = () => { changCampaign(select_cid.value); }
         </script>
             
     </div>

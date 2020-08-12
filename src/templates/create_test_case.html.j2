@@ -78,9 +78,9 @@
             </div>
         </div>
         <script type="module">
-            import { CallListenScriptList, callees } from "./assets/js/modify_test_case.js";
+            import { CallListenScriptList, ScriptTypeRadios, callees, changCampaign, scriptList } from "./assets/js/modify_test_case.js";
 
-            var scriptList = new CallListenScriptList(document.getElementById("script-list"));
+            scriptList.init(document.getElementById("script-list"));
             scriptList.addScript();
             scriptList.scripts[0].addAction();
 
@@ -99,6 +99,9 @@
             document.getElementById("add").onclick = () => {
                 scriptList.addScript();
             }
+
+            let select_cid = document.getElementsByName("campaign_id")[0];
+            select_cid.onchange = () => { changCampaign(select_cid.value); }
         </script>
 
     </div>

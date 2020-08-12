@@ -120,7 +120,7 @@ class ListenScriptData extends BaseData {
         this.addButton.onclick = (() => { this.addAction(); }).bind(this);
 
         // Set delete button action 
-        this.deleteWidgetButton.onclick = (() => { parent.removeWidget(this); }).bind(this);
+        this.deleteWidgetButton.onclick = (() => { parent.removeCallListen(this); }).bind(this);
     }
 
     setCallScript() {
@@ -237,7 +237,11 @@ export class CallListenScriptList {
     s = 0;
 
     // Create widget list
-    constructor(div) {
+    constructor() {
+        
+    }
+
+    init(div) {
         this.div = div;
     }
 
@@ -273,4 +277,32 @@ export class CallListenScriptList {
     }
 }
 
+export var scriptList = new CallListenScriptList();
 
+export function changCampaign(cid) {
+
+    $.ajax({
+        type: "POST",
+        url: "campaign_hotline",
+        datatype: "json",
+        data: { 
+            campaign_id: cid
+        },
+        success: response => { 
+            callees.length = 0;
+
+            for (let line of response.split("\n")) {
+                callees.push(line);
+            }
+            
+
+            for (let s of scriptList.scripts) {
+                if (s.types.radios[1].checked) {
+                    s.data.refreshPhone();
+                }
+            }
+        },
+    });
+
+    
+}
