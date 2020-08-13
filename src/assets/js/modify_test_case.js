@@ -29,17 +29,23 @@ class CallScriptData extends BaseData {
             <div class="row">
                 <label class="col-sm-2 control-label">Máy nghe dự kiến</label>
                 <div class="col-sm-5">
-                    <input type="text" class="default-callee form-control">
+                    <textarea class="default-callee form-control"></textarea>
                     <small>Mỗi máy cách nhau bởi dấu ,</small>
                 </div>
             </div>
         `;
+
+        this.refreshCallee();
     }
 
     setDataName(count) {
         this.phone.name = 'phone_' + count;
         this.defaultState.name = 'defaultState_' + count;
         this.defaultCallee.name = 'defaultCallee_' + count;
+    }
+
+    refreshCallee() {
+        this.defaultCallee.value = callees.toString();
     }
 }
 
@@ -72,10 +78,10 @@ class ListenScriptData extends BaseData {
             <div class="hr-line-dashed"></div>
         `;
 
-        this.refreshPhone();
+        this.refreshCallee();
     }
 
-    refreshPhone() {
+    refreshCallee() {
         this.phone.innerHTML = "";
         for (let c of callees) {
             let option = document.createElement('option');
@@ -295,11 +301,8 @@ export function changCampaign(cid) {
                 callees.push(line);
             }
             
-
             for (let s of scriptList.scripts) {
-                if (s.types.radios[1].checked) {
-                    s.data.refreshPhone();
-                }
+                s.data.refreshCallee();
             }
         },
     });
