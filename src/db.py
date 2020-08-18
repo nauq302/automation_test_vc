@@ -127,8 +127,19 @@ class TestDialplanDAO:
     def search(searchString, pageIndex, pageSize):
         search_from = (pageIndex - 1) * pageSize
 
+        cids = CampaignDAO.col.distinct("id", { "name": searchOptions(searchString) })
+
         return TestDialplanDAO.col.find({ 
-            "name": searchOptions(searchString) 
+            "$or": [
+                {
+                    "name": searchOptions(searchString)
+                }, { 
+                    "id_campaign": {
+                        "$in": cids
+                    } 
+                }
+            ]
+            
         }).sort([("create_date", -1)]).skip(search_from).limit(pageSize)
 
     @staticmethod
