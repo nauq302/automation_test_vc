@@ -287,25 +287,33 @@ export var scriptList = new CallListenScriptList();
 
 export function changCampaign(cid) {
 
-    $.ajax({
-        type: "POST",
-        url: "campaign_hotline",
-        datatype: "json",
-        data: { 
-            campaign_id: cid
-        },
-        success: response => { 
-            callees.length = 0;
-
-            for (let line of response.split("\n")) {
-                callees.push(line);
-            }
-            
-            for (let s of scriptList.scripts) {
-                s.data.refreshCallee();
-            }
-        },
-    });
+    if (cid != "") {
+        $.ajax({
+            type: "POST",
+            url: "campaign_hotline",
+            datatype: "json",
+            data: { 
+                campaign_id: cid
+            },
+            success: response => { 
+                callees.length = 0;
+    
+                for (let line of response.split("\n")) {
+                    callees.push(line);
+                }
+                
+                for (let s of scriptList.scripts) {
+                    s.data.refreshCallee();
+                }
+            },
+        });
+    } else {
+        callees.length = 0;
+        for (let s of scriptList.scripts) {
+            s.data.refreshCallee();
+        }
+    }
+    
 
     
 }

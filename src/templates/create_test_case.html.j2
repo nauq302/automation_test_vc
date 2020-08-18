@@ -31,7 +31,8 @@
                             <div class="row">
                                 <label class="col-lg-2 control-label">Tổng đài</label>
                                 <div class="col-lg-4">
-                                    <select name="campaign_id" class="form-control">
+                                    <select name="campaign_id" id="campaign_id" class="form-control">
+                                        <option value="">--Chọn Tổng đài--</option>
                                         {% for c in campaigns %}
                                             <option value="{{c['id']}}">{{c['name']}}</option>
                                         {% endfor %}
@@ -84,15 +85,22 @@
             scriptList.addScript();
             scriptList.scripts[0].addAction();
 
-            {% for n in numbers %}
-                callees.push("{{n}}");
-            {% endfor %}
+            let select_cid = document.getElementsByName("campaign_id")[0];
+            select_cid.onchange = () => { 
+                changCampaign(select_cid.value);
+            }
 
             document.getElementById("sm").onclick = () => {
                 scriptList.setDataName();
                 
                 if (confirm("Bạn có chắc mình muốn tạo 1 Test Case như vậy? Hành động này sẽ không thể quay lại")) {
-                    return document.forms["form"].submit();
+                    if (select_cid.value != "") {
+                        return document.forms["form"].submit();
+                    } else {
+                        document.querySelector("#campaign_id").scrollIntoView( {behavior: 'smooth', block: 'end'});
+                        alert("Bạn phải chọn Tổng đài cho Test Case");
+                    }
+                    
                 }    
             }
 
@@ -100,8 +108,7 @@
                 scriptList.addScript();
             }
 
-            let select_cid = document.getElementsByName("campaign_id")[0];
-            select_cid.onchange = () => { changCampaign(select_cid.value); }
+            
         </script>
 
     </div>
