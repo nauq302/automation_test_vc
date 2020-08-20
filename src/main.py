@@ -698,11 +698,19 @@ def test_case():
     count = testCaseList.count()
     page_count = count // test_case.pageSize + (0 if count % test_case.pageSize == 0 else 1)
 
+    testCases = []
+    for tc in testCaseList:
+        testCases.append({
+            "tc": tc, 
+            "cname": 
+            db.TestCaseDAO.getCampaignName(tc["id"])
+        })
+
     # Create response
     res = render_template(
         "test_case.html.j2",
         info_user = g.user,
-        test_case_list = testCaseList,
+        testCases = testCases,
         campaign_id = campaignID,
         campaigns = campaigns,
         page_count = page_count
@@ -724,10 +732,18 @@ def test_cases_list():
     # Get all Test case
     testCaseList = db.TestCaseDAO.getOfCampaign(campaignID, page, test_case.pageSize)
 
+    testCases = []
+    for tc in testCaseList:
+        testCases.append({
+            "tc": tc, 
+            "cname": 
+            db.TestCaseDAO.getCampaignName(tc["id"])
+        })
+
     # Create response
     res = render_template(
         "test_cases_list.html.j2",
-        test_case_list = testCaseList
+        testCases = testCases,
     )
 
     return make_response(res)

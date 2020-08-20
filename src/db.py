@@ -144,10 +144,6 @@ class TestDialplanDAO:
         return testDialplans.count(True), testDialplans.sort([("create_date", -1)]).skip(search_from).limit(pageSize)
 
     @staticmethod
-    def searchCount(searchString):
-        return TestDialplanDAO.col.find({ "name": searchOptions(searchString) }).count(True)
-
-    @staticmethod
     def getAllIdAndName():
         return TestDialplanDAO.col.find({}, { "id": 1, "name": 1 }) 
 
@@ -276,6 +272,15 @@ class TestCaseDAO:
     @staticmethod
     def get(id):
         return TestCaseDAO.col.find_one({ "id": id })
+
+    @staticmethod
+    def getCampaignName(id):
+        campaignID = TestCaseDAO.col.find_one({ "id": id }, { "id_campaign": 1 }).get("id_campaign")
+
+        if campaignID:
+            return CampaignDAO.col.find_one({ "id": campaignID }, { "name": 1 })["name"]
+        else:
+            return ""
 
     @staticmethod
     def getOfTestDialplan(dialplan):
