@@ -129,7 +129,7 @@ class TestDialplanDAO:
 
         cids = CampaignDAO.col.distinct("id", { "name": searchOptions(searchString) })
 
-        return TestDialplanDAO.col.find({ 
+        testDialplans = TestDialplanDAO.col.find({ 
             "$or": [
                 {
                     "name": searchOptions(searchString)
@@ -139,8 +139,9 @@ class TestDialplanDAO:
                     } 
                 }
             ]
-            
-        }).sort([("create_date", -1)]).skip(search_from).limit(pageSize)
+        })
+
+        return testDialplans.count(True), testDialplans.sort([("create_date", -1)]).skip(search_from).limit(pageSize)
 
     @staticmethod
     def searchCount(searchString):

@@ -4,14 +4,10 @@
     <tr class="gradeX">
         <td>{{tc['id']}}</td>
         <td>{{tc['name']}}</td>
-
+        <td></td>
         <td>{{tc['create_date'].date()}}</td>
-        <td>
-            <a onclick="editTestCase(`{{tc['id']}}`)">Edit</a>
-        </td>
-
+        <td><a onclick="editTestCase(`{{tc['id']}}`)">Edit</a></td>
         <td>{{tc['desc']}}</td>
-        
         <td>
             <button onclick="deleteTestCase(`{{tc['id']}}`)">
                 <i class="fa fa-minus"></i>

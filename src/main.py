@@ -265,10 +265,9 @@ def index():
         searchString = ""
 
     # Get dialplans
-    testDialplanList = db.TestDialplanDAO.search(searchString, 1, index.pageSize)
+    count, testDialplanList = db.TestDialplanDAO.search(searchString, 1, index.pageSize)
 
     # Calculate page count
-    count = db.TestDialplanDAO.searchCount(searchString)
     pageCount = count // index.pageSize + (0 if count % index.pageSize == 0 else 1)
 
     # Count passed and total test cases
@@ -318,10 +317,9 @@ def test_dialplans_list():
     searchString = request.form["search"]
 
     # Get dialplans
-    testDialplanList = db.TestDialplanDAO.search(searchString, page, index.pageSize)
-
+    count, testDialplanList= db.TestDialplanDAO.search(searchString, page, index.pageSize)
+    
     # Calculate page count
-    count = db.TestDialplanDAO.searchCount(searchString)
     pageCount = count // index.pageSize + (0 if count % index.pageSize == 0 else 1)
 
     # Count passed and total test cases
