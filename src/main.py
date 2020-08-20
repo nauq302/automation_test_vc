@@ -398,7 +398,7 @@ def dependent_test_cases():
             testCaseList.append({
                 "id": tc["id"],
                 "name": tc["name"],
-                "priority": None,
+                "priority": tc.get("priority"),
                 "status": "",
                 "checked": False,
                 "result": ""
@@ -785,6 +785,7 @@ def create_test_case_post():
             "name": request.form["name"],
             "id_campaign": request.form["campaign_id"],
             "desc": request.form["description"],
+            "priority": request.form["priority"],
             "require": bool(request.form.get("require")),
             "create_date": datetime.datetime.today(),
         }
@@ -926,6 +927,7 @@ def edit_post():
             "name": request.form["name"],
             "id_campaign": request.form["campaign_id"],
             "desc": request.form["description"],
+            "priority": request.form["priority"],
             "require": bool(request.form.get("require")),
             "create_date": datetime.datetime.today(),
             "status": False
@@ -992,7 +994,8 @@ def edit_post():
 
             db.ActionDAO.removeOfCallListenScript(cl["id"])
         
-        db.ActionDAO.addMany(actionDialplans)
+        if actionDialplans:
+            db.ActionDAO.addMany(actionDialplans)
 
         return redirect("/edit_test_case?id=" + id)
 

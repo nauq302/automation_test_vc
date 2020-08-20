@@ -284,7 +284,7 @@ class TestCaseDAO:
 
     @staticmethod
     def getOfTestDialplan(dialplan):
-        return TestCaseDAO.col.find({ "id_campaign": dialplan["id_campaign"] }, { "id": 1, "name": 1 })
+        return TestCaseDAO.col.find({ "id_campaign": dialplan["id_campaign"] }, { "id": 1, "name": 1, "priority": 1 })
 
     @staticmethod
     def add(testCase):
@@ -309,7 +309,8 @@ class TestCaseDAO:
                     "id_campaign": testCase["id_campaign"],
                     "require": testCase["require"], 
                     "create_date": testCase["create_date"],
-                    "desc": testCase["desc"]
+                    "desc": testCase["desc"],
+                    "priority": testCase["priority"]
                 }
             }
         )
