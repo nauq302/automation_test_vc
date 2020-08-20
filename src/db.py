@@ -129,13 +129,6 @@ class TestDialplanDAO:
 
         cids = CampaignDAO.col.distinct("id", { "name": searchOptions(searchString) })
 
-<<<<<<< HEAD
-
-
-=======
-        print(cids)
->>>>>>> 8e62ce1a078b5d4220b202865e7f2b889c0f6667
-
         return TestDialplanDAO.col.find({ 
             "$or": [
                 {
