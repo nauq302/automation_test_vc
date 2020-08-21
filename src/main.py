@@ -785,35 +785,48 @@ def create_test_case_post():
         }
         
         if testCase["require"]:
-            pass
+            tdids = db.TestDialplanDAO.getAllIdOfCampaign(testCase["id_campaign"])
+            for tdid in tdids:
+                db.TestDialplanDAO.addTestCaseInfo(tdid, {
+                    "id": testCase["id"],
+                    "priority": testCase["priority"],
+                    "status": "",
+                    "result": "",
+                })
 
+        
         db.TestCaseDAO.add(testCase)
-
+        
+        
         # Insert call/listen dialplans
         for i in range(int(request.form["size"])):
+            
             callListenScript = {
                 "id": uuid4().hex,
                 "id_test_case": testCase["id"],
                 "type": request.form["type_%d" % i],
                 "machine": request.form["phone_%d" % i]
             }
-
+            
+            
             if callListenScript["type"] == "call":
                 callListenScript["default_state"] = request.form["defaultState_%d" % i]
                 callListenScript["default_callee"] = request.form["defaultCallee_%d" % i].split(",")
             else:
                 callListenScript["ring_time"] = request.form["ringTime_%d" % i]
-
+            
             db.CallListenScriptDAO.add(callListenScript)
-
+            
             # Insert actions
             for j in range(int(request.form["size_%d" % i])):
+                
                 action = {
                     "id": uuid4().hex,
                     "id_call_listen": callListenScript["id"],
                     "name": request.form["name_%d_%d" % (i,j)],
                     "note": request.form["note_%d_%d"% (i,j)],
                 }
+                
 
                 if action["name"] == "play":
                     audio = request.files.get("value_%d_%d" % (i,j))
@@ -830,7 +843,7 @@ def create_test_case_post():
 
                 db.ActionDAO.add(action)
 
-        return redirect("/edit_test_case?id=" + id)
+        return redirect("/edit_test_case?id=" + testCase["id"])
                 
     except Exception as e:
         print(e)
@@ -931,7 +944,14 @@ def edit_post():
         }
 
         if testCase["require"]:
-            pass
+            tdids = db.TestDialplanDAO.getAllIdOfCampaign(testCase["id_campaign"])
+            for tdid in tdids:
+                db.TestDialplanDAO.addTestCaseInfo(tdid, {
+                    "id": testCase["id"],
+                    "priority": testCase["priority"],
+                    "status": "",
+                    "result": "",
+                })
 
         db.TestCaseDAO.update(testCase)
 

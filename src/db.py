@@ -103,6 +103,10 @@ class TestDialplanDAO:
         return TestDialplanDAO.col.find_one({ "id" : id })
 
     @staticmethod
+    def getAllIdOfCampaign(campaignId):
+        return TestDialplanDAO.col.distinct("id", { "id_campaign": campaignId })
+
+    @staticmethod
     def getCampaignName(id):
         campaignID = TestDialplanDAO.col.find_one({ "id": id }, { "id_campaign": 1 }).get("id_campaign")
 
@@ -178,8 +182,7 @@ class TestDialplanDAO:
                 }   
             }
         )
-        
-        print(id, testCaseInfo["id"])
+
 
     @staticmethod
     def removeTestCaseInfo(id, testCaseInfo):
@@ -241,15 +244,15 @@ class TestDialplanDAO:
                 }
             )
 
-        TestDialplanDAO.col.find_one_and_update(
-            { "id": id },
-            { 
-                "$addToSet" : {
-                    "info_test_case": testCaseInfo
+        if not TestDialplanDAO.col.find_one({ "id": id, "info_test_case.id": testCaseInfo["id"] }):
+            TestDialplanDAO.col.find_one_and_update(
+                { "id": id },
+                { 
+                    "$addToSet" : {
+                        "info_test_case": testCaseInfo
+                    }
                 }
-                
-            }
-        )
+            )
     
     @staticmethod
     def setState(id, state):
