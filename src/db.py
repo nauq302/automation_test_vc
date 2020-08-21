@@ -80,7 +80,7 @@ def login(username, password):
 def searchOptions(searchString):
     return { "$regex": "^.*" + searchString + ".*$", "$options": "i" }
 
-
+#######################################################################################################
 
 class CampaignDAO:
     col = db.tbl_campaign
@@ -93,6 +93,7 @@ class CampaignDAO:
     def getName(id):
         return CampaignDAO.col.find_one({ "id": id }, { "name": 1 })["name"]
 
+##############################################################################################################
 
 class TestDialplanDAO:
     col = db.tbl_test_dialplan
@@ -117,7 +118,6 @@ class TestDialplanDAO:
     @staticmethod
     def getAllHotlineOfCampaign(campaignId):
         return TestDialplanDAO.col.distinct("hotline_number", { "id_campaign": campaignId })
-        #return TestDialplanDAO.col.find( { "id_campaign": campaignId }, {"hotline_number": 1})
 
     @staticmethod
     def getName(id):
@@ -444,29 +444,6 @@ class CallListenResultDAO:
 
 #######################################################################
 
-
-#######################################################################
-
-def test(campaignID):
-    campaignName = CampaignDAO.getName(campaignID)
-
-    hotlineIds = HotlineDAO.col.distinct("id", { "exchange": campaignName })
-
-    extensionIds = db.tbl_map_all.distinct(
-        "extension_id", { 
-            "hotline_id": {
-                "$in": hotlineIds
-            } 
-        }
-    )
-
-    return ExtentionDAO.col.distinct(
-        "extension_number", {
-            "id": {
-                "$in": extensionIds
-            }
-        }
-    )
 
 #######################################################################
 

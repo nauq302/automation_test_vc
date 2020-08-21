@@ -433,8 +433,6 @@ def add_dependent_test_case():
 
     db.TestDialplanDAO.addTestCaseInfo(testDialplanId, infoTestCase)
 
-    # db.initCallListenResult(infoTestCase["id"], testDialplanId)
-
     return "true"
 
 @app.route("/update_dependent_test_case", methods = ["POST"])
@@ -449,8 +447,6 @@ def update_dependent_test_case():
             "result": request.form["result"],
         }
     )
-
-    print(request.form["priority"])
 
     return "true"
 
@@ -564,8 +560,6 @@ def run_test_case():
     db.TestDialplanDAO.setState(testDialplanId, "pending")
 
     response = requests.post(api, headers=headers, json=data)
-
-    print(response)
 
     return ""
 
@@ -758,7 +752,7 @@ def test_cases_list():
 def create_test_case_get():
 
     campaigns = db.CampaignDAO.getAllIdAndName()
-    numbers = db.test(campaigns[0]["id"])
+    numbers = db.ExtentionDAO.getAllNumberOfCampaign(campaigns[0]["id"])
 
     res = render_template(
         "create_test_case.html.j2",
@@ -882,7 +876,7 @@ def edit_get():
         testCase = db.TestCaseDAO.get(id)
         clsList = db.CallListenScriptDAO.getOfTestCase(id)
 
-        numbers = db.test(testCase["id_campaign"]) if campaigns.count() > 0 else []
+        numbers = db.ExtentionDAO.getAllNumberOfCampaign(testCase["id_campaign"]) if campaigns.count() > 0 else []
 
         # Get actions for each dialplan
         callListenScripts = []

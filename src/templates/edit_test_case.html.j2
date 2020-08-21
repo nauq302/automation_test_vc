@@ -88,7 +88,7 @@
         </div>
 
         <script type="module">
-            import { CallListenScriptList, ScriptTypeRadios, callees, changCampaign, scriptList } from "./assets/js/modify_test_case.js";
+            import { CallListenScriptList, ScriptTypeRadios, callees, changCampaign, scriptList, CallScriptData } from "./assets/js/modify_test_case.js";
 
             scriptList.init(document.getElementById("script-list"));
 
@@ -109,7 +109,7 @@
                 {% if cld['data']['type'] == 'call' %}
                     item.types.radios[ScriptTypeRadios.CALL].checked = true;
 
-                    item.data.defaultState.value = "{{cld['data']['default_state']}}";
+                    item.data.defaultState.selectedIndex = CallScriptData.defaultStates["{{cld['data']['default_state']}}"];
                     item.data.defaultCallee.value = "{{','.join(cld['data']['default_callee'])}}";
 
                 {% else %}

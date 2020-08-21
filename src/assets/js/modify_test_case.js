@@ -1,7 +1,7 @@
 import { BaseData, Action, ScriptTypeRadios, callees } from './change_test_case.js'
 export { ScriptTypeRadios, callees };
 
-class CallScriptData extends BaseData {
+export class CallScriptData extends BaseData {
 
     constructor(parent, div) {
         super(parent,div);
@@ -19,10 +19,14 @@ class CallScriptData extends BaseData {
             </div>
             <div class="hr-line-dashed"></div>
 
-
             <div class="row">
                 <label class="col-sm-2 control-label">Kết quả dự kiến</label>
-                <div class="col-sm-5"><input type="text" class="default-state form-control"></div>
+                <div class="col-sm-5">
+                    <select class="default-state form-control">
+                        <option value="Success">Success</option>
+                        <option value="Miss">Miss</option>
+                    </select>
+                </div>
             </div>
             <div class="hr-line-dashed"></div>
 
@@ -49,6 +53,12 @@ class CallScriptData extends BaseData {
     }
 }
 
+CallScriptData.defaultStates = {
+    "Success": 0,
+    "success": 0,
+    "Miss": 1,
+    "miss": 1,
+};
 
 
 class ListenScriptData extends BaseData {
