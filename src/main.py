@@ -784,6 +784,9 @@ def create_test_case_post():
             "create_date": datetime.datetime.today(),
         }
         
+        if testCase["require"]:
+            pass
+
         db.TestCaseDAO.add(testCase)
 
         # Insert call/listen dialplans
@@ -916,7 +919,7 @@ def edit_post():
         id = request.form["id"]
 
         # Add new Test Case
-        test_case = {
+        testCase = {
             "id": id,
             "name": request.form["name"],
             "id_campaign": request.form["campaign_id"],
@@ -927,7 +930,10 @@ def edit_post():
             "status": False
         }
 
-        db.TestCaseDAO.update(test_case)
+        if testCase["require"]:
+            pass
+
+        db.TestCaseDAO.update(testCase)
 
         callListenScripts = []
         actionDialplans = []
@@ -936,7 +942,7 @@ def edit_post():
             
             callListenScript = {
                 "id": request.form["id_%d" % i],
-                "id_test_case": test_case["id"],
+                "id_test_case": testCase["id"],
                 "type": request.form["type_%d" % i],
                 
                 "machine": request.form["phone_%d" % i]
@@ -1002,7 +1008,7 @@ def edit_post():
 @login_required
 def campaign_hotline():
     campaignId = request.form["campaign_id"]
-    numbers = db.test(campaignId)
+    numbers = db.ExtentionDAO.getAllNumberOfCampaign(campaignId)
 
     numberString = ""
     for n in numbers:
