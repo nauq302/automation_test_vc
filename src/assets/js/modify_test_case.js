@@ -175,19 +175,7 @@ class ListenScriptData extends BaseData {
 
                 <input type="hidden" class="id">
 
-                <div class="row types">
-                    <label class="col-sm-3 control-label">Chọn loại Kịch bản</label>
-
-                    <label class="col-sm-3 control-label">
-                        <input type="radio" value="call" class="type" checked/>
-                        Kịch bản Gọi
-                    </label>
-
-                    <label class="col-sm-3 control-label">
-                        <input type="radio" value="listen" class="type"/>
-                        Kịch bản Nghe
-                    </label>
-                </div>
+                <div class="row types"></div>
                 <div class="hr-line-dashed"></div>
 
                 <div class="data"></div>

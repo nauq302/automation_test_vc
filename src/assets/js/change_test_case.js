@@ -110,16 +110,14 @@ export class ScriptTypeRadios {
 
     setHTML() {
         this.div.innerHTML = /*html*/`
-            <label class="col-sm-3 control-label">Chọn loại Kịch bản</label>
+            <label class="col-sm-3 control-label">Chọn loại cấu hình</label>
 
             <label class="col-sm-3 control-label">
-                <input type="radio" value="call" class="type" checked/>
-                Kịch bản Gọi
+                <input type="radio" value="call" class="type" checked/>Máy Gọi
             </label>
 
             <label class="col-sm-3 control-label">
-                <input type="radio" value="listen" class="type"/>
-                Kịch bản Nghe
+                <input type="radio" value="listen" class="type"/>Máy Nghe
             </label>
         `;
     }
