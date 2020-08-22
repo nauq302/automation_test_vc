@@ -19,6 +19,7 @@ class UpdateButton {
     set disabled(value) { this.btn.disabled = value; }
 
     sendRequestUpdateTestCase() {
+
         $.ajax({
             type: "POST",
             url: "update_dependent_test_case",
@@ -76,6 +77,7 @@ class SelectCheckbox {
             data: { 
                 test_dialplan_id: tdid, 
                 id: this.parent.id.innerHTML,
+                priority: this.parent.priority.value,
                 status: this.parent.status.value,
                 result: this.parent.result.value
             },
